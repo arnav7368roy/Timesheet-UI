@@ -1,9 +1,9 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function Header() {
+export default function Header({ toggleMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -45,9 +45,27 @@ export default function Header() {
 
   return (
     <header className="topbar">
-      <div>
-        <h2 id="title">{meta.title}</h2>
-        <span className="subtitle">{meta.subtitle}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button 
+          className="mobile-menu-btn" 
+          onClick={toggleMobile}
+          aria-label="Toggle Navigation Menu"
+          style={{
+            background: '#f1f5f9',
+            border: '1px solid #cbd5e1',
+            borderRadius: '8px',
+            padding: '8px',
+            cursor: 'pointer',
+            display: 'none',
+            color: '#1e293b'
+          }}
+        >
+          <Menu size={22} />
+        </button>
+        <div>
+          <h2 id="title">{meta.title}</h2>
+          <span className="subtitle">{meta.subtitle}</span>
+        </div>
       </div>
 
       <div className="top-right">

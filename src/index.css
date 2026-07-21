@@ -1695,68 +1695,81 @@ button:active{
 
 @media(max-width:768px){
 
+.mobile-menu-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out !important;
+    width: 270px !important;
+    display: flex !important;
+}
+
+.sidebar.mobile-open {
+    transform: translateX(0) !important;
+}
+
+.sidebar .logo span,
+.sidebar .menu li a span,
+.sidebar .menu li .menu-link span,
+.sidebar-bottom button span {
+    display: inline !important;
+}
+
+.sidebar-bottom button {
+    font-size: 15px !important;
+}
+
+.sidebar-bottom button i,
+.sidebar-bottom button svg {
+    margin-right: 8px !important;
+}
+
 .cards{
-
     grid-template-columns:1fr;
-
 }
 
 .topbar{
-
-    padding:20px;
-
+    padding:16px 20px;
     height:auto;
-
-    flex-direction:column;
-
-    gap:20px;
-
+    flex-wrap:wrap;
+    gap:16px;
 }
 
 .profile div{
-
     display:none;
-
 }
 
 .table-card{
-
-    margin:20px;
-
+    margin:15px;
 }
 
 .modal-content{
-
     width:96%;
-
 }
 
 }
 
 @media(max-width:480px){
 
-.sidebar{
-
-    display:none;
-
-}
-
 .main{
-
     width:100%;
-
 }
 
 .topbar h2{
-
-    font-size:22px;
-
+    font-size:20px;
 }
 
 .card h1{
-
-    font-size:28px;
-
+    font-size:26px;
 }
 
 }

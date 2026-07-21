@@ -16,7 +16,7 @@ import {
    LogOut 
 } from 'lucide-react';
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen, closeMobile }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,8 +35,13 @@ export default function Sidebar() {
     { path: '/profile', label: 'Profile', icon: User },
   ];
 
+  const handleNavigate = (path) => {
+    navigate(path);
+    if (closeMobile) closeMobile();
+  };
+
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
       <div className="logo">
         <Clock className="logo-icon" size={24} />
         <span>TimeSheet</span>
@@ -48,7 +53,7 @@ export default function Sidebar() {
           return (
             <li key={item.path} className={isActive ? 'active' : ''}>
               <div 
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigate(item.path)}
                 className={`menu-link ${isActive ? 'active' : ''}`}
                 style={{ cursor: 'pointer' }}
               >
@@ -61,7 +66,7 @@ export default function Sidebar() {
       </ul>
 
       <div className="sidebar-bottom">
-        <button className="logout" onClick={logout}>
+        <button className="logout" onClick={() => { logout(); if (closeMobile) closeMobile(); }}>
           <LogOut size={20} className="menu-icon" />
           <span>Logout</span>
         </button>
