@@ -9,13 +9,6 @@ export function AuthProvider({ children }) {
 
   // Check user session
   const checkUserSession = async () => {
-    // If user is directly visiting the login page, skip calling /auth/me on initial load
-    if (typeof window !== 'undefined' && window.location.pathname.includes('/login')) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await apiRequest('/auth/me');
       if (response && response.ok && response.data && (response.data.status || response.data.data)) {
