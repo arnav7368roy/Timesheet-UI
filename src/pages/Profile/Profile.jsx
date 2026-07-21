@@ -19,11 +19,12 @@ import {
   X,
   Camera,
   Building,
-  Award
+  Award,
+  LogOut
 } from 'lucide-react';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   // Active Tab State: 'personal', 'job', 'financial', 'leaves', 'documents'
   const [activeTab, setActiveTab] = useState('personal');
@@ -217,7 +218,7 @@ export default function Profile() {
           </div>
 
           {/* Quick Action Buttons */}
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button 
               onClick={() => setShowEditModal(true)}
               style={{
@@ -254,6 +255,25 @@ export default function Profile() {
               }}
             >
               <Key size={16} /> Change Password
+            </button>
+            <button 
+              onClick={logout}
+              style={{
+                background: '#ef4444',
+                color: '#ffffff',
+                border: 'none',
+                padding: '10px 18px',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)'
+              }}
+            >
+              <LogOut size={16} /> Logout
             </button>
           </div>
         </div>
