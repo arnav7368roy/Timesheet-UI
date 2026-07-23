@@ -1,12 +1,14 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Header({ toggleMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   // Map pathnames to Titles and Subtitles
   const getPageMeta = (pathname) => {
@@ -43,6 +45,12 @@ export default function Header({ toggleMobile }) {
   const roleName = user?.roleName || 'Employee';
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=2563eb&color=fff`;
 
+  const isDarkMode = theme === 'Dark' || (theme === 'System' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const toggleTheme = () => {
+    setTheme(isDarkMode ? 'Light' : 'Dark');
+  };
+
   return (
     <header className="topbar">
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -51,13 +59,13 @@ export default function Header({ toggleMobile }) {
           onClick={toggleMobile}
           aria-label="Toggle Navigation Menu"
           style={{
-            background: '#f1f5f9',
-            border: '1px solid #cbd5e1',
+            background: 'var(--bg)',
+            border: '1px solid var(--border)',
             borderRadius: '8px',
             padding: '8px',
             cursor: 'pointer',
             display: 'none',
-            color: '#1e293b'
+            color: 'var(--text)'
           }}
         >
           <Menu size={22} />
@@ -74,7 +82,16 @@ export default function Header({ toggleMobile }) {
           <input type="text" placeholder="Search..." />
         </div>
 
-        <button className="notification">
+        <button 
+          className="notification" 
+          onClick={toggleTheme} 
+          title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle Dark Mode"
+        >
+          {isDarkMode ? <Sun size={18} style={{ color: '#fbbf24' }} /> : <Moon size={18} />}
+        </button>
+
+        <button className="notification" aria-label="Notifications">
           <Bell size={18} />
         </button>
 

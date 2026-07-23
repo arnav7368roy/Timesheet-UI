@@ -42,7 +42,12 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
 
   return (
     <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
-      <div className="logo">
+      <div 
+        className="logo" 
+        onClick={() => handleNavigate('/')} 
+        style={{ cursor: 'pointer' }}
+        title="Go to Home / Dashboard"
+      >
         <Clock className="logo-icon" size={24} />
         <span>TimeSheet</span>
       </div>
