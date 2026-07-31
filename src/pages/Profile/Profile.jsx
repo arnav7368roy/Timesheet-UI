@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../utils/api';
 import { 
@@ -8,19 +8,14 @@ import {
   FileText, 
   Calendar, 
   Key, 
-  Mail, 
-  Phone, 
-  MapPin, 
   ShieldCheck, 
   Edit3, 
   Download, 
   CheckCircle, 
-  Clock, 
   X,
   Camera,
-  Building,
-  Award,
-  LogOut
+  LogOut,
+  RefreshCw
 } from 'lucide-react';
 
 export default function Profile() {
@@ -29,16 +24,39 @@ export default function Profile() {
   // Active Tab State: 'personal', 'job', 'financial', 'leaves', 'documents'
   const [activeTab, setActiveTab] = useState('personal');
 
+  // Profile data from backend
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   // Edit Personal Details Modal State
   const [showEditModal, setShowEditModal] = useState(false);
+  const [savingPersonal, setSavingPersonal] = useState(false);
   const [personalForm, setPersonalForm] = useState({
-    mobileNumber: user?.mobileNumber || '',
-    personalEmail: user?.personalEmail || 'user@example.com',
-    dob: user?.dob || '1995-08-15',
-    gender: user?.gender || 'Male',
-    bloodGroup: user?.bloodGroup || 'O+',
-    emergencyContact: user?.emergencyContact || '+91 98765 43210',
-    address: user?.address || '123 Tech Park Avenue, Silicon Valley, CA'
+    personalEmail: '',
+    alternateMobile: '',
+    dob: '',
+    gender: 'Male',
+    bloodGroup: '',
+    emergencyContactName: '',
+    emergencyContactRelation: '',
+    emergencyContactPhone: '',
+    presentAddress: '',
+    permanentAddress: '',
+  });
+
+  // Edit Statutory Modal State (Admin Only)
+  const [showAdminEditModal, setShowAdminEditModal] = useState(false);
+  const [savingAdmin, setSavingAdmin] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
+    panNumber: '',
+    uanNumber: '',
+    esiNumber: '',
+    employmentType: 'Full-Time',
+    workLocation: 'Head Office',
+    dateOfJoining: ''
   });
   
   // Change Password Modal state
@@ -49,7 +67,52 @@ export default function Profile() {
   const [modalSuccess, setModalSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!user) {
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await apiRequest('/profile/me');
+      if (res.ok && res.data && res.data.status && res.data.data) {
+        const p = res.data.data;
+        setProfileData(p);
+
+        // Pre-fill forms
+        setPersonalForm({
+          personalEmail: p.profile?.personalEmail || '',
+          alternateMobile: p.profile?.alternateMobile || '',
+          dob: p.profile?.dob || '',
+          gender: p.profile?.gender || 'Male',
+          bloodGroup: p.profile?.bloodGroup || '',
+          emergencyContactName: p.profile?.emergencyContactName || '',
+          emergencyContactRelation: p.profile?.emergencyContactRelation || '',
+          emergencyContactPhone: p.profile?.emergencyContactPhone || '',
+          presentAddress: p.profile?.presentAddress || '',
+          permanentAddress: p.profile?.permanentAddress || '',
+        });
+
+        setAdminForm({
+          bankName: p.profile?.bankName || '',
+          accountNumber: p.profile?.accountNumber || '',
+          ifscCode: p.profile?.ifscCode || '',
+          panNumber: p.profile?.panNumber || '',
+          uanNumber: p.profile?.uanNumber || '',
+          esiNumber: p.profile?.esiNumber || '',
+          employmentType: p.profile?.employmentType || 'Full-Time',
+          workLocation: p.profile?.workLocation || 'Head Office',
+          dateOfJoining: p.profile?.dateOfJoining || '',
+        });
+      }
+    } catch (err) {
+      console.error('Fetch profile error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  if (loading && !profileData) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
         <div className="loader"></div>
@@ -57,20 +120,23 @@ export default function Profile() {
     );
   }
 
+  const p = profileData?.profile || {};
+  const isAdmin = profileData?.roleCode === 'ADMIN';
+
   const userDetails = {
-    firstName: user.firstName || 'User',
-    lastName: user.lastName || '',
-    email: user.email || 'N/A',
-    mobile: personalForm.mobileNumber || user.mobileNumber || 'N/A',
-    role: user.roleName || 'Employee',
-    roleCode: user.roleCode || 'EMPLOYEE',
-    department: user.departmentName || 'Information Technology',
-    designation: user.designationName || 'Software Engineer',
-    reportingManager: user.reportingManagerName || 'System Admin',
-    employeeCode: user.employeeCode || 'EMP001',
-    joiningDate: user.joiningDate || '2023-01-15',
-    workLocation: user.workLocation || 'Headquarters (Main Office)',
-    employmentType: user.employmentType || 'Full-Time',
+    firstName: profileData?.firstName || user?.firstName || 'User',
+    lastName: profileData?.lastName || user?.lastName || '',
+    email: profileData?.email || user?.email || 'N/A',
+    mobile: profileData?.mobileNumber || user?.mobileNumber || 'N/A',
+    role: profileData?.roleName || user?.roleName || 'Employee',
+    roleCode: profileData?.roleCode || user?.roleCode || 'EMPLOYEE',
+    department: profileData?.departmentName || 'Product Development',
+    designation: profileData?.designationName || 'Software Engineer',
+    reportingManager: profileData?.reportingManager || 'System Admin',
+    employeeCode: profileData?.employeeCode || 'EMP0001',
+    joiningDate: p.dateOfJoining || '2024-01-15',
+    workLocation: p.workLocation || 'Head Office',
+    employmentType: p.employmentType || 'Full-Time',
   };
 
   const handleChangePassword = async (e) => {
@@ -88,7 +154,7 @@ export default function Profile() {
     setModalSuccess('');
     try {
       const res = await apiRequest('/auth/forgot-password', 'POST', {
-        email: user.email,
+        email: userDetails.email,
         password: newPassword,
         confirmPassword: confirmPassword,
       });
@@ -110,32 +176,64 @@ export default function Profile() {
     }
   };
 
-  const handleSavePersonal = (e) => {
+  const handleSavePersonal = async (e) => {
     e.preventDefault();
-    setShowEditModal(false);
-    alert('Personal details updated successfully!');
+    setSavingPersonal(true);
+    try {
+      const res = await apiRequest('/profile/me', 'PATCH', personalForm);
+      if (res.ok && res.data && res.data.status) {
+        setShowEditModal(false);
+        fetchProfile();
+      } else {
+        alert(res.data?.message || 'Failed to update personal profile');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error saving personal profile');
+    } finally {
+      setSavingPersonal(false);
+    }
+  };
+
+  const handleSaveAdmin = async (e) => {
+    e.preventDefault();
+    setSavingAdmin(true);
+    try {
+      const res = await apiRequest(`/profile/${userDetails.id}`, 'PATCH', adminForm);
+      if (res.ok && res.data && res.data.status) {
+        setShowAdminEditModal(false);
+        fetchProfile();
+      } else {
+        alert(res.data?.message || 'Failed to update statutory details');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating statutory profile');
+    } finally {
+      setSavingAdmin(false);
+    }
   };
 
   return (
     <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', paddingBottom: '40px' }}>
       
-      {/* 1. ENTERPRISE HERO HEADER CARD */}
+      {/* 1. HERO PROFILE CARD */}
       <div style={{
-        background: '#ffffff',
+        background: 'var(--white)',
         borderRadius: '16px',
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
         boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         overflow: 'hidden',
         marginBottom: '24px'
       }}>
-        {/* Cover Graphic */}
+        {/* Banner */}
         <div style={{
           height: '130px',
           background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e40af 100%)',
           position: 'relative'
         }} />
 
-        {/* Profile Details Bar */}
+        {/* Details Bar */}
         <div style={{
           padding: '20px 32px 24px',
           display: 'flex',
@@ -143,17 +241,17 @@ export default function Profile() {
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '20px',
-          background: '#ffffff'
+          background: 'var(--white)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-            {/* Avatar with Upload Badge */}
+            {/* Avatar */}
             <div style={{ position: 'relative', marginTop: '-60px' }}>
               <div style={{
                 width: '105px',
                 height: '105px',
                 borderRadius: '20px',
-                background: '#ffffff',
-                color: '#1e293b',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -164,32 +262,12 @@ export default function Profile() {
               }}>
                 {userDetails.firstName[0]}{userDetails.lastName[0] || ''}
               </div>
-              <button 
-                title="Change Avatar"
-                style={{
-                  position: 'absolute',
-                  bottom: '2px',
-                  right: '2px',
-                  background: '#3b82f6',
-                  color: '#ffffff',
-                  border: '2px solid #ffffff',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer'
-                }}
-              >
-                <Camera size={14} />
-              </button>
             </div>
 
-            {/* Employee Name & Job Meta */}
+            {/* Employee Header */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em' }}>
+                <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: '800', color: 'var(--text)', letterSpacing: '-0.02em' }}>
                   {userDetails.firstName} {userDetails.lastName}
                 </h1>
                 <span style={{
@@ -207,24 +285,24 @@ export default function Profile() {
                   <CheckCircle size={12} /> Active ({userDetails.employmentType})
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginTop: '8px', fontSize: '0.9rem', color: '#64748b', fontWeight: '500', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginTop: '8px', fontSize: '0.9rem', color: 'var(--text-light)', fontWeight: '500', flexWrap: 'wrap' }}>
                 <span><strong>Designation:</strong> {userDetails.designation}</span>
                 <span>•</span>
                 <span><strong>Dept:</strong> {userDetails.department}</span>
                 <span>•</span>
-                <span><strong>Emp ID:</strong> <code style={{ background: '#f1f5f9', padding: '2px 8px', borderRadius: '4px', color: '#0f172a', fontWeight: '700' }}>{userDetails.employeeCode}</code></span>
+                <span><strong>Emp ID:</strong> <code style={{ background: 'var(--bg)', padding: '2px 8px', borderRadius: '4px', color: 'var(--text)', fontWeight: '700' }}>{userDetails.employeeCode}</code></span>
               </div>
             </div>
           </div>
 
-          {/* Quick Action Buttons */}
+          {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button 
               onClick={() => setShowEditModal(true)}
               style={{
-                background: '#f8fafc',
-                color: '#334155',
-                border: '1px solid #cbd5e1',
+                background: 'var(--bg)',
+                color: 'var(--text)',
+                border: '1px solid var(--border)',
                 padding: '10px 18px',
                 borderRadius: '8px',
                 fontSize: '0.875rem',
@@ -237,6 +315,29 @@ export default function Profile() {
             >
               <Edit3 size={16} /> Edit Profile
             </button>
+            
+            {isAdmin && (
+              <button 
+                onClick={() => setShowAdminEditModal(true)}
+                style={{
+                  background: '#8b5cf6',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '10px 18px',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 2px 4px rgba(139, 92, 246, 0.25)'
+                }}
+              >
+                <ShieldCheck size={16} /> Edit Statutory (Admin)
+              </button>
+            )}
+
             <button 
               onClick={() => setShowPasswordModal(true)}
               style={{
@@ -278,12 +379,12 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* HRMS Standard Navigation Tabs */}
+        {/* HRMS Tabs */}
         <div style={{
           display: 'flex',
-          borderTop: '1px solid #f1f5f9',
+          borderTop: '1px solid var(--border)',
           padding: '0 24px',
-          background: '#f8fafc',
+          background: 'var(--bg)',
           overflowX: 'auto'
         }}>
           {[
@@ -303,7 +404,7 @@ export default function Profile() {
                   padding: '14px 20px',
                   border: 'none',
                   background: 'transparent',
-                  color: isActive ? '#3b82f6' : '#64748b',
+                  color: isActive ? '#3b82f6' : 'var(--text-light)',
                   fontWeight: isActive ? '700' : '600',
                   fontSize: '0.9rem',
                   borderBottom: isActive ? '3px solid #3b82f6' : '3px solid transparent',
@@ -329,7 +430,7 @@ export default function Profile() {
         <div className="table-card" style={{ padding: '32px' }}>
           <div style={sectionHeaderStyle}>
             <User size={20} style={{ color: '#3b82f6' }} />
-            <h3 style={{ margin: 0 }}>Personal & Contact Details</h3>
+            <h3 style={{ margin: 0, color: 'var(--text)' }}>Personal & Contact Details</h3>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -337,12 +438,16 @@ export default function Profile() {
             <FieldBox label="Last Name" value={userDetails.lastName || 'N/A'} />
             <FieldBox label="Work Email Address" value={userDetails.email} />
             <FieldBox label="Mobile Number" value={userDetails.mobile} />
-            <FieldBox label="Personal Email" value={personalForm.personalEmail} />
-            <FieldBox label="Date of Birth" value={personalForm.dob} />
-            <FieldBox label="Gender" value={personalForm.gender} />
-            <FieldBox label="Blood Group" value={personalForm.bloodGroup} />
-            <FieldBox label="Emergency Contact" value={personalForm.emergencyContact} />
-            <FieldBox label="Permanent Address" value={personalForm.address} fullWidth />
+            <FieldBox label="Personal Email" value={p.personalEmail || 'Not Provided'} />
+            <FieldBox label="Alternate Mobile" value={p.alternateMobile || 'Not Provided'} />
+            <FieldBox label="Date of Birth" value={p.dob || 'Not Provided'} />
+            <FieldBox label="Gender" value={p.gender || 'Not Provided'} />
+            <FieldBox label="Blood Group" value={p.bloodGroup || 'Not Provided'} />
+            <FieldBox label="Emergency Contact Name" value={p.emergencyContactName || 'Not Provided'} />
+            <FieldBox label="Emergency Relation" value={p.emergencyContactRelation || 'Not Provided'} />
+            <FieldBox label="Emergency Contact Phone" value={p.emergencyContactPhone || 'Not Provided'} />
+            <FieldBox label="Present Address" value={p.presentAddress || 'Not Provided'} fullWidth />
+            <FieldBox label="Permanent Address" value={p.permanentAddress || 'Not Provided'} fullWidth />
           </div>
         </div>
       )}
@@ -352,7 +457,7 @@ export default function Profile() {
         <div className="table-card" style={{ padding: '32px' }}>
           <div style={sectionHeaderStyle}>
             <Briefcase size={20} style={{ color: '#10b981' }} />
-            <h3 style={{ margin: 0 }}>Work & Employment Information</h3>
+            <h3 style={{ margin: 0, color: 'var(--text)' }}>Work & Employment Information</h3>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -360,9 +465,9 @@ export default function Profile() {
             <FieldBox label="Department" value={userDetails.department} />
             <FieldBox label="Designation / Job Title" value={userDetails.designation} />
             <FieldBox label="Reporting Manager" value={userDetails.reportingManager} />
-            <FieldBox label="Date of Joining" value={userDetails.joiningDate} />
-            <FieldBox label="Employment Type" value={userDetails.employmentType} />
-            <FieldBox label="Primary Work Location" value={userDetails.workLocation} />
+            <FieldBox label="Date of Joining" value={p.dateOfJoining || userDetails.joiningDate} />
+            <FieldBox label="Employment Type" value={p.employmentType || userDetails.employmentType} />
+            <FieldBox label="Primary Work Location" value={p.workLocation || userDetails.workLocation} />
             <FieldBox label="System Role & Security Access" value={userDetails.role} />
           </div>
         </div>
@@ -373,16 +478,16 @@ export default function Profile() {
         <div className="table-card" style={{ padding: '32px' }}>
           <div style={sectionHeaderStyle}>
             <CreditCard size={20} style={{ color: '#8b5cf6' }} />
-            <h3 style={{ margin: 0 }}>Bank Account & Statutory Information</h3>
+            <h3 style={{ margin: 0, color: 'var(--text)' }}>Bank Account & Statutory Information</h3>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-            <FieldBox label="Bank Name" value="HDFC Bank Ltd." />
-            <FieldBox label="Account Number" value="•••• •••• 5849" />
-            <FieldBox label="IFSC Code" value="HDFC0001234" />
-            <FieldBox label="PAN Card Number" value="ABCDE1234F" />
-            <FieldBox label="UAN / Provident Fund No." value="101234567890" />
-            <FieldBox label="ESI Registration No." value="3100123456" />
+            <FieldBox label="Bank Name" value={p.bankName || 'Not Set'} />
+            <FieldBox label="Account Number" value={p.accountNumber ? `•••• •••• ${p.accountNumber.slice(-4)}` : 'Not Set'} />
+            <FieldBox label="IFSC Code" value={p.ifscCode || 'Not Set'} />
+            <FieldBox label="PAN Card Number" value={p.panNumber || 'Not Set'} />
+            <FieldBox label="UAN / Provident Fund No." value={p.uanNumber || 'Not Set'} />
+            <FieldBox label="ESI Registration No." value={p.esiNumber || 'Not Set'} />
           </div>
         </div>
       )}
@@ -392,7 +497,7 @@ export default function Profile() {
         <div className="table-card" style={{ padding: '32px' }}>
           <div style={sectionHeaderStyle}>
             <Calendar size={20} style={{ color: '#ea580c' }} />
-            <h3 style={{ margin: 0 }}>Leave Allocation & Balances</h3>
+            <h3 style={{ margin: 0, color: 'var(--text)' }}>Leave Allocation & Balances</h3>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
@@ -409,36 +514,35 @@ export default function Profile() {
         <div className="table-card" style={{ padding: '32px' }}>
           <div style={sectionHeaderStyle}>
             <FileText size={20} style={{ color: '#06b6d4' }} />
-            <h3 style={{ margin: 0 }}>Employee Document Vault</h3>
+            <h3 style={{ margin: 0, color: 'var(--text)' }}>Employee Document Vault</h3>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {[
-              { title: 'Employment Contract & Offer Letter', date: 'Jan 15, 2023', size: '1.2 MB' },
-              { title: 'PAN & Aadhaar ID Verification Proof', date: 'Jan 16, 2023', size: '850 KB' },
-              { title: 'Highest Educational Degree Certificate', date: 'Jan 16, 2023', size: '2.4 MB' },
-              { title: 'Previous Company Relieving Letter', date: 'Jan 17, 2023', size: '1.1 MB' },
+              { title: 'Employment Contract & Offer Letter', date: 'Jan 15, 2024', size: '1.2 MB' },
+              { title: 'PAN & Identity Proof', date: 'Jan 16, 2024', size: '850 KB' },
+              { title: 'Educational Qualification Certificate', date: 'Jan 16, 2024', size: '2.4 MB' },
             ].map((doc, idx) => (
               <div key={idx} style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '16px 20px',
-                background: '#f8fafc',
+                background: 'var(--bg)',
                 borderRadius: '10px',
-                border: '1px solid #e2e8f0'
+                border: '1px solid var(--border)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <FileText size={24} style={{ color: '#3b82f6' }} />
                   <div>
-                    <strong style={{ display: 'block', fontSize: '0.95rem', color: '#1e293b' }}>{doc.title}</strong>
-                    <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Uploaded on {doc.date} • {doc.size}</span>
+                    <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--text)' }}>{doc.title}</strong>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Uploaded on {doc.date} • {doc.size}</span>
                   </div>
                 </div>
                 <button 
                   style={{
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--white)',
+                    border: '1px solid var(--border)',
                     padding: '8px 14px',
                     borderRadius: '6px',
                     fontSize: '0.85rem',
@@ -462,7 +566,7 @@ export default function Profile() {
       {/* EDIT PERSONAL MODAL */}
       {showEditModal && (
         <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content">
+          <div className="modal-content" style={{ maxWidth: '650px' }}>
             <div className="modal-header">
               <h2>Edit Personal Details</h2>
               <span onClick={() => setShowEditModal(false)}><X size={20} /></span>
@@ -470,16 +574,16 @@ export default function Profile() {
             <form onSubmit={handleSavePersonal}>
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Mobile Number</label>
-                  <input value={personalForm.mobileNumber} onChange={e => setPersonalForm({ ...personalForm, mobileNumber: e.target.value })} required />
+                  <label>Personal Email</label>
+                  <input type="email" value={personalForm.personalEmail} onChange={e => setPersonalForm({ ...personalForm, personalEmail: e.target.value })} />
                 </div>
                 <div className="form-group">
-                  <label>Personal Email</label>
-                  <input type="email" value={personalForm.personalEmail} onChange={e => setPersonalForm({ ...personalForm, personalEmail: e.target.value })} required />
+                  <label>Alternate Mobile</label>
+                  <input value={personalForm.alternateMobile} onChange={e => setPersonalForm({ ...personalForm, alternateMobile: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Date of Birth</label>
-                  <input type="date" value={personalForm.dob} onChange={e => setPersonalForm({ ...personalForm, dob: e.target.value })} required />
+                  <input type="date" value={personalForm.dob} onChange={e => setPersonalForm({ ...personalForm, dob: e.target.value })} />
                 </div>
                 <div className="form-group">
                   <label>Gender</label>
@@ -491,20 +595,97 @@ export default function Profile() {
                 </div>
                 <div className="form-group">
                   <label>Blood Group</label>
-                  <input value={personalForm.bloodGroup} onChange={e => setPersonalForm({ ...personalForm, bloodGroup: e.target.value })} />
+                  <input value={personalForm.bloodGroup} onChange={e => setPersonalForm({ ...personalForm, bloodGroup: e.target.value })} placeholder="e.g. O+" />
                 </div>
                 <div className="form-group">
-                  <label>Emergency Contact</label>
-                  <input value={personalForm.emergencyContact} onChange={e => setPersonalForm({ ...personalForm, emergencyContact: e.target.value })} />
+                  <label>Emergency Contact Name</label>
+                  <input value={personalForm.emergencyContactName} onChange={e => setPersonalForm({ ...personalForm, emergencyContactName: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>Emergency Relation</label>
+                  <input value={personalForm.emergencyContactRelation} onChange={e => setPersonalForm({ ...personalForm, emergencyContactRelation: e.target.value })} placeholder="e.g. Spouse / Brother" />
+                </div>
+                <div className="form-group">
+                  <label>Emergency Phone</label>
+                  <input value={personalForm.emergencyContactPhone} onChange={e => setPersonalForm({ ...personalForm, emergencyContactPhone: e.target.value })} />
+                </div>
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label>Present Address</label>
+                  <input value={personalForm.presentAddress} onChange={e => setPersonalForm({ ...personalForm, presentAddress: e.target.value })} />
                 </div>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label>Permanent Address</label>
-                  <input value={personalForm.address} onChange={e => setPersonalForm({ ...personalForm, address: e.target.value })} />
+                  <input value={personalForm.permanentAddress} onChange={e => setPersonalForm({ ...personalForm, permanentAddress: e.target.value })} />
                 </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="cancel" onClick={() => setShowEditModal(false)}>Cancel</button>
-                <button type="submit" className="save">Save Details</button>
+                <button type="submit" className="save" disabled={savingPersonal}>
+                  {savingPersonal ? 'Saving...' : 'Save Personal Details'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT STATUTORY MODAL (ADMIN ONLY) */}
+      {showAdminEditModal && (
+        <div className="modal" style={{ display: 'flex' }}>
+          <div className="modal-content" style={{ maxWidth: '650px' }}>
+            <div className="modal-header">
+              <h2>Edit Statutory & Financial Info (Admin)</h2>
+              <span onClick={() => setShowAdminEditModal(false)}><X size={20} /></span>
+            </div>
+            <form onSubmit={handleSaveAdmin}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Bank Name</label>
+                  <input value={adminForm.bankName} onChange={e => setAdminForm({ ...adminForm, bankName: e.target.value })} placeholder="e.g. HDFC Bank Ltd." />
+                </div>
+                <div className="form-group">
+                  <label>Account Number</label>
+                  <input value={adminForm.accountNumber} onChange={e => setAdminForm({ ...adminForm, accountNumber: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>IFSC Code</label>
+                  <input value={adminForm.ifscCode} onChange={e => setAdminForm({ ...adminForm, ifscCode: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>PAN Number</label>
+                  <input value={adminForm.panNumber} onChange={e => setAdminForm({ ...adminForm, panNumber: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>UAN Number</label>
+                  <input value={adminForm.uanNumber} onChange={e => setAdminForm({ ...adminForm, uanNumber: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>ESI Number</label>
+                  <input value={adminForm.esiNumber} onChange={e => setAdminForm({ ...adminForm, esiNumber: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>Employment Type</label>
+                  <select value={adminForm.employmentType} onChange={e => setAdminForm({ ...adminForm, employmentType: e.target.value })}>
+                    <option value="Full-Time">Full-Time</option>
+                    <option value="Part-Time">Part-Time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Intern">Intern</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Work Location</label>
+                  <input value={adminForm.workLocation} onChange={e => setAdminForm({ ...adminForm, workLocation: e.target.value })} />
+                </div>
+                <div className="form-group">
+                  <label>Date of Joining</label>
+                  <input type="date" value={adminForm.dateOfJoining} onChange={e => setAdminForm({ ...adminForm, dateOfJoining: e.target.value })} />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="cancel" onClick={() => setShowAdminEditModal(false)}>Cancel</button>
+                <button type="submit" className="save" disabled={savingAdmin}>
+                  {savingAdmin ? 'Saving...' : 'Save Statutory Info'}
+                </button>
               </div>
             </form>
           </div>
@@ -564,37 +745,37 @@ export default function Profile() {
 const FieldBox = ({ label, value, highlighted, fullWidth }) => (
   <div style={{
     gridColumn: fullWidth ? 'span 2' : 'span 1',
-    background: '#f8fafc',
+    background: 'var(--bg)',
     borderRadius: '10px',
     padding: '16px',
-    border: '1px solid #e2e8f0'
+    border: '1px solid var(--border)'
   }}>
-    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: '#64748b', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
+    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: 'var(--text-light)', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
       {label}
     </span>
-    <span style={{ fontSize: '1.05rem', fontWeight: '700', color: highlighted ? '#3b82f6' : '#0f172a' }}>
-      {value || 'N/A'}
+    <span style={{ fontSize: '1.05rem', fontWeight: '700', color: highlighted ? '#3b82f6' : 'var(--text)' }}>
+      {value || 'Not Set'}
     </span>
   </div>
 );
 
 const BalanceCard = ({ title, allocated, used, color }) => (
   <div style={{
-    background: '#ffffff',
+    background: 'var(--white)',
     borderRadius: '12px',
-    border: '1px solid #e2e8f0',
+    border: '1px solid var(--border)',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
   }}>
-    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#475569' }}>{title}</span>
+    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>{title}</span>
     <div style={{ margin: '14px 0 10px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
       <span style={{ fontSize: '1.8rem', fontWeight: '800', color }}>{allocated - used}</span>
-      <span style={{ fontSize: '0.85rem', color: '#64748b' }}>/ {allocated} Days Left</span>
+      <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>/ {allocated} Days Left</span>
     </div>
-    <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '6px', background: 'var(--bg)', borderRadius: '3px', overflow: 'hidden' }}>
       <div style={{ width: `${((allocated - used) / allocated) * 100}%`, height: '100%', background: color }} />
     </div>
   </div>
@@ -604,7 +785,7 @@ const sectionHeaderStyle = {
   display: 'flex',
   alignItems: 'center',
   gap: '12px',
-  borderBottom: '1px solid #f1f5f9',
+  borderBottom: '1px solid var(--border)',
   paddingBottom: '16px',
   marginBottom: '24px'
 };
