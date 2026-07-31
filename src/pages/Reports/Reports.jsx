@@ -183,7 +183,9 @@ export default function Reports() {
           render: (row) => <span style={{ fontWeight: '700', color: row.remaining > 0 ? '#10b981' : '#ef4444' }}>{row.remaining}</span>
         },
       ];
+    }
   };
+
 
   return (
 
