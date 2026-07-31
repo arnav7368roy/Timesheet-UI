@@ -93,10 +93,16 @@ export default function Calendar() {
         // Fallback default holidays if backend table is empty
         setHolidays([
           { id: 1, title: 'Independence Day', date: '2026-08-15', type: 'National Holiday' },
-          { id: 2, title: 'Mahatma Gandhi Jayanti', date: '2026-10-02', type: 'National Holiday' },
-          { id: 3, title: 'Diwali', date: '2026-11-08', type: 'Company Holiday' },
-          { id: 4, title: 'Christmas Day', date: '2026-12-25', type: 'National Holiday' },
+          { id: 2, title: 'Raksha Bandhan', date: '2026-08-28', type: 'Restricted Holiday' },
+          { id: 3, title: 'Mahatma Gandhi Jayanti', date: '2026-10-02', type: 'National Holiday' },
+          { id: 4, title: 'Dussehra', date: '2026-10-20', type: 'National Holiday' },
+          { id: 5, title: 'Diwali', date: '2026-11-08', type: 'National Holiday' },
+          { id: 6, title: 'Govardhan', date: '2026-11-09', type: 'Company Holiday' },
+          { id: 7, title: 'Bhai Dooj', date: '2026-11-10', type: 'Company Holiday' },
+          { id: 8, title: 'Guru Nanak Jayanti', date: '2026-11-24', type: 'Restricted Holiday' },
+          { id: 9, title: 'Christmas', date: '2026-12-25', type: 'National Holiday' },
         ]);
+
       }
     } catch (e) {
       console.error('Failed to fetch holidays:', e);
