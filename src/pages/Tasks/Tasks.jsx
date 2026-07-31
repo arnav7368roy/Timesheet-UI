@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/Tables/Tables';
-import { CheckSquare, RefreshCw, X, Eye, Edit2, Trash2 } from 'lucide-react';
+import { CheckSquare, RefreshCw, X, Eye, Edit2, Trash2, Download } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -19,7 +19,9 @@ export default function Tasks() {
   // Modal Logs state
   const [showLogsModal, setShowLogsModal] = useState(false);
   const [selectedTaskLogs, setSelectedTaskLogs] = useState([]);
+  const [selectedTask, setSelectedTask] = useState(null);
   const [logsLoading, setLogsLoading] = useState(false);
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -225,11 +227,12 @@ export default function Tasks() {
   };
 
   // Logs Modal
-  const openLogsModal = async (taskId) => {
+  const openLogsModal = async (task) => {
+    setSelectedTask(task);
     setShowLogsModal(true);
     setLogsLoading(true);
     try {
-      const res = await apiRequest(`/tasks/logs/${taskId}`);
+      const res = await apiRequest(`/tasks/logs/${task.id}`);
       if (res.ok && res.data) {
         setSelectedTaskLogs(res.data.data || []);
       }
@@ -240,13 +243,54 @@ export default function Tasks() {
     }
   };
 
+  const handleExportTaskLogsExcel = () => {
+    try {
+      if (!selectedTaskLogs || selectedTaskLogs.length === 0) {
+        alert('No logs available to export.');
+        return;
+      }
+
+      const headers = ['Task Title', 'Project Name', 'Action', 'User', 'Date & Time'].join('\t');
+      const rows = selectedTaskLogs.map(log => {
+        const taskTitle = selectedTask?.title || '';
+        const projName = selectedTask?.projectName || '';
+        const action = log.action || '';
+        const user = log.userName || log.userId || '';
+        const dateTime = log.actionAt ? new Date(log.actionAt).toLocaleString() : '';
+
+        return [
+          `"${taskTitle.replace(/"/g, '""')}"`,
+          `"${projName.replace(/"/g, '""')}"`,
+          `"${action.replace(/"/g, '""')}"`,
+          `"${user.replace(/"/g, '""')}"`,
+          `"${dateTime.replace(/"/g, '""')}"`
+        ].join('\t');
+      });
+
+      const excelContent = '\uFEFF' + [headers, ...rows].join('\n');
+      const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      const cleanTitle = (selectedTask?.title || 'task').toLowerCase().replace(/[^a-z0-9]/g, '_');
+      a.download = `task_logs_${cleanTitle}_${new Date().toISOString().slice(0,10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (e) {
+      console.error('Export Task Logs Excel error:', e);
+      alert('Error downloading Excel file');
+    }
+  };
+
   const renderActionButtons = (task) => {
     const isManagerOrAdmin = user?.roleCode === 'MANAGER' || user?.roleCode === 'ADMIN';
 
     const getPrimaryAction = () => {
       if (isManagerOrAdmin) {
         return (
-          <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task.id)}>
+          <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
             <Eye size={14} />
           </button>
         );
@@ -288,7 +332,7 @@ export default function Tasks() {
           );
         case 'COMPLETED':
           return (
-            <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task.id)}>
+            <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
               <Eye size={14} />
             </button>
           );
@@ -470,60 +514,91 @@ export default function Tasks() {
 
       {/* Logs Modal */}
       {showLogsModal && (
-        <div className="modal" style={{ display: 'flex' }}>
-          <div className="modal-content" style={{ maxWidth: '800px', width: '90%' }}>
-            <div className="modal-header">
-              <h2>Task Action Logs</h2>
-              <span onClick={() => setShowLogsModal(false)}><X size={20} /></span>
+        <div className="modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(15, 23, 42, 0.65)' }}>
+          <div className="modal-content" style={{ maxWidth: '750px', width: '92%', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+            <div className="modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>Task Action Logs</h2>
+                {selectedTask && (
+                  <span style={{ fontSize: '0.825rem', color: '#64748b', fontWeight: '500' }}>
+                    {selectedTask.title} ({selectedTask.projectName})
+                  </span>
+                )}
+              </div>
+              <span onClick={() => setShowLogsModal(false)} style={{ cursor: 'pointer', color: '#64748b' }}><X size={20} /></span>
             </div>
 
-            <div style={{ padding: '20px', maxHeight: '400px', overflowY: 'auto' }}>
+            <div style={{ padding: '20px 24px', maxHeight: '420px', overflowY: 'auto' }}>
               {logsLoading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '30px' }}>
                   <div className="loader"></div>
                 </div>
               ) : selectedTaskLogs.length === 0 ? (
-                <p>No action logs found for this task.</p>
+                <p style={{ color: '#64748b', textAlign: 'center', padding: '20px' }}>No action logs found for this task.</p>
               ) : (
-                <table className="logs-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 8px' }}>Action</th>
-                      <th style={{ padding: '12px 8px' }}>User</th>
-                      <th style={{ padding: '12px 8px' }}>Date & Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedTaskLogs.map((log, idx) => {
-                      const getStyle = (action) => {
-                        const act = action?.toUpperCase();
-                        if (act === 'START' || act === 'RESUME') {
-                          return { backgroundColor: '#22c55e', color: '#ffffff', borderRadius: '30px', padding: '4px 10px', fontSize: '11px', fontWeight: '600', display: 'inline-block' };
-                        } else if (act === 'PAUSE') {
-                          return { backgroundColor: '#f59e0b', color: '#ffffff', borderRadius: '30px', padding: '4px 10px', fontSize: '11px', fontWeight: '600', display: 'inline-block' };
-                        } else if (act === 'COMPLETE' || act === 'COMPLETED') {
-                          return { backgroundColor: '#16a34a', color: '#ffffff', borderRadius: '30px', padding: '4px 10px', fontSize: '11px', fontWeight: '600', display: 'inline-block' };
-                        }
-                        return { backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '30px', padding: '4px 10px', fontSize: '11px', fontWeight: '600', display: 'inline-block' };
-                      };
-                      return (
-                        <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '12px 8px' }}>
-                            <span style={getStyle(log.action)}>
-                              {log.action}
-                            </span>
-                          </td>
-                          <td style={{ padding: '12px 8px' }}>{log.userName || log.userId}</td>
-                          <td style={{ padding: '12px 8px' }}>{new Date(log.actionAt).toLocaleString()}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="logs-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '550px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', backgroundColor: '#f8fafc' }}>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700', width: '130px' }}>Action</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700' }}>User</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Date & Time</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedTaskLogs.map((log, idx) => {
+                        const getStyle = (action) => {
+                          const act = action?.toUpperCase();
+                          if (act === 'START' || act === 'RESUME') {
+                            return { backgroundColor: '#dbeafe', color: '#1d4ed8', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
+                          } else if (act === 'PAUSE') {
+                            return { backgroundColor: '#fef3c7', color: '#b45309', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
+                          } else if (act === 'COMPLETE' || act === 'COMPLETED') {
+                            return { backgroundColor: '#dcfce7', color: '#15803d', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
+                          }
+                          return { backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
+                        };
+                        return (
+                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={getStyle(log.action)}>
+                                {log.action}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px 16px', fontWeight: '600', color: '#334155' }}>{log.userName || log.userId}</td>
+                            <td style={{ padding: '12px 16px', color: '#64748b', whiteSpace: 'nowrap' }}>
+                              {new Date(log.actionAt).toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 
-            <div className="modal-footer">
+            <div className="modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={handleExportTaskLogsExcel}
+                disabled={selectedTaskLogs.length === 0}
+                style={{
+                  background: selectedTaskLogs.length > 0 ? '#10b981' : '#cbd5e1',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontWeight: '600',
+                  fontSize: '0.85rem',
+                  cursor: selectedTaskLogs.length > 0 ? 'pointer' : 'not-allowed',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Download size={16} /> Export Excel
+              </button>
               <button type="button" className="cancel" onClick={() => setShowLogsModal(false)}>Close</button>
             </div>
           </div>
