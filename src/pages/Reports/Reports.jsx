@@ -12,14 +12,19 @@ import {
   Search,
   Filter
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../utils/api';
 import DataTable from '../../components/Tables/Tables';
 
 export default function Reports() {
+  const { user } = useAuth();
+  const isEmployee = user?.roleCode === 'EMPLOYEE';
+
   const [activeReport, setActiveReport] = useState('attendance'); // 'attendance', 'timesheet', 'project', 'leave'
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
   
   // Date Range Filters
   const [startDate, setStartDate] = useState('');
@@ -157,9 +162,28 @@ export default function Reports() {
         },
       ];
     }
-  };
+  if (isEmployee) {
+    return (
+      <div style={{
+        padding: '40px',
+        textAlign: 'center',
+        background: '#ffffff',
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
+        margin: '20px auto',
+        maxWidth: '500px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+      }}>
+        <h2 style={{ color: '#ef4444', marginBottom: '12px', fontWeight: '800' }}>Access Restricted</h2>
+        <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
+          Reports and analytics are restricted to Managers and Admins.
+        </p>
+      </div>
+    );
+  }
 
   return (
+
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', paddingBottom: '30px' }}>
       
       {/* Top Header Controls */}

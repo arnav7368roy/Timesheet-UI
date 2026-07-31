@@ -17,9 +17,11 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar({ mobileOpen, closeMobile }) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isEmployee = user?.roleCode === 'EMPLOYEE';
 
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,10 +32,11 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
     { path: '/leave', label: 'Leave', icon: FileText },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
-    { path: '/reports', label: 'Reports', icon: BarChart3 },
+    ...(!isEmployee ? [{ path: '/reports', label: 'Reports', icon: BarChart3 }] : []),
     { path: '/settings', label: 'Settings', icon: Settings },
     { path: '/profile', label: 'Profile', icon: User },
   ];
+
 
   const handleNavigate = (path) => {
     navigate(path);
