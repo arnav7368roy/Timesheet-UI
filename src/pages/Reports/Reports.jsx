@@ -64,14 +64,12 @@ export default function Reports() {
 
   const handleExportCSV = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-      const url = `${backendUrl}/reports/export-csv?reportType=${activeReport}`;
+      const API_BASE = 'https://timesheet-2-e5cr.onrender.com/api/v1';
+      const url = `${API_BASE}/reports/export-csv?reportType=${activeReport}`;
       
       const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        method: 'GET',
+        credentials: 'include',
       });
       
       if (response.ok) {
