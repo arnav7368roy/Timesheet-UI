@@ -61,7 +61,7 @@ export default function Reports() {
     fetchReportData();
   }, [activeReport, startDate, endDate]);
 
-  const handleExportCSV = () => {
+  const handleExportExcel = () => {
     try {
       if (!filteredData || filteredData.length === 0) {
         alert('No data available to export.');
@@ -69,32 +69,32 @@ export default function Reports() {
       }
 
       const columns = getColumns();
-      const headers = columns.map(col => `"${col.header}"`).join(',');
+      const headers = columns.map(col => `"${col.header}"`).join('\t');
       
       const rows = filteredData.map(row => {
         return columns.map(col => {
           let val = row[col.accessor];
           if (val === null || val === undefined) val = '';
           return `"${String(val).replace(/"/g, '""')}"`;
-        }).join(',');
+        }).join('\t');
       });
 
-      const csvContent = [headers, ...rows].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      // BOM header \uFEFF ensures Microsoft Excel opens UTF-8 characters cleanly
+      const excelContent = '\uFEFF' + [headers, ...rows].join('\n');
+      const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `${activeReport}_report_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `${activeReport}_report_${new Date().toISOString().slice(0,10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
     } catch (e) {
-      console.error('Export CSV error:', e);
-      alert('Error downloading CSV file');
+      console.error('Export Excel error:', e);
+      alert('Error downloading Excel file');
     }
   };
-
 
   // Filter Data by Search Term
   const filteredData = reportData.filter(item => {
@@ -126,6 +126,32 @@ export default function Reports() {
         { header: 'PROJECT NAME', accessor: 'projectName' },
         { header: 'TASK TITLE', accessor: 'taskTitle' },
         { 
+          header: 'LOG ACTION', 
+          accessor: 'logAction',
+          render: (row) => {
+            const action = (row.logAction || 'PENDING').toUpperCase();
+            let bg = '#f1f5f9';
+            let color = '#475569';
+            if (action === 'START') { bg = '#dbeafe'; color = '#1d4ed8'; }
+            else if (action === 'PAUSE') { bg = '#fef3c7'; color = '#b45309'; }
+            else if (action === 'RESUME') { bg = '#e0e7ff'; color = '#4338ca'; }
+            else if (action === 'COMPLETE' || action === 'COMPLETED') { bg = '#dcfce7'; color = '#15803d'; }
+            return (
+              <span style={{
+                background: bg,
+                color: color,
+                padding: '4px 10px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                fontSize: '0.75rem'
+              }}>
+                {action}
+              </span>
+            );
+          }
+        },
+        { header: 'LOG TIME', accessor: 'actionTime' },
+        { 
           header: 'TASK STATUS', 
           accessor: 'taskStatus',
           render: (row) => (
@@ -147,6 +173,7 @@ export default function Reports() {
           render: (row) => <span style={{ fontWeight: '700', color: '#3b82f6' }}>{row.totalLoggedHours} hrs</span>
         },
       ];
+
 
     } else if (activeReport === 'project') {
       return [
@@ -288,7 +315,7 @@ export default function Reports() {
         </div>
 
         <button
-          onClick={handleExportCSV}
+          onClick={handleExportExcel}
           style={{
             background: '#10b981',
             color: '#ffffff',
@@ -304,7 +331,7 @@ export default function Reports() {
             boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)'
           }}
         >
-          <Download size={18} /> Export CSV
+          <Download size={18} /> Export Excel
         </button>
       </div>
 
