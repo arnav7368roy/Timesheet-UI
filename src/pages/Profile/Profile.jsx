@@ -134,7 +134,7 @@ export default function Profile() {
     designation: profileData?.designationName || 'Software Engineer',
     reportingManager: profileData?.reportingManager || 'System Admin',
     employeeCode: profileData?.employeeCode || 'EMP0001',
-    joiningDate: p.dateOfJoining || '2024-01-15',
+    joiningDate: p.dateOfJoining || profileData?.createdAt || '2024-01-15',
     workLocation: p.workLocation || 'Head Office',
     employmentType: p.employmentType || 'Full-Time',
   };
