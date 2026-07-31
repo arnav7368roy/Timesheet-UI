@@ -516,16 +516,23 @@ export default function Tasks() {
       {showLogsModal && (
         <div className="modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(15, 23, 42, 0.65)' }}>
           <div className="modal-content" style={{ maxWidth: '750px', width: '92%', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
-            <div className="modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>Task Action Logs</h2>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a', lineHeight: '1.3' }}>Task Action Logs</h2>
                 {selectedTask && (
-                  <span style={{ fontSize: '0.825rem', color: '#64748b', fontWeight: '500' }}>
-                    {selectedTask.title} ({selectedTask.projectName})
-                  </span>
+                  <div style={{ fontSize: '0.875rem', color: '#475569', fontWeight: '500', marginTop: '4px' }}>
+                    {selectedTask.title} <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'normal', display: 'inline', width: 'auto', height: 'auto', borderRadius: '0' }}>({selectedTask.projectName})</span>
+                  </div>
                 )}
               </div>
-              <span onClick={() => setShowLogsModal(false)} style={{ cursor: 'pointer', color: '#64748b' }}><X size={20} /></span>
+              <button
+                type="button"
+                onClick={() => setShowLogsModal(false)}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '-2px' }}
+                title="Close"
+              >
+                <X size={20} color="#64748b" />
+              </button>
             </div>
 
             <div style={{ padding: '20px 24px', maxHeight: '420px', overflowY: 'auto' }}>
