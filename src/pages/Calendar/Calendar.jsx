@@ -25,7 +25,11 @@ export default function Calendar() {
   const [activeTab, setActiveTab] = useState('calendar'); // 'calendar', 'holidays', 'shifts'
   
   // Date Navigation State
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 6, 1)); // Default July 2026
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Attendance Map State for Calendar Grid
+  const [attendanceMap, setAttendanceMap] = useState({});
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
 
   // Holidays State
   const [holidays, setHolidays] = useState([]);
@@ -62,6 +66,22 @@ export default function Calendar() {
     shiftId: '1',
     effectiveFrom: ''
   });
+
+  const fetchCalendarAttendance = async () => {
+    setLoadingAttendance(true);
+    try {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      const res = await apiRequest(`/attendance/calendar?year=${year}&month=${month}`);
+      if (res.ok && res.data && res.data.data) {
+        setAttendanceMap(res.data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch calendar attendance:', e);
+    } finally {
+      setLoadingAttendance(false);
+    }
+  };
 
   const fetchHolidays = async () => {
     setLoadingHolidays(true);
@@ -110,10 +130,12 @@ export default function Calendar() {
   useEffect(() => {
     fetchHolidays();
     fetchShifts();
+    fetchCalendarAttendance();
     if (isAdmin) {
       fetchUsers();
     }
   }, [currentDate]);
+
 
   // Calendar Grid Calculation
   const getDaysInMonth = (date) => {
@@ -334,13 +356,14 @@ export default function Calendar() {
                 const dayNum = i + 1;
                 const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
                 const matchedHoliday = holidays.find(h => h.date === dateStr);
+                const dayAttendance = attendanceMap[dateStr];
                 const isSunday = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNum).getDay() === 0;
 
                 return (
                   <div key={dayNum} style={{
                     height: '70px',
-                    background: matchedHoliday ? '#fff7ed' : isSunday ? '#fef2f2' : '#ffffff',
-                    border: matchedHoliday ? '1px solid #ffedd5' : '1px solid #e2e8f0',
+                    background: matchedHoliday ? '#fff7ed' : isSunday ? '#fef2f2' : dayAttendance ? '#f0fdf4' : '#ffffff',
+                    border: matchedHoliday ? '1px solid #ffedd5' : dayAttendance ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
                     borderRadius: '8px',
                     padding: '8px',
                     display: 'flex',
@@ -356,12 +379,28 @@ export default function Calendar() {
                         {matchedHoliday.title}
                       </span>
                     )}
-                    {isSunday && !matchedHoliday && (
+                    {dayAttendance && !matchedHoliday && (
+                      <span style={{
+                        fontSize: '0.65rem',
+                        background: dayAttendance.status === 'PRESENT' ? '#16a34a' : dayAttendance.status === 'HALF_DAY' ? '#ca8a04' : '#2563eb',
+                        color: '#ffffff',
+                        padding: '2px 4px',
+                        borderRadius: '4px',
+                        fontWeight: '600',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {dayAttendance.status === 'PRESENT' ? `${dayAttendance.workingHours}h` : dayAttendance.status}
+                      </span>
+                    )}
+                    {isSunday && !matchedHoliday && !dayAttendance && (
                       <span style={{ fontSize: '0.65rem', color: '#ef4444', fontWeight: '600' }}>Weekend</span>
                     )}
                   </div>
                 );
               })}
+
             </div>
           </div>
 
