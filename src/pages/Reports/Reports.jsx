@@ -7,7 +7,6 @@ import {
   Calendar as CalendarIcon, 
   Users, 
   Clock, 
-  CheckCircle,
   Briefcase,
   Search,
   Filter
@@ -18,7 +17,7 @@ import DataTable from '../../components/Tables/Tables';
 
 export default function Reports() {
   const { user } = useAuth();
-  const isEmployee = user?.roleCode === 'EMPLOYEE';
+
 
   const [activeReport, setActiveReport] = useState('attendance'); // 'attendance', 'timesheet', 'project', 'leave'
   const [reportData, setReportData] = useState([]);
