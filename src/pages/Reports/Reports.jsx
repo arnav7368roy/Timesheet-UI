@@ -120,12 +120,30 @@ export default function Reports() {
         { header: 'EMP CODE', accessor: 'employeeCode' },
         { header: 'EMPLOYEE NAME', accessor: 'employeeName' },
         { header: 'PROJECT NAME', accessor: 'projectName' },
+        { header: 'TASK TITLE', accessor: 'taskTitle' },
+        { 
+          header: 'TASK STATUS', 
+          accessor: 'taskStatus',
+          render: (row) => (
+            <span style={{
+              background: row.taskStatus === 'COMPLETED' ? '#dcfce7' : '#fef3c7',
+              color: row.taskStatus === 'COMPLETED' ? '#15803d' : '#b45309',
+              padding: '4px 8px',
+              borderRadius: '6px',
+              fontWeight: '600',
+              fontSize: '0.75rem'
+            }}>
+              {row.taskStatus}
+            </span>
+          )
+        },
         { 
           header: 'LOGGED HOURS', 
           accessor: 'totalLoggedHours',
           render: (row) => <span style={{ fontWeight: '700', color: '#3b82f6' }}>{row.totalLoggedHours} hrs</span>
         },
       ];
+
     } else if (activeReport === 'project') {
       return [
         { header: 'PROJECT CODE', accessor: 'projectCode' },
