@@ -346,9 +346,27 @@ export default function Reports() {
               Showing {filteredData.length} records
             </span>
           </div>
-          <button onClick={fetchReportData} className="refresh" style={{ padding: '8px 12px' }}>
+          <button
+            onClick={fetchReportData}
+            style={{
+              background: '#3b82f6',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '8px 16px',
+              fontWeight: '600',
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.2s',
+              boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)'
+            }}
+          >
             <RefreshCw size={16} /> Refresh
           </button>
+
         </div>
 
         <DataTable
