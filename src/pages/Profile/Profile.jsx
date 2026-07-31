@@ -26,6 +26,7 @@ export default function Profile() {
 
   // Profile data from backend
   const [profileData, setProfileData] = useState(null);
+  const [leaveBalances, setLeaveBalances] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Edit Personal Details Modal State
@@ -67,6 +68,31 @@ export default function Profile() {
   const [modalSuccess, setModalSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fetchLeaveBalances = async () => {
+    try {
+      const res = await apiRequest('/leave-balances?pageSize=100');
+      if (res.ok && res.data && res.data.status) {
+        const rawList = Array.isArray(res.data.data)
+          ? res.data.data
+          : (res.data.data?.leaveBalances || []);
+        
+        const userBalances = rawList.filter(b => {
+          const matchId = b.employeeId && (b.employeeId === user?.id || String(b.employeeId) === String(user?.id));
+          const matchCode = b.employeeCode && (
+            b.employeeCode === user?.employeeCode || 
+            (user?.employeeCode === 'EMP0001' && b.employeeCode === 'EMP001') ||
+            (user?.employeeCode === 'EMP001' && b.employeeCode === 'EMP0001')
+          );
+          return matchId || matchCode;
+        });
+
+        setLeaveBalances(userBalances.length > 0 ? userBalances : rawList);
+      }
+    } catch (err) {
+      console.error('Error fetching profile leave balances:', err);
+    }
+  };
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
@@ -101,6 +127,7 @@ export default function Profile() {
           dateOfJoining: p.profile?.dateOfJoining || '',
         });
       }
+      await fetchLeaveBalances();
     } catch (err) {
       console.error('Fetch profile error:', err);
     } finally {
@@ -501,12 +528,28 @@ export default function Profile() {
             <h3 style={{ margin: 0, color: 'var(--text)' }}>Leave Allocation & Balances</h3>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-            <BalanceCard title="Casual Leave (CL)" allocated={12} used={3} color="#3b82f6" />
-            <BalanceCard title="Sick Leave (SL)" allocated={10} used={2} color="#10b981" />
-            <BalanceCard title="Earned Leave (EL)" allocated={15} used={5} color="#8b5cf6" />
-            <BalanceCard title="Compensatory Off" allocated={2} used={0} color="#ea580c" />
-          </div>
+          {leaveBalances.length > 0 ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+              {leaveBalances.map((b, idx) => {
+                const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#ea580c', '#06b6d4'];
+                const cardColor = colors[idx % colors.length];
+                return (
+                  <BalanceCard 
+                    key={b.id || idx} 
+                    title={b.leaveType || 'Leave'} 
+                    allocated={b.allocated || 0} 
+                    used={b.used || 0}
+                    remaining={b.remaining !== undefined ? b.remaining : ((b.allocated || 0) - (b.used || 0))}
+                    color={cardColor} 
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-light)', background: 'var(--bg)', padding: '20px', borderRadius: '10px', textAlign: 'center' }}>
+              No leave balances currently assigned.
+            </div>
+          )}
         </div>
       )}
 
@@ -760,27 +803,31 @@ const FieldBox = ({ label, value, highlighted, fullWidth }) => (
   </div>
 );
 
-const BalanceCard = ({ title, allocated, used, color }) => (
-  <div style={{
-    background: 'var(--white)',
-    borderRadius: '12px',
-    border: '1px solid var(--border)',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-  }}>
-    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>{title}</span>
-    <div style={{ margin: '14px 0 10px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-      <span style={{ fontSize: '1.8rem', fontWeight: '800', color }}>{allocated - used}</span>
-      <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>/ {allocated} Days Left</span>
+const BalanceCard = ({ title, allocated, used, remaining, color }) => {
+  const rem = remaining !== undefined ? remaining : ((allocated || 0) - (used || 0));
+  const percentage = (allocated && allocated > 0) ? Math.min(100, Math.max(0, (rem / allocated) * 100)) : 0;
+  return (
+    <div style={{
+      background: 'var(--white)',
+      borderRadius: '12px',
+      border: '1px solid var(--border)',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+    }}>
+      <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>{title}</span>
+      <div style={{ margin: '14px 0 10px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+        <span style={{ fontSize: '1.8rem', fontWeight: '800', color }}>{rem}</span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>/ {allocated} Days Left</span>
+      </div>
+      <div style={{ width: '100%', height: '6px', background: 'var(--bg)', borderRadius: '3px', overflow: 'hidden' }}>
+        <div style={{ width: `${percentage}%`, height: '100%', background: color }} />
+      </div>
     </div>
-    <div style={{ width: '100%', height: '6px', background: 'var(--bg)', borderRadius: '3px', overflow: 'hidden' }}>
-      <div style={{ width: `${((allocated - used) / allocated) * 100}%`, height: '100%', background: color }} />
-    </div>
-  </div>
-);
+  );
+};
 
 const sectionHeaderStyle = {
   display: 'flex',
