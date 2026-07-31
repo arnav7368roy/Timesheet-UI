@@ -61,33 +61,40 @@ export default function Reports() {
     fetchReportData();
   }, [activeReport, startDate, endDate]);
 
-  const handleExportCSV = async () => {
+  const handleExportCSV = () => {
     try {
-      const API_BASE = 'https://timesheet-2-e5cr.onrender.com/api/v1';
-      const url = `${API_BASE}/reports/export-csv?reportType=${activeReport}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `${activeReport}_report_${new Date().toISOString().slice(0,10)}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      } else {
-        alert('Failed to export report CSV');
+      if (!filteredData || filteredData.length === 0) {
+        alert('No data available to export.');
+        return;
       }
+
+      const columns = getColumns();
+      const headers = columns.map(col => `"${col.header}"`).join(',');
+      
+      const rows = filteredData.map(row => {
+        return columns.map(col => {
+          let val = row[col.accessor];
+          if (val === null || val === undefined) val = '';
+          return `"${String(val).replace(/"/g, '""')}"`;
+        }).join(',');
+      });
+
+      const csvContent = [headers, ...rows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `${activeReport}_report_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (e) {
       console.error('Export CSV error:', e);
       alert('Error downloading CSV file');
     }
   };
+
 
   // Filter Data by Search Term
   const filteredData = reportData.filter(item => {
