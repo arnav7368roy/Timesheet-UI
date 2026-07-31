@@ -124,6 +124,7 @@ export default function Profile() {
   const isAdmin = profileData?.roleCode === 'ADMIN';
 
   const userDetails = {
+    id: profileData?.id || user?.id || '',
     firstName: profileData?.firstName || user?.firstName || 'User',
     lastName: profileData?.lastName || user?.lastName || '',
     email: profileData?.email || user?.email || 'N/A',
