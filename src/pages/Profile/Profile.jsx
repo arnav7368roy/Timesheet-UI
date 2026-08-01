@@ -72,7 +72,31 @@ export default function Profile() {
 
   const fetchLeaveBalances = async (targetId, targetCode) => {
     try {
+      let typesList = [
+        { id: 'cl', leaveName: 'Casual Leave', leaveCode: 'CL', yearlyAllocation: 12 },
+        { id: 'el', leaveName: 'Earned Leave', leaveCode: 'EL', yearlyAllocation: 15 },
+        { id: 'shl', leaveName: 'Short Leave', leaveCode: 'SHL', yearlyAllocation: 12 },
+        { id: 'co', leaveName: 'Comp Off', leaveCode: 'CO', yearlyAllocation: 0 },
+        { id: 'wfh', leaveName: 'Work From Home', leaveCode: 'WFH', yearlyAllocation: 0 },
+        { id: 'lop', leaveName: 'Loss Of Pay', leaveCode: 'LOP', yearlyAllocation: 0 }
+      ];
+
+      try {
+        const resTypes = await apiRequest('/leave-types?pageSize=100');
+        if (resTypes.ok && resTypes.data && resTypes.data.status) {
+          const fetchedTypes = Array.isArray(resTypes.data.data) 
+            ? resTypes.data.data 
+            : (resTypes.data.data?.leaveTypes || []);
+          if (fetchedTypes.length > 0) {
+            typesList = fetchedTypes;
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching leave types list:', err);
+      }
+
       const res = await apiRequest('/leave-balances?pageSize=100');
+      let userBalances = [];
       if (res.ok && res.data && res.data.status) {
         const rawList = Array.isArray(res.data.data)
           ? res.data.data
@@ -81,7 +105,7 @@ export default function Profile() {
         const effectiveId = targetId || userId || user?.id;
         const effectiveCode = targetCode || user?.employeeCode;
 
-        const userBalances = rawList.filter(b => {
+        userBalances = rawList.filter(b => {
           const matchId = b.employeeId && (String(b.employeeId) === String(effectiveId));
           const matchCode = b.employeeCode && (
             b.employeeCode === effectiveCode || 
@@ -90,9 +114,40 @@ export default function Profile() {
           );
           return matchId || matchCode;
         });
-
-        setLeaveBalances(userBalances);
       }
+
+      const mergedList = typesList.map(type => {
+        const typeName = type.leaveName || type.name || '';
+        const typeCode = type.leaveCode || type.code || '';
+
+        const match = userBalances.find(b => 
+          (b.leaveTypeId && (String(b.leaveTypeId) === String(type.id))) ||
+          (b.leaveType && typeName && (b.leaveType.toLowerCase().trim() === typeName.toLowerCase().trim())) ||
+          (b.leaveCode && typeCode && (b.leaveCode.toUpperCase().trim() === typeCode.toUpperCase().trim()))
+        );
+
+        if (match) {
+          return {
+            id: match.id || type.id,
+            leaveType: match.leaveType || typeName,
+            leaveCode: typeCode,
+            allocated: match.allocated ?? (type.yearlyAllocation || 0),
+            used: match.used ?? 0,
+            remaining: match.remaining !== undefined ? match.remaining : ((match.allocated || 0) - (match.used || 0))
+          };
+        } else {
+          return {
+            id: type.id,
+            leaveType: typeName,
+            leaveCode: typeCode,
+            allocated: 0,
+            used: 0,
+            remaining: 0
+          };
+        }
+      });
+
+      setLeaveBalances(mergedList);
     } catch (err) {
       console.error('Error fetching profile leave balances:', err);
     }
@@ -579,14 +634,15 @@ export default function Profile() {
           </div>
 
           {leaveBalances.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
               {leaveBalances.map((b, idx) => {
-                const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#ea580c', '#06b6d4'];
+                const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#ea580c', '#06b6d4', '#ec4899'];
                 const cardColor = colors[idx % colors.length];
                 return (
                   <BalanceCard 
                     key={b.id || idx} 
                     title={b.leaveType || 'Leave'} 
+                    code={b.leaveCode}
                     allocated={b.allocated || 0} 
                     used={b.used || 0}
                     remaining={b.remaining !== undefined ? b.remaining : ((b.allocated || 0) - (b.used || 0))}
@@ -903,7 +959,7 @@ const FieldBox = ({ label, value, highlighted, fullWidth }) => (
   </div>
 );
 
-const BalanceCard = ({ title, allocated, used, remaining, color }) => {
+const BalanceCard = ({ title, code, allocated, used, remaining, color }) => {
   const rem = remaining !== undefined ? remaining : ((allocated || 0) - (used || 0));
   const percentage = (allocated && allocated > 0) ? Math.min(100, Math.max(0, (rem / allocated) * 100)) : 0;
   return (
@@ -911,19 +967,35 @@ const BalanceCard = ({ title, allocated, used, remaining, color }) => {
       background: 'var(--white)',
       borderRadius: '12px',
       border: '1px solid var(--border)',
-      padding: '20px',
+      padding: '16px 20px',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+      borderTop: `4px solid ${color}`
     }}>
-      <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>{title}</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>{title}</span>
+        {code && (
+          <span style={{
+            fontSize: '0.7rem',
+            fontWeight: '800',
+            background: 'var(--bg)',
+            color: color,
+            padding: '2px 8px',
+            borderRadius: '6px',
+            border: `1px solid ${color}33`
+          }}>
+            {code}
+          </span>
+        )}
+      </div>
       <div style={{ margin: '14px 0 10px', display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-        <span style={{ fontSize: '1.8rem', fontWeight: '800', color }}>{rem}</span>
-        <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>/ {allocated} Days Left</span>
+        <span style={{ fontSize: '1.65rem', fontWeight: '800', color }}>{rem}</span>
+        <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: '600' }}>/ {allocated} Days Left</span>
       </div>
       <div style={{ width: '100%', height: '6px', background: 'var(--bg)', borderRadius: '3px', overflow: 'hidden' }}>
-        <div style={{ width: `${percentage}%`, height: '100%', background: color }} />
+        <div style={{ width: `${percentage}%`, height: '100%', background: color, transition: 'width 0.3s ease' }} />
       </div>
     </div>
   );
