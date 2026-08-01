@@ -71,10 +71,17 @@ export default function Leave() {
     return usersDropdown.find(u => String(u.id) === String(selectedFilterUserId) || u.employeeCode === selectedFilterUserId);
   }, [usersDropdown, selectedFilterUserId]);
 
+  const teamUserIds = useMemo(() => {
+    const ids = new Set(usersDropdown.map(u => String(u.id)));
+    if (user?.id) ids.add(String(user.id));
+    return ids;
+  }, [usersDropdown, user]);
+
   const displayedBalances = useMemo(() => {
     if (!leaveBalances.length) return [];
     if (selectedFilterUserId === 'ALL') {
-      return leaveBalances;
+      if (isAdmin) return leaveBalances;
+      return leaveBalances.filter(b => b.employeeId && teamUserIds.has(String(b.employeeId)));
     }
     if (selectedFilterUserId === 'MY' || !selectedFilterUserId) {
       return leaveBalances.filter(b => {
@@ -92,12 +99,13 @@ export default function Leave() {
       const matchCode = selectedUserObject && (b.employeeCode === selectedUserObject.employeeCode);
       return matchId || matchCode;
     });
-  }, [leaveBalances, selectedFilterUserId, user, selectedUserObject]);
+  }, [leaveBalances, selectedFilterUserId, user, selectedUserObject, isAdmin, teamUserIds]);
 
   const displayedLeaves = useMemo(() => {
     if (!leaves.length) return [];
     if (selectedFilterUserId === 'ALL') {
-      return leaves;
+      if (isAdmin) return leaves;
+      return leaves.filter(l => l.employeeId && teamUserIds.has(String(l.employeeId)));
     }
     if (selectedFilterUserId === 'MY' || !selectedFilterUserId) {
       return leaves.filter(l => {
@@ -115,23 +123,48 @@ export default function Leave() {
       const matchCode = selectedUserObject && (l.employeeCode === selectedUserObject.employeeCode);
       return matchId || matchCode;
     });
-  }, [leaves, selectedFilterUserId, user, selectedUserObject]);
+  }, [leaves, selectedFilterUserId, user, selectedUserObject, isAdmin, teamUserIds]);
 
   const fetchUsersDropdown = useCallback(async () => {
-    if (!user || !isAdmin) return;
+    if (!user || !isManagerOrAdmin) return;
     try {
-      const res = await apiRequest('/users/dropdown');
-      if (res.ok && res.data && res.data.status) {
-        const uList = res.data.data || [];
-        setUsersDropdown(uList);
-        if (uList.length > 0) {
-          setBalanceEmpId(prev => prev || uList[0].id);
+      let uList = [];
+      const res = await apiRequest('/users');
+      if (res.ok && res.data && res.data.status && Array.isArray(res.data.data)) {
+        uList = res.data.data;
+      } else {
+        const resDropdown = await apiRequest('/users/dropdown');
+        if (resDropdown.ok && resDropdown.data && resDropdown.data.status && Array.isArray(resDropdown.data.data)) {
+          uList = resDropdown.data.data;
         }
+      }
+
+      uList = uList.map(u => ({
+        id: u.id,
+        name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,
+        firstName: u.firstName,
+        lastName: u.lastName,
+        employeeCode: u.employeeCode,
+        reportingManagerId: u.reportingManagerId
+      }));
+
+      if (!isAdmin) {
+        uList = uList.filter(u => 
+          String(u.id) !== String(user.id) &&
+          (!u.reportingManagerId || String(u.reportingManagerId) === String(user.id))
+        );
+      } else {
+        uList = uList.filter(u => String(u.id) !== String(user.id));
+      }
+
+      setUsersDropdown(uList);
+      if (uList.length > 0) {
+        setBalanceEmpId(prev => prev || uList[0].id);
       }
     } catch (err) {
       console.error('Error fetching users dropdown:', err);
     }
-  }, [user, isAdmin]);
+  }, [user, isAdmin, isManagerOrAdmin]);
 
   const fetchLeaveTypes = useCallback(async () => {
     if (!user) return;
@@ -210,10 +243,10 @@ export default function Leave() {
     fetchLeaveTypes();
     fetchLeaves();
     fetchLeaveBalances();
-    if (isAdmin) {
+    if (isManagerOrAdmin) {
       fetchUsersDropdown();
     }
-  }, [fetchLeaveTypes, fetchLeaves, fetchUsersDropdown, fetchLeaveBalances, isAdmin]);
+  }, [fetchLeaveTypes, fetchLeaves, fetchUsersDropdown, fetchLeaveBalances, isManagerOrAdmin]);
 
   const handleApprove = async (id) => {
     try {
@@ -543,7 +576,7 @@ export default function Leave() {
               }}
             >
               <option value="MY">My Balances ({user?.firstName || 'Logged in User'})</option>
-              <option value="ALL">All Employees</option>
+              <option value="ALL">{isAdmin ? 'All Employees' : 'All Team Members'}</option>
               {usersDropdown.map(u => (
                 <option key={u.id} value={u.id}>
                   {u.name} ({u.employeeCode})
