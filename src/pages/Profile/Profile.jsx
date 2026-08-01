@@ -91,7 +91,7 @@ export default function Profile() {
           return matchId || matchCode;
         });
 
-        setLeaveBalances(userBalances.length > 0 ? userBalances : rawList);
+        setLeaveBalances(userBalances);
       }
     } catch (err) {
       console.error('Error fetching profile leave balances:', err);
