@@ -210,8 +210,36 @@ export default function Employees() {
           data={employees} 
           renderRow={(emp, idx) => (
             <tr key={idx}>
-              <td>{emp.employeeCode}</td>
-              <td><strong>{emp.firstName} {emp.lastName}</strong></td>
+              <td>
+                <span 
+                  style={{ 
+                    color: '#3b82f6', 
+                    fontWeight: '600', 
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                  onClick={() => navigate(`/profile/${emp.id}`)}
+                  title={`View ${emp.firstName}'s Profile`}
+                >
+                  {emp.employeeCode}
+                </span>
+              </td>
+              <td>
+                <span 
+                  style={{ 
+                    color: 'var(--text)', 
+                    fontWeight: '700', 
+                    cursor: 'pointer',
+                    transition: 'color 0.2s'
+                  }}
+                  onClick={() => navigate(`/profile/${emp.id}`)}
+                  title={`View ${emp.firstName}'s Profile`}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#3b82f6'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text)'}
+                >
+                  {emp.firstName} {emp.lastName}
+                </span>
+              </td>
               <td>{emp.email}</td>
               <td>{emp.mobileNumber}</td>
               <td>{emp.roleName}</td>
