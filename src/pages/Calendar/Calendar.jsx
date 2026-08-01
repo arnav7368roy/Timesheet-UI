@@ -223,11 +223,11 @@ export default function Calendar() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#ffffff',
+        background: 'var(--card-bg)',
         padding: '16px 24px',
         borderRadius: '16px',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-sm)',
         flexWrap: 'wrap',
         gap: '16px'
       }}>
@@ -241,8 +241,8 @@ export default function Calendar() {
               fontWeight: '700',
               fontSize: '0.9rem',
               cursor: 'pointer',
-              background: activeTab === 'calendar' ? '#3b82f6' : '#f8fafc',
-              color: activeTab === 'calendar' ? '#ffffff' : '#64748b',
+              background: activeTab === 'calendar' ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)',
+              color: activeTab === 'calendar' ? '#ffffff' : 'var(--text-muted)',
               transition: 'all 0.2s'
             }}
           >
@@ -257,8 +257,8 @@ export default function Calendar() {
               fontWeight: '700',
               fontSize: '0.9rem',
               cursor: 'pointer',
-              background: activeTab === 'holidays' ? '#3b82f6' : '#f8fafc',
-              color: activeTab === 'holidays' ? '#ffffff' : '#64748b',
+              background: activeTab === 'holidays' ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)',
+              color: activeTab === 'holidays' ? '#ffffff' : 'var(--text-muted)',
               transition: 'all 0.2s'
             }}
           >
@@ -273,8 +273,8 @@ export default function Calendar() {
               fontWeight: '700',
               fontSize: '0.9rem',
               cursor: 'pointer',
-              background: activeTab === 'shifts' ? '#3b82f6' : '#f8fafc',
-              color: activeTab === 'shifts' ? '#ffffff' : '#64748b',
+              background: activeTab === 'shifts' ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)',
+              color: activeTab === 'shifts' ? '#ffffff' : 'var(--text-muted)',
               transition: 'all 0.2s'
             }}
           >
@@ -332,7 +332,7 @@ export default function Calendar() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <CalendarIcon size={24} style={{ color: '#3b82f6' }} />
-                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800', color: 'var(--text)' }}>
                   {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h3>
               </div>
@@ -343,7 +343,7 @@ export default function Calendar() {
             </div>
 
             {/* Days Header */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', fontWeight: '700', color: '#64748b', fontSize: '0.85rem', marginBottom: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', fontWeight: '700', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '12px' }}>
               <span>Sun</span>
               <span>Mon</span>
               <span>Tue</span>
@@ -356,7 +356,7 @@ export default function Calendar() {
             {/* Calendar Days Cells */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px' }}>
               {Array.from({ length: firstDay }).map((_, i) => (
-                <div key={`empty-${i}`} style={{ height: '70px', background: '#f8fafc', borderRadius: '8px', opacity: 0.4 }} />
+                <div key={`empty-${i}`} style={{ height: '70px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px', opacity: 0.3 }} />
               ))}
               {Array.from({ length: daysCount }).map((_, i) => {
                 const dayNum = i + 1;
@@ -368,8 +368,20 @@ export default function Calendar() {
                 return (
                   <div key={dayNum} style={{
                     height: '70px',
-                    background: matchedHoliday ? '#fff7ed' : isSunday ? '#fef2f2' : dayAttendance ? '#f0fdf4' : '#ffffff',
-                    border: matchedHoliday ? '1px solid #ffedd5' : dayAttendance ? '1px solid #bbf7d0' : '1px solid #e2e8f0',
+                    background: matchedHoliday 
+                      ? 'rgba(234, 88, 12, 0.15)' 
+                      : isSunday 
+                      ? 'rgba(239, 68, 68, 0.1)' 
+                      : dayAttendance 
+                      ? 'rgba(16, 185, 129, 0.12)' 
+                      : 'rgba(255, 255, 255, 0.03)',
+                    border: matchedHoliday 
+                      ? '1px solid rgba(234, 88, 12, 0.4)' 
+                      : dayAttendance 
+                      ? '1px solid rgba(16, 185, 129, 0.35)' 
+                      : isSunday 
+                      ? '1px solid rgba(239, 68, 68, 0.3)' 
+                      : '1px solid var(--border)',
                     borderRadius: '8px',
                     padding: '8px',
                     display: 'flex',
@@ -377,7 +389,7 @@ export default function Calendar() {
                     justifyContent: 'space-between',
                     position: 'relative'
                   }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: isSunday ? '#ef4444' : '#1e293b' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: isSunday ? '#ef4444' : 'var(--text)' }}>
                       {dayNum}
                     </span>
                     {matchedHoliday && (
@@ -413,15 +425,15 @@ export default function Calendar() {
           {/* Upcoming Holidays & Shift Info Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="table-card" style={{ padding: '20px' }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: '1.05rem', fontWeight: '700', color: '#0f172a' }}>Upcoming Holidays</h3>
+              <h3 style={{ margin: '0 0 16px', fontSize: '1.05rem', fontWeight: '700', color: 'var(--text)' }}>Upcoming Holidays</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {holidays.slice(0, 4).map(h => (
-                  <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px' }}>
+                  <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                     <div>
-                      <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1e293b' }}>{h.title}</strong>
-                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{h.date}</span>
+                      <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text)' }}>{h.title}</strong>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{h.date}</span>
                     </div>
-                    <span style={{ fontSize: '0.7rem', background: '#eff6ff', color: '#3b82f6', padding: '2px 8px', borderRadius: '12px', fontWeight: '600' }}>
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(59, 130, 246, 0.15)', color: '#38bdf8', padding: '3px 9px', borderRadius: '12px', fontWeight: '600', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
                       {h.type}
                     </span>
                   </div>
@@ -430,12 +442,12 @@ export default function Calendar() {
             </div>
 
             <div className="table-card" style={{ padding: '20px' }}>
-              <h3 style={{ margin: '0 0 16px', fontSize: '1.05rem', fontWeight: '700', color: '#0f172a' }}>Assigned Shift</h3>
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <Sun size={28} style={{ color: '#16a34a' }} />
+              <h3 style={{ margin: '0 0 16px', fontSize: '1.05rem', fontWeight: '700', color: 'var(--text)' }}>Assigned Shift</h3>
+              <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '16px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <Sun size={28} style={{ color: '#10b981' }} />
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#166534' }}>General Shift (Day)</h4>
-                  <span style={{ fontSize: '0.8rem', color: '#15803d' }}>09:00 AM - 06:00 PM (15m Grace)</span>
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#10b981' }}>General Shift (Day)</h4>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>09:00 AM - 06:00 PM (15m Grace)</span>
                 </div>
               </div>
             </div>
@@ -446,7 +458,7 @@ export default function Calendar() {
       {/* TAB 2: COMPANY HOLIDAYS MASTER */}
       {activeTab === 'holidays' && (
         <div className="table-card" style={{ padding: '24px' }}>
-          <h3 style={{ marginBottom: '20px' }}>Annual Holiday List</h3>
+          <h3 style={{ marginBottom: '20px', color: 'var(--text)' }}>Annual Holiday List</h3>
           <DataTable
             headers={['Holiday Name', 'Date', 'Type', 'Description', ...(isAdmin ? ['Action'] : [])]}
             data={holidays}
@@ -455,7 +467,7 @@ export default function Calendar() {
                 <td><strong>{h.title}</strong></td>
                 <td>{h.date}</td>
                 <td>
-                  <span style={{ background: '#eff6ff', color: '#3b82f6', padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600' }}>
+                  <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#38bdf8', padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
                     {h.type}
                   </span>
                 </td>
@@ -480,7 +492,7 @@ export default function Calendar() {
       {/* TAB 3: SHIFT MANAGEMENT */}
       {activeTab === 'shifts' && (
         <div className="table-card" style={{ padding: '24px' }}>
-          <h3 style={{ marginBottom: '20px' }}>Configured Work Shifts</h3>
+          <h3 style={{ marginBottom: '20px', color: 'var(--text)' }}>Configured Work Shifts</h3>
           <DataTable
             headers={['Shift Name', 'Start Time', 'End Time', 'Grace Period', 'Half-Day Hours', 'Night Shift', ...(isAdmin ? ['Action'] : [])]}
             data={shifts}
@@ -492,7 +504,7 @@ export default function Calendar() {
                 <td>{s.graceMinutes} Minutes</td>
                 <td>{s.halfDayHours} Hours</td>
                 <td>
-                  <span style={{ background: s.isNight ? '#fef2f2' : '#f0fdf4', color: s.isNight ? '#ef4444' : '#16a34a', padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600' }}>
+                  <span style={{ background: s.isNight ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)', color: s.isNight ? '#ef4444' : '#10b981', padding: '4px 10px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '600', border: s.isNight ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(16, 185, 129, 0.3)' }}>
                     {s.isNight ? 'Yes (Night)' : 'No (Day)'}
                   </span>
                 </td>
