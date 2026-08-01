@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../../components/Tables/Tables';
-import { UserPlus, RefreshCw, X, Edit2, Trash2 } from 'lucide-react';
+import { UserPlus, RefreshCw, X, Edit2, Trash2, Eye, User } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Employees() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = user?.roleCode === 'ADMIN';
   const [employees, setEmployees] = useState([]);
@@ -216,8 +218,16 @@ export default function Employees() {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button 
                       className="primary-btn" 
+                      style={{ padding: '6px', background: '#0284c7', display: 'inline-flex', alignItems: 'center' }} 
+                      title="View & Edit Full Profile"
+                      onClick={() => navigate(`/profile/${emp.id}`)}
+                    >
+                      <Eye size={14} />
+                    </button>
+                    <button 
+                      className="primary-btn" 
                       style={{ padding: '6px', background: '#3b82f6', display: 'inline-flex', alignItems: 'center' }} 
-                      title="Edit"
+                      title="Edit Account Details"
                       onClick={() => openEditModal(emp)}
                     >
                       <Edit2 size={14} />
@@ -246,6 +256,34 @@ export default function Employees() {
               <h2>{isEditMode ? 'Edit Employee' : 'Create Employee'}</h2>
               <span onClick={() => setShowModal(false)}><X size={20} /></span>
             </div>
+
+            {isEditMode && (
+              <div style={{ padding: '0 28px 12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 4px rgba(2, 132, 199, 0.25)'
+                  }}
+                  onClick={() => {
+                    setShowModal(false);
+                    navigate(`/profile/${editEmployeeId}`);
+                  }}
+                >
+                  <User size={15} /> Edit Full User Profile (Personal, Statutory, Work)
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="form-grid">

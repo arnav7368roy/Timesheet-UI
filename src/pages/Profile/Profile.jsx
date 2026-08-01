@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../utils/api';
 import { 
@@ -20,6 +21,7 @@ import {
 
 export default function Profile() {
   const { user, logout } = useAuth();
+  const { userId } = useParams();
   
   // Active Tab State: 'personal', 'job', 'financial', 'leaves', 'documents'
   const [activeTab, setActiveTab] = useState('personal');
@@ -68,7 +70,7 @@ export default function Profile() {
   const [modalSuccess, setModalSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchLeaveBalances = async () => {
+  const fetchLeaveBalances = async (targetId, targetCode) => {
     try {
       const res = await apiRequest('/leave-balances?pageSize=100');
       if (res.ok && res.data && res.data.status) {
@@ -76,12 +78,15 @@ export default function Profile() {
           ? res.data.data
           : (res.data.data?.leaveBalances || []);
         
+        const effectiveId = targetId || userId || user?.id;
+        const effectiveCode = targetCode || user?.employeeCode;
+
         const userBalances = rawList.filter(b => {
-          const matchId = b.employeeId && (b.employeeId === user?.id || String(b.employeeId) === String(user?.id));
+          const matchId = b.employeeId && (String(b.employeeId) === String(effectiveId));
           const matchCode = b.employeeCode && (
-            b.employeeCode === user?.employeeCode || 
-            (user?.employeeCode === 'EMP0001' && b.employeeCode === 'EMP001') ||
-            (user?.employeeCode === 'EMP001' && b.employeeCode === 'EMP0001')
+            b.employeeCode === effectiveCode || 
+            (effectiveCode === 'EMP0001' && b.employeeCode === 'EMP001') ||
+            (effectiveCode === 'EMP001' && b.employeeCode === 'EMP0001')
           );
           return matchId || matchCode;
         });
@@ -96,7 +101,8 @@ export default function Profile() {
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await apiRequest('/profile/me');
+      const endpoint = (userId && userId !== user?.id) ? `/profile/${userId}` : '/profile/me';
+      const res = await apiRequest(endpoint);
       if (res.ok && res.data && res.data.status && res.data.data) {
         const p = res.data.data;
         setProfileData(p);
@@ -126,8 +132,9 @@ export default function Profile() {
           workLocation: p.profile?.workLocation || 'Head Office',
           dateOfJoining: p.profile?.dateOfJoining || '',
         });
+
+        await fetchLeaveBalances(p.id, p.employeeCode);
       }
-      await fetchLeaveBalances();
     } catch (err) {
       console.error('Fetch profile error:', err);
     } finally {
@@ -137,7 +144,7 @@ export default function Profile() {
 
   useEffect(() => {
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   if (loading && !profileData) {
     return (
@@ -208,7 +215,8 @@ export default function Profile() {
     e.preventDefault();
     setSavingPersonal(true);
     try {
-      const res = await apiRequest('/profile/me', 'PATCH', personalForm);
+      const endpoint = (userId && userId !== user?.id) ? `/profile/${userId}` : '/profile/me';
+      const res = await apiRequest(endpoint, 'PATCH', personalForm);
       if (res.ok && res.data && res.data.status) {
         setShowEditModal(false);
         fetchProfile();
@@ -227,7 +235,8 @@ export default function Profile() {
     e.preventDefault();
     setSavingAdmin(true);
     try {
-      const res = await apiRequest(`/profile/${userDetails.id}`, 'PATCH', adminForm);
+      const targetId = userId || userDetails.id || user?.id;
+      const res = await apiRequest(`/profile/${targetId}`, 'PATCH', adminForm);
       if (res.ok && res.data && res.data.status) {
         setShowAdminEditModal(false);
         fetchProfile();

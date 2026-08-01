@@ -113,7 +113,7 @@ export default function AppRoutes() {
         } 
       />
       <Route 
-        path="/profile" 
+        path="/profile/:userId?" 
         element={
           <PrivateRoute>
             <Layout><Profile /></Layout>
