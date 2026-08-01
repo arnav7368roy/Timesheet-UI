@@ -548,29 +548,29 @@ export default function Leave() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: '#ffffff',
-          padding: '12px 20px',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          background: 'var(--card-bg)',
+          padding: '16px 24px',
+          borderRadius: '16px',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow)',
           flexWrap: 'wrap',
           gap: '12px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1e293b' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>
               Select User to View Available Balances:
             </span>
             <select
               value={selectedFilterUserId}
               onChange={(e) => setSelectedFilterUserId(e.target.value)}
               style={{
-                border: '1px solid #4f46e5',
+                border: '1px solid var(--primary)',
                 borderRadius: '8px',
                 padding: '6px 14px',
                 fontSize: '0.85rem',
-                fontWeight: '600',
-                color: '#4f46e5',
-                background: '#e0e7ff',
+                fontWeight: '700',
+                color: 'var(--primary)',
+                background: 'var(--bg)',
                 cursor: 'pointer',
                 outline: 'none'
               }}
@@ -584,7 +584,7 @@ export default function Leave() {
               ))}
             </select>
           </div>
-          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>
             Showing <strong>{displayedBalances.length}</strong> leave balance card(s)
           </span>
         </div>
@@ -597,63 +597,63 @@ export default function Leave() {
             <div 
               key={b.id} 
               style={{ 
-                background: '#ffffff', 
-                border: '1px solid #e2e8f0', 
-                borderRadius: '12px', 
-                padding: '16px', 
-                boxShadow: '0 1px 3px rgba(0,0,0,0.05)', 
+                background: 'var(--card-bg)', 
+                border: '1px solid var(--border)', 
+                borderRadius: '16px', 
+                padding: '20px', 
+                boxShadow: 'var(--shadow)', 
                 display: 'flex', 
                 flexDirection: 'column', 
                 gap: '8px' 
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1e293b' }}>{b.leaveType}</span>
-                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: '12px' }}>{b.year}</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--text)' }}>{b.leaveType}</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 10px', borderRadius: '12px' }}>{b.year}</span>
               </div>
 
               {(selectedFilterUserId === 'ALL' || (selectedFilterUserId !== 'MY' && b.employeeName)) && (
-                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#4f46e5', background: '#e0e7ff', padding: '2px 8px', borderRadius: '6px', alignSelf: 'flex-start' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--primary)', background: 'var(--bg)', padding: '4px 10px', borderRadius: '6px', alignSelf: 'flex-start' }}>
                   User: {b.employeeName || b.employeeCode}
                 </div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '6px' }}>
                 <div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#059669' }}>{b.remaining}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Days Available</div>
+                  <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#10b981' }}>{b.remaining}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Days Available</div>
                 </div>
-                <div style={{ textAlign: 'right', fontSize: '0.75rem', color: '#64748b' }}>
-                  <div>Allocated: <strong>{b.allocated}</strong></div>
-                  <div>Used: <strong>{b.used}</strong></div>
+                <div style={{ textAlign: 'right', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <div>Allocated: <strong style={{ color: 'var(--text)' }}>{b.allocated}</strong></div>
+                  <div>Used: <strong style={{ color: 'var(--text)' }}>{b.used}</strong></div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ fontSize: '0.85rem', color: '#64748b', background: '#ffffff', padding: '16px 20px', borderRadius: '12px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'var(--card-bg)', padding: '20px', borderRadius: '16px', border: '1px solid var(--border)', textAlign: 'center' }}>
           No leave balances assigned for this user. Use <strong>Assign Balance</strong> button to allocate leave days.
         </div>
       )}
 
-      <div className="table-card">
+      <div className="table-card" style={{ margin: 0 }}>
         <div className="table-header">
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <h3 style={{ margin: 0 }}>Leave Management</h3>
-            <div style={{ display: 'flex', background: '#f1f5f9', padding: '3px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', background: 'var(--bg)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border)' }}>
               <button
                 onClick={() => setActiveTab('requests')}
                 style={{
                   border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
                   fontSize: '0.8rem',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
-                  background: activeTab === 'requests' ? '#ffffff' : 'transparent',
-                  color: activeTab === 'requests' ? '#4f46e5' : '#64748b',
-                  boxShadow: activeTab === 'requests' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  background: activeTab === 'requests' ? 'var(--primary-gradient)' : 'transparent',
+                  color: activeTab === 'requests' ? '#ffffff' : 'var(--text-muted)',
+                  boxShadow: activeTab === 'requests' ? 'var(--shadow-glow)' : 'none'
                 }}
               >
                 Requests
@@ -662,14 +662,14 @@ export default function Leave() {
                 onClick={() => setActiveTab('types')}
                 style={{
                   border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
                   fontSize: '0.8rem',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
-                  background: activeTab === 'types' ? '#ffffff' : 'transparent',
-                  color: activeTab === 'types' ? '#4f46e5' : '#64748b',
-                  boxShadow: activeTab === 'types' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  background: activeTab === 'types' ? 'var(--primary-gradient)' : 'transparent',
+                  color: activeTab === 'types' ? '#ffffff' : 'var(--text-muted)',
+                  boxShadow: activeTab === 'types' ? 'var(--shadow-glow)' : 'none'
                 }}
               >
                 Leave Types ({availableLeaveTypes.length})
@@ -678,14 +678,14 @@ export default function Leave() {
                 onClick={() => setActiveTab('balances')}
                 style={{
                   border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
                   fontSize: '0.8rem',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
-                  background: activeTab === 'balances' ? '#ffffff' : 'transparent',
-                  color: activeTab === 'balances' ? '#4f46e5' : '#64748b',
-                  boxShadow: activeTab === 'balances' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  background: activeTab === 'balances' ? 'var(--primary-gradient)' : 'transparent',
+                  color: activeTab === 'balances' ? '#ffffff' : 'var(--text-muted)',
+                  boxShadow: activeTab === 'balances' ? 'var(--shadow-glow)' : 'none'
                 }}
               >
                 Balances ({displayedBalances.length})
@@ -699,21 +699,8 @@ export default function Leave() {
               <button 
                 type="button"
                 onClick={() => setShowCreateTypeModal(true)} 
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 4px rgba(79, 70, 229, 0.25)',
-                  transition: 'all 0.2s ease'
-                }}
+                className="primary-btn"
+                style={{ fontSize: '0.85rem', padding: '8px 16px' }}
               >
                 <Plus size={16} /> Add Leave Type
               </button>
@@ -725,14 +712,14 @@ export default function Leave() {
                   alignItems: 'center',
                   gap: '8px',
                   padding: '8px 16px',
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                   border: 'none',
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: '#ffffff',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   fontSize: '0.85rem',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 4px rgba(5, 150, 105, 0.25)',
+                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -748,37 +735,25 @@ export default function Leave() {
               alignItems: 'center',
               gap: '8px',
               padding: '8px 16px',
-              borderRadius: '8px',
-              border: '1px solid #cbd5e1',
-              background: '#ffffff',
-              color: '#1e293b',
-              fontWeight: '600',
+              borderRadius: '12px',
+              border: '1px solid var(--border)',
+              background: 'var(--card-bg)',
+              color: 'var(--text)',
+              fontWeight: '700',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+              boxShadow: 'var(--shadow-sm)',
               transition: 'all 0.2s ease'
             }}
           >
-            <FilePlus2 size={16} style={{ color: '#4f46e5' }} /> Apply Leave
+            <FilePlus2 size={16} style={{ color: 'var(--primary)' }} /> Apply Leave
           </button>
           <button 
             type="button"
+            className="refresh"
             onClick={handleRefreshCurrentTab} 
             disabled={loading}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '36px',
-              height: '36px',
-              borderRadius: '8px',
-              border: '1px solid #cbd5e1',
-              background: '#ffffff',
-              color: '#64748b',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-              transition: 'all 0.2s ease'
-            }}
+            title="Refresh Leave Data"
           >
             <RefreshCw size={16} className={loading ? 'spin' : ''} />
           </button>
@@ -834,7 +809,7 @@ export default function Leave() {
           renderRow={(lt, idx) => (
             <tr key={idx}>
               <td><strong>{lt.leaveName || lt.name}</strong></td>
-              <td><code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem' }}>{lt.leaveCode || lt.code}</code></td>
+              <td><code>{lt.leaveCode || lt.code}</code></td>
               <td>{lt.yearlyAllocation} days</td>
               <td>{lt.description || '-'}</td>
               <td>
@@ -847,19 +822,19 @@ export default function Leave() {
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button
                       onClick={() => openEditModal(lt)}
-                      style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                       <Edit2 size={12} /> Edit
                     </button>
                     <button
                       onClick={() => handleDeleteLeaveType(lt.id)}
-                      style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                       <Trash2 size={12} /> Delete
                     </button>
                   </div>
                 ) : (
-                  <span style={{ color: '#94a3b8' }}>-</span>
+                  <span style={{ color: 'var(--text-muted)' }}>-</span>
                 )}
               </td>
             </tr>
@@ -874,30 +849,30 @@ export default function Leave() {
           renderRow={(lb, idx) => (
             <tr key={idx}>
               <td><strong>{lb.employeeName}</strong></td>
-              <td><code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.8rem' }}>{lb.employeeCode}</code></td>
+              <td><code>{lb.employeeCode}</code></td>
               <td>{lb.leaveType}</td>
               <td>{lb.year}</td>
-              <td><span style={{ fontWeight: '600', color: '#4f46e5' }}>{lb.allocated} days</span></td>
-              <td><span style={{ color: '#dc2626' }}>{lb.used} days</span></td>
-              <td><span style={{ fontWeight: '700', color: '#059669' }}>{lb.remaining} days</span></td>
+              <td><span style={{ fontWeight: '700', color: '#3b82f6' }}>{lb.allocated} days</span></td>
+              <td><span style={{ fontWeight: '700', color: '#ef4444' }}>{lb.used} days</span></td>
+              <td><span style={{ fontWeight: '800', color: '#10b981' }}>{lb.remaining} days</span></td>
               <td>
                 {isAdmin ? (
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <button
                       onClick={() => openEditBalanceModal(lb)}
-                      style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                       <Edit2 size={12} /> Edit
                     </button>
                     <button
                       onClick={() => handleDeleteLeaveBalance(lb.id)}
-                      style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                       <Trash2 size={12} /> Delete
                     </button>
                   </div>
                 ) : (
-                  <span style={{ color: '#94a3b8' }}>-</span>
+                  <span style={{ color: 'var(--text-muted)' }}>-</span>
                 )}
               </td>
             </tr>

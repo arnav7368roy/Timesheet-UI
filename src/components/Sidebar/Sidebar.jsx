@@ -13,7 +13,8 @@ import {
    BarChart3, 
    Settings, 
    User, 
-   LogOut 
+   LogOut,
+   Sparkles
 } from 'lucide-react';
 
 export default function Sidebar({ mobileOpen, closeMobile }) {
@@ -45,11 +46,31 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
       <div 
         className="logo" 
         onClick={() => handleNavigate('/')} 
-        style={{ cursor: 'pointer' }}
-        title="Go to Home / Dashboard"
+        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+        title="TimeSheet Workspace"
       >
-        <Clock className="logo-icon" size={24} />
-        <span>TimeSheet</span>
+        <div style={{
+          background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+          width: '38px',
+          height: '38px',
+          borderRadius: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 14px rgba(59, 130, 246, 0.4)'
+        }}>
+          <Clock size={20} color="#ffffff" />
+        </div>
+        <span style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontSize: '20px',
+          fontWeight: '800',
+          letterSpacing: '-0.02em'
+        }}>
+          TimeSheet
+        </span>
       </div>
 
       <ul className="menu">
@@ -62,8 +83,18 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
                 className={`menu-link ${isActive ? 'active' : ''}`}
                 style={{ cursor: 'pointer' }}
               >
-                <item.icon size={20} className="menu-icon" />
+                <item.icon size={19} className="menu-icon" />
                 <span>{item.label}</span>
+                {isActive && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: '#ffffff',
+                    boxShadow: '0 0 8px #ffffff'
+                  }} />
+                )}
               </div>
             </li>
           );
@@ -72,7 +103,7 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
 
       <div className="sidebar-bottom">
         <button className="logout" onClick={() => { logout(); if (closeMobile) closeMobile(); }}>
-          <LogOut size={20} className="menu-icon" />
+          <LogOut size={18} className="menu-icon" />
           <span>Logout</span>
         </button>
       </div>

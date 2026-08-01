@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/Tables/Tables';
-import { CheckSquare, RefreshCw, X, Eye, Edit2, Trash2, Download } from 'lucide-react';
+import { CheckSquare, RefreshCw, X, Eye, Edit2, Trash2, Download, AlertCircle, Clock } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,7 +21,6 @@ export default function Tasks() {
   const [selectedTaskLogs, setSelectedTaskLogs] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [logsLoading, setLogsLoading] = useState(false);
-
 
   // Form state
   const [formData, setFormData] = useState({
@@ -169,7 +168,7 @@ export default function Tasks() {
           setShowModal(false);
           setMessage({ text: '', type: 'success' });
           fetchTasks();
-        }, 1500);
+        }, 1200);
       } else {
         setMessage({ text: res.data?.message || 'Failed to save task', type: 'error' });
       }
@@ -290,49 +289,49 @@ export default function Tasks() {
     const getPrimaryAction = () => {
       if (isManagerOrAdmin) {
         return (
-          <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
+          <button className="primary-btn" style={{ padding: '8px', background: '#64748b', boxShadow: 'none' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
             <Eye size={14} />
           </button>
         );
       }
 
       if (task.assignedTo !== user?.id) {
-        return <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>Only assignee can execute actions</span>;
+        return <span style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontStyle: 'italic' }}>View only</span>;
       }
 
       switch (task.status) {
         case 'PENDING':
           return (
-            <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => startTask(task.id)}>
+            <button className="primary-btn" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => startTask(task.id)}>
               Start
             </button>
           );
         case 'STARTED':
         case 'IN_PROGRESS':
           return (
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#eab308' }} onClick={() => pauseTask(task.id)}>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#f59e0b', boxShadow: 'none' }} onClick={() => pauseTask(task.id)}>
                 Pause
               </button>
-              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#22c55e' }} onClick={() => completeTask(task.id)}>
+              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', boxShadow: 'none' }} onClick={() => completeTask(task.id)}>
                 Complete
               </button>
             </div>
           );
         case 'PAUSED':
           return (
-            <div style={{ display: 'flex', gap: '5px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => resumeTask(task.id)}>
                 Resume
               </button>
-              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#22c55e' }} onClick={() => completeTask(task.id)}>
+              <button className="primary-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', boxShadow: 'none' }} onClick={() => completeTask(task.id)}>
                 Complete
               </button>
             </div>
           );
         case 'COMPLETED':
           return (
-            <button className="primary-btn" style={{ padding: '6px', background: '#64748b' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
+            <button className="primary-btn" style={{ padding: '8px', background: '#64748b', boxShadow: 'none' }} title="View Task Logs" onClick={() => openLogsModal(task)}>
               <Eye size={14} />
             </button>
           );
@@ -346,16 +345,16 @@ export default function Tasks() {
         {getPrimaryAction()}
         <button 
           className="primary-btn" 
-          style={{ padding: '6px', background: '#3b82f6', display: 'inline-flex', alignItems: 'center' }} 
-          title="Edit"
+          style={{ padding: '8px', background: '#3b82f6', boxShadow: 'none' }} 
+          title="Edit Task"
           onClick={() => openEditModal(task)}
         >
           <Edit2 size={14} />
         </button>
         <button 
           className="primary-btn" 
-          style={{ padding: '6px', background: '#ef4444', display: 'inline-flex', alignItems: 'center' }} 
-          title="Delete"
+          style={{ padding: '8px', background: '#ef4444', boxShadow: 'none' }} 
+          title="Delete Task"
           onClick={() => handleDeleteTask(task.id)}
         >
           <Trash2 size={14} />
@@ -364,24 +363,27 @@ export default function Tasks() {
     );
   };
 
-  const headers = ['Task', 'Project', 'Assigned To', 'Priority', 'Status', 'Action', 'Hours'];
+  const headers = ['Task Title', 'Project', 'Assigned Member', 'Priority', 'Status', 'Actions', 'Est. Hours'];
 
   return (
     <div className="table-card">
       <div className="table-header">
-        <h3>Tasks Directory</h3>
+        <div>
+          <h3>Task Management Workspace</h3>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Track, assign, and execute project deliverables</span>
+        </div>
         <div className="table-actions">
           <button className="primary-btn" onClick={openCreateModal}>
             <CheckSquare size={16} /> Create Task
           </button>
-          <button className="refresh" onClick={fetchTasks}>
+          <button className="refresh" onClick={fetchTasks} title="Refresh tasks">
             <RefreshCw size={16} />
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: '60px', display: 'flex', justifyContent: 'center' }}>
           <div className="loader"></div>
         </div>
       ) : (
@@ -391,27 +393,29 @@ export default function Tasks() {
           renderRow={(task, idx) => (
             <tr key={idx}>
               <td>
-                <strong>{task.title}</strong>
+                <strong style={{ color: 'var(--text)', fontSize: '0.95rem' }}>{task.title}</strong>
                 <br />
-                <small style={{ color: '#64748b' }}>{task.description}</small>
+                <small style={{ color: 'var(--text-muted)' }}>{task.description}</small>
               </td>
-              <td>{task.projectName}</td>
+              <td>
+                <span style={{ fontWeight: '600', color: 'var(--text)' }}>{task.projectName}</span>
+              </td>
               <td>
                 {task.assignedTo ? (
                   <div>
-                    <strong>{task.assignedToName}</strong>
+                    <strong style={{ color: 'var(--text)' }}>{task.assignedToName}</strong>
                     <br />
-                    <small style={{ color: '#94a3b8' }}>Assigned by: {task.assignedByName}</small>
+                    <small style={{ color: 'var(--text-light)' }}>Assigned by: {task.assignedByName}</small>
                   </div>
                 ) : (
                   <select
                     className="table-select"
                     defaultValue=""
+                    style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }}
                     onFocus={() => fetchProjectMembers(task.projectId)}
                     onChange={(e) => handleAssignTask(task.id, e.target.value)}
                   >
-                    <option value="">Select User</option>
-
+                    <option value="">Assign Member...</option>
                     {employees.map(emp => (
                       <option key={emp.id} value={emp.id}>
                         {emp.employeeCode} - {emp.name}
@@ -434,7 +438,9 @@ export default function Tasks() {
                 </button>
               </td>
               <td>{renderActionButtons(task)}</td>
-              <td>{task.estimatedHours}h</td>
+              <td>
+                <span style={{ fontWeight: '700', color: 'var(--primary)' }}>{task.estimatedHours} hrs</span>
+              </td>
             </tr>
           )}
         />
@@ -445,7 +451,7 @@ export default function Tasks() {
         <div className="modal" style={{ display: 'flex' }}>
           <div className="modal-content">
             <div className="modal-header">
-              <h2>{isEditMode ? 'Edit Task' : 'Create Task'}</h2>
+              <h2>{isEditMode ? 'Edit Task Details' : 'Create New Task'}</h2>
               <span onClick={() => setShowModal(false)}><X size={20} /></span>
             </div>
 
@@ -453,18 +459,18 @@ export default function Tasks() {
               <div className="form-grid">
                 <div className="form-grid-full" style={{ gridColumn: 'span 2' }}>
                   <div className="form-group">
-                    <label>Task Title</label>
-                    <input name="title" value={formData.title} onChange={handleInputChange} required />
+                    <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Task Title</label>
+                    <input name="title" value={formData.title} onChange={handleInputChange} required placeholder="Enter task title" />
                   </div>
                 </div>
                 <div className="form-grid-full" style={{ gridColumn: 'span 2' }}>
                   <div className="form-group">
-                    <label>Description</label>
-                    <textarea name="description" value={formData.description} onChange={handleInputChange} required />
+                    <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Description</label>
+                    <textarea name="description" value={formData.description} onChange={handleInputChange} required placeholder="Provide clear task instructions..." />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Project</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Project</label>
                   <select name="projectId" value={formData.projectId} onChange={handleInputChange} required>
                     <option value="">Select Project</option>
                     {projects.map(p => <option key={p.id} value={p.id}>{p.projectName}</option>)}
@@ -472,7 +478,7 @@ export default function Tasks() {
                 </div>
 
                 <div className="form-group">
-                  <label>Priority</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Priority Level</label>
                   <select name="priority" value={formData.priority} onChange={handleInputChange} required>
                     <option value="LOW">Low</option>
                     <option value="MEDIUM">Medium</option>
@@ -480,15 +486,15 @@ export default function Tasks() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Estimated Hours</label>
-                  <input type="number" name="estimatedHours" value={formData.estimatedHours} onChange={handleInputChange} required />
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Estimated Hours</label>
+                  <input type="number" name="estimatedHours" value={formData.estimatedHours} onChange={handleInputChange} required placeholder="e.g. 8" />
                 </div>
                 <div className="form-group">
-                  <label>Start Date</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Start Date</label>
                   <input type="date" name="startDate" value={formData.startDate} onChange={handleInputChange} required />
                 </div>
                 <div className="form-group">
-                  <label>Due Date</label>
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Due Date</label>
                   <input type="date" name="dueDate" value={formData.dueDate} onChange={handleInputChange} required />
                 </div>
               </div>
@@ -496,8 +502,9 @@ export default function Tasks() {
               {message.text && (
                 <div style={{
                   padding: '12px 28px',
-                  color: message.type === 'success' ? '#16a34a' : '#ef4444',
-                  fontWeight: '500'
+                  color: message.type === 'success' ? '#10b981' : '#ef4444',
+                  fontWeight: '700',
+                  fontSize: '0.9rem'
                 }}>
                   {message.text}
                 </div>
@@ -505,7 +512,7 @@ export default function Tasks() {
 
               <div className="modal-footer">
                 <button type="button" className="cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="save">{isEditMode ? 'Update Task' : 'Save Task'}</button>
+                <button type="submit" className="save">{isEditMode ? 'Update Task' : 'Create Task'}</button>
               </div>
             </form>
           </div>
@@ -514,94 +521,74 @@ export default function Tasks() {
 
       {/* Logs Modal */}
       {showLogsModal && (
-        <div className="modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(15, 23, 42, 0.65)' }}>
-          <div className="modal-content" style={{ maxWidth: '750px', width: '92%', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
-            <div className="modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="modal" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="modal-content" style={{ maxWidth: '750px', width: '92%', borderRadius: '18px', overflow: 'hidden' }}>
+            <div className="modal-header" style={{ padding: '20px 28px' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700', color: '#0f172a', lineHeight: '1.3' }}>Task Action Logs</h2>
+                <h2>Task Execution Logs</h2>
                 {selectedTask && (
-                  <div style={{ fontSize: '0.875rem', color: '#475569', fontWeight: '500', marginTop: '4px' }}>
-                    {selectedTask.title} <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 'normal', display: 'inline', width: 'auto', height: 'auto', borderRadius: '0' }}>({selectedTask.projectName})</span>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600', marginTop: '4px' }}>
+                    {selectedTask.title} <span style={{ color: 'var(--primary)' }}>({selectedTask.projectName})</span>
                   </div>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => setShowLogsModal(false)}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '-2px' }}
-                title="Close"
-              >
-                <X size={20} color="#64748b" />
-              </button>
+              <span onClick={() => setShowLogsModal(false)}><X size={20} /></span>
             </div>
 
-            <div style={{ padding: '20px 24px', maxHeight: '420px', overflowY: 'auto' }}>
+            <div style={{ padding: '24px', maxHeight: '420px', overflowY: 'auto' }}>
               {logsLoading ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '30px' }}>
                   <div className="loader"></div>
                 </div>
               ) : selectedTaskLogs.length === 0 ? (
-                <p style={{ color: '#64748b', textAlign: 'center', padding: '20px' }}>No action logs found for this task.</p>
+                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '20px' }}>No action logs found for this task.</p>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
-                  <table className="logs-table" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '550px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '550px' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid #e2e8f0', textAlign: 'left', backgroundColor: '#f8fafc' }}>
-                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700', width: '130px' }}>Action</th>
-                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700' }}>User</th>
-                        <th style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Date & Time</th>
+                      <tr>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem' }}>Action</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem' }}>Executed By</th>
+                        <th style={{ padding: '12px 16px', fontSize: '0.8rem' }}>Timestamp</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedTaskLogs.map((log, idx) => {
-                        const getStyle = (action) => {
-                          const act = action?.toUpperCase();
-                          if (act === 'START' || act === 'RESUME') {
-                            return { backgroundColor: '#dbeafe', color: '#1d4ed8', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
-                          } else if (act === 'PAUSE') {
-                            return { backgroundColor: '#fef3c7', color: '#b45309', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
-                          } else if (act === 'COMPLETE' || act === 'COMPLETED') {
-                            return { backgroundColor: '#dcfce7', color: '#15803d', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
-                          }
-                          return { backgroundColor: '#f1f5f9', color: '#475569', borderRadius: '6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: '700', display: 'inline-block' };
-                        };
-                        return (
-                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '12px 16px' }}>
-                              <span style={getStyle(log.action)}>
-                                {log.action}
-                              </span>
-                            </td>
-                            <td style={{ padding: '12px 16px', fontWeight: '600', color: '#334155' }}>{log.userName || log.userId}</td>
-                            <td style={{ padding: '12px 16px', color: '#64748b', whiteSpace: 'nowrap' }}>
-                              {new Date(log.actionAt).toLocaleString()}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {selectedTaskLogs.map((log, idx) => (
+                        <tr key={idx}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span className="priority-badge medium" style={{ textTransform: 'uppercase' }}>
+                              {log.action}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px', fontWeight: '700', color: 'var(--text)' }}>{log.userName || log.userId}</td>
+                          <td style={{ padding: '12px 16px', color: 'var(--text-muted)' }}>
+                            {new Date(log.actionAt).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
               )}
             </div>
 
-            <div className="modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="modal-footer" style={{ padding: '16px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button
                 type="button"
                 onClick={handleExportTaskLogsExcel}
                 disabled={selectedTaskLogs.length === 0}
                 style={{
-                  background: selectedTaskLogs.length > 0 ? '#10b981' : '#cbd5e1',
+                  background: selectedTaskLogs.length > 0 ? '#10b981' : 'var(--border)',
                   color: '#ffffff',
                   border: 'none',
-                  borderRadius: '8px',
-                  padding: '8px 16px',
-                  fontWeight: '600',
+                  borderRadius: '10px',
+                  padding: '10px 18px',
+                  fontWeight: '700',
                   fontSize: '0.85rem',
                   cursor: selectedTaskLogs.length > 0 ? 'pointer' : 'not-allowed',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '8px'
                 }}
               >
                 <Download size={16} /> Export Excel

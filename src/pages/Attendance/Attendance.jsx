@@ -1285,10 +1285,10 @@ export default function Attendance() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: #ffffff;
+          background: var(--card-bg);
           padding: 10px 30px;
-          border-bottom: 1px solid #e2e8f0;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+          border-bottom: 1px solid var(--border);
+          box-shadow: var(--shadow-sm);
         }
         .zoho-tabs {
           display: flex;
@@ -1296,32 +1296,32 @@ export default function Attendance() {
         }
         .zoho-tab {
           padding: 12px 20px;
-          font-weight: 500;
+          font-weight: 600;
           font-size: 0.95rem;
-          color: #64748b;
+          color: var(--text-muted);
           border-bottom: 3px solid transparent;
           cursor: pointer;
           transition: all 0.2s;
           display: flex;
           align-items: center;
           gap: 8px;
-          border-radius: 6px 6px 0 0;
+          border-radius: 8px 8px 0 0;
         }
         .zoho-tab:hover {
-          color: #2563eb;
-          background: #f8fafc;
+          color: var(--primary);
+          background: var(--bg);
         }
         .zoho-tab.active {
-          color: #2563eb;
-          border-bottom-color: #2563eb;
-          font-weight: 600;
-          background: #eff6ff;
+          color: var(--primary);
+          border-bottom-color: var(--primary);
+          font-weight: 700;
+          background: var(--bg);
         }
         
         /* Role simulator styling */
         .role-simulator-badge {
-          background: #f1f5f9;
-          border: 1px dashed #cbd5e1;
+          background: var(--bg);
+          border: 1px dashed var(--border);
           border-radius: 8px;
           padding: 6px 12px;
           display: flex;
@@ -1329,14 +1329,15 @@ export default function Attendance() {
           gap: 8px;
           font-size: 0.85rem;
           font-weight: 500;
+          color: var(--text);
         }
         .role-simulator-select {
-          border: 1px solid #cbd5e1;
-          border-radius: 4px;
-          background: white;
-          color: #1e293b;
-          padding: 2px 6px;
-          font-weight: 600;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          background: var(--card-bg);
+          color: var(--text);
+          padding: 4px 8px;
+          font-weight: 700;
           cursor: pointer;
           outline: none;
         }
@@ -1349,37 +1350,37 @@ export default function Attendance() {
           padding: 20px 30px;
         }
         .metric-mini-card {
-          background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          border-radius: 16px;
           padding: 16px;
           text-align: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          box-shadow: var(--shadow);
           transition: transform 0.2s, box-shadow 0.2s;
         }
         .metric-mini-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+          box-shadow: var(--shadow-lg);
         }
         .metric-mini-card h4 {
           font-size: 1.6rem;
-          font-weight: 700;
-          color: #1e293b;
+          font-weight: 800;
+          color: var(--text);
           margin: 0;
         }
         .metric-mini-card p {
           font-size: 0.8rem;
-          color: #64748b;
+          color: var(--text-muted);
           margin-top: 4px;
-          font-weight: 500;
+          font-weight: 600;
         }
 
         /* Check In Widget */
         .checkin-widget-card {
-          background: white;
+          background: var(--card-bg);
           border-radius: 16px;
-          border: 1px solid #e2e8f0;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+          border: 1px solid var(--border);
+          box-shadow: var(--shadow);
           padding: 24px;
           margin: 0 30px;
         }
@@ -1444,29 +1445,32 @@ export default function Attendance() {
           z-index: 1000;
           animation: fadeIn 0.2s ease-out;
         }
-        .modal-dialog {
-          background: white;
+        .modal-card {
+          background: var(--card-bg);
           border-radius: 16px;
           width: 500px;
           max-width: 90%;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          border: 1px solid var(--border);
+          box-shadow: var(--shadow-lg);
           animation: slideUp 0.2s ease-out;
           overflow: hidden;
         }
         .modal-header {
           padding: 20px 24px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border);
           display: flex;
           justify-content: space-between;
           align-items: center;
+          color: var(--text);
         }
         .modal-body {
           padding: 24px;
+          color: var(--text);
         }
         .modal-footer {
           padding: 16px 24px;
-          border-top: 1px solid #e2e8f0;
-          background: #f8fafc;
+          border-top: 1px solid var(--border);
+          background: var(--bg);
           display: flex;
           justify-content: flex-end;
           gap: 12px;
@@ -1480,22 +1484,23 @@ export default function Attendance() {
           display: block;
           font-size: 0.85rem;
           font-weight: 600;
-          color: #334155;
+          color: var(--text);
           margin-bottom: 6px;
         }
         .form-input, .form-select {
           width: 100%;
-          border: 1px solid #cbd5e1;
+          border: 1px solid var(--border);
           border-radius: 8px;
           padding: 8px 12px;
           font-size: 0.9rem;
-          color: #1e293b;
+          background: var(--bg);
+          color: var(--text);
           outline: none;
           transition: border 0.15s;
         }
         .form-input:focus, .form-select:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
         @keyframes fadeIn {
@@ -1715,12 +1720,12 @@ export default function Attendance() {
 
               {/* Right Widget: Checkin Logs & General Rules info */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#1e293b', margin: 0 }}>
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text)', margin: 0 }}>
                       Attendance Logging Panel
                     </h3>
-                    <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '2px' }}>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '2px' }}>
                       Shift Timings: {settings.officeStartTime} AM to {minutesToTimeString(parseTimeToMinutes(settings.officeStartTime) + settings.workHoursRequired * 60)} ({settings.workHoursRequired}h required)
                     </p>
                   </div>
@@ -1737,41 +1742,29 @@ export default function Attendance() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
-                  <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>CHECK-IN TIME</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e293b', marginTop: '4px' }}>
+                  <div style={{ background: 'var(--bg)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>CHECK-IN TIME</span>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)', marginTop: '4px' }}>
                       {todayLog && todayLog.checkIn !== '-' ? todayLog.checkIn : '--:--'}
                     </h4>
                   </div>
-
-                  <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>CHECK-OUT TIME</span>
-                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: '#1e293b', marginTop: '4px' }}>
+                  <div style={{ background: 'var(--bg)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>CHECK-OUT TIME</span>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)', marginTop: '4px' }}>
                       {todayLog && todayLog.checkOut !== '-' ? todayLog.checkOut : '--:--'}
                     </h4>
                   </div>
-
-                  <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>TODAY'S STATUS</span>
-                    <div style={{ marginTop: '4px' }}>
-                      {todayLog ? (
-                        <span className={`status-badge ${
-                          todayLog.status === 'Present' ? 'present' :
-                          todayLog.status === 'Half Day' ? 'half-day' :
-                          todayLog.status === 'Checked In' ? 'present' : 'absent'
-                        }`}>
-                          {todayLog.status}
-                        </span>
-                      ) : (
-                        <span className="status-badge absent">Not Marked</span>
-                      )}
-                    </div>
+                  <div style={{ background: 'var(--bg)', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>SHIFT STATUS</span>
+                    <h4 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text)', marginTop: '4px' }}>
+                      {todayLog ? todayLog.status : 'Pending'}
+                    </h4>
                   </div>
                 </div>
 
-                <div style={{ background: '#eff6ff', borderRadius: '8px', padding: '10px 14px', border: '1px solid #bfdbfe', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <AlertCircle size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.8rem', color: '#1e40af', lineHeight: '1.3' }}>
+                <div style={{ background: 'rgba(59, 130, 246, 0.12)', borderRadius: '12px', padding: '12px 16px', border: '1px solid rgba(59, 130, 246, 0.25)', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <AlertCircle size={18} style={{ color: '#3b82f6', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text)', lineHeight: '1.4' }}>
                     <strong>Attendance Rule reminder:</strong> Check-ins after <strong>{settings.bufferTime} AM</strong> will automatically trigger <strong>Half Day</strong> status. Make sure to complete <strong>{settings.workHoursRequired} hours</strong> of shift length to ensure a full-day Present status.
                   </span>
                 </div>
@@ -1969,9 +1962,9 @@ export default function Attendance() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             
             {/* Left: Pending Regularization Requests */}
-            <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ margin: 0, fontWeight: '700', color: '#1e293b' }}>Pending Attendance Regularizations</h4>
+            <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow)', overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', background: 'var(--bg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h4 style={{ margin: 0, fontWeight: '700', color: 'var(--text)' }}>Pending Attendance Regularizations</h4>
                 <span className="status-badge" style={{ background: '#d97706', color: 'white' }}>
                   {filteredPendingRegularizations.length} Pending
                 </span>
@@ -1979,37 +1972,37 @@ export default function Attendance() {
               
               <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '10px' }}>
                 {filteredPendingRegularizations.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b', fontSize: '0.85rem' }}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     No pending regularization requests.
                   </div>
                 ) : (
                   filteredPendingRegularizations.map((req, idx) => (
-                    <div key={idx} style={{ border: '1px solid #f1f5f9', background: '#f8fafc', borderRadius: '8px', padding: '14px', marginBottom: '10px' }}>
+                    <div key={idx} style={{ border: '1px solid var(--border)', background: 'var(--bg)', borderRadius: '12px', padding: '14px', marginBottom: '10px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <strong>{req.name} ({req.employeeCode})</strong>
-                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Date: {req.date}</span>
+                        <strong style={{ color: 'var(--text)' }}>{req.name} (<code>{req.employeeCode}</code>)</strong>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Date: {req.date}</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#334155', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text)', marginBottom: '8px' }}>
                         <div><strong>Original:</strong> In: {req.originalCheckIn} | Out: {req.originalCheckOut}</div>
                         <div><strong>Requested:</strong> In: {req.requestedCheckIn} | Out: {req.requestedCheckOut} ({req.hours} hrs)</div>
-                        <div style={{ marginTop: '4px', fontStyle: 'italic', color: '#64748b' }}>"{req.reason}"</div>
+                        <div style={{ marginTop: '4px', fontStyle: 'italic', color: 'var(--text-muted)' }}>"{req.reason}"</div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <button 
                           onClick={() => handleFetchRegularizationDetails(req.id)}
-                          style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '5px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         >
                           <Eye size={12} /> View
                         </button>
                         <button 
                           onClick={() => handleRejectRegularization(req.id)}
-                          style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                          style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
                         >
                           Reject
                         </button>
                         <button 
                           onClick={() => handleApproveRegularization(req.id)}
-                          style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                          style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
                         >
                           Approve
                         </button>
@@ -2021,9 +2014,9 @@ export default function Attendance() {
             </div>
 
             {/* Right: Pending Leave Requests */}
-            <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ margin: 0, fontWeight: '700', color: '#1e293b' }}>Pending Leave Requests</h4>
+            <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow)', overflow: 'hidden' }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', background: 'var(--bg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h4 style={{ margin: 0, fontWeight: '700', color: 'var(--text)' }}>Pending Leave Requests</h4>
                 <span className="status-badge" style={{ background: '#7c3aed', color: 'white' }}>
                   {filteredPendingLeaves.length} Pending
                 </span>
@@ -2031,30 +2024,30 @@ export default function Attendance() {
               
               <div style={{ maxHeight: '350px', overflowY: 'auto', padding: '10px' }}>
                 {filteredPendingLeaves.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b', fontSize: '0.85rem' }}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                     No pending leave requests.
                   </div>
                 ) : (
                   filteredPendingLeaves.map((leave, idx) => (
-                    <div key={idx} style={{ border: '1px solid #f1f5f9', background: '#f8fafc', borderRadius: '8px', padding: '14px', marginBottom: '10px' }}>
+                    <div key={idx} style={{ border: '1px solid var(--border)', background: 'var(--bg)', borderRadius: '12px', padding: '14px', marginBottom: '10px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <strong>{leave.name} ({leave.employeeCode})</strong>
+                        <strong style={{ color: 'var(--text)' }}>{leave.name} (<code>{leave.employeeCode}</code>)</strong>
                         <span className="status-badge leave" style={{ fontSize: '0.7rem' }}>{leave.type}</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#334155', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text)', marginBottom: '8px' }}>
                         <div><strong>Dates:</strong> {leave.start} to {leave.end} ({leave.days} working days)</div>
-                        <div style={{ marginTop: '4px', fontStyle: 'italic', color: '#64748b' }}>"{leave.reason}"</div>
+                        <div style={{ marginTop: '4px', fontStyle: 'italic', color: 'var(--text-muted)' }}>"{leave.reason}"</div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                         <button 
                           onClick={() => handleRejectLeave(leave.id)}
-                          style={{ background: '#fee2e2', color: '#b91c1c', border: 'none', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                          style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
                         >
                           Reject
                         </button>
                         <button 
                           onClick={() => handleApproveLeave(leave.id)}
-                          style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                          style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
                         >
                           Approve
                         </button>
@@ -2068,30 +2061,30 @@ export default function Attendance() {
           </div>
 
           {/* Team Attendance Directory */}
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-            <div style={{ padding: '20px', borderBottom: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow)', overflow: 'hidden' }}>
+            <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 style={{ margin: 0, fontWeight: '700', color: '#1e293b', fontSize: '1.05rem' }}>Team Monthly Attendance Directory</h4>
-                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{isLiveLoading ? 'Loading logs...' : `Showing ${teamLogs.length} logs`}</span>
+                <h4 style={{ margin: 0, fontWeight: '700', color: 'var(--text)', fontSize: '1.05rem' }}>Team Monthly Attendance Directory</h4>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{isLiveLoading ? 'Loading logs...' : `Showing ${teamLogs.length} logs`}</span>
               </div>
               
               {/* Search & Filter Toolbar */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '10px' }}>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <Search size={16} style={{ position: 'absolute', left: '10px', color: '#94a3b8' }} />
+                  <Search size={16} style={{ position: 'absolute', left: '10px', color: 'var(--text-muted)' }} />
                   <input 
                     type="text" 
                     placeholder="Search by Employee Code or Name" 
                     value={filterEmployee}
                     onChange={(e) => setFilterEmployee(e.target.value)}
-                    style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 10px 6px 32px', fontSize: '0.85rem', width: '100%', outline: 'none' }}
+                    style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '6px 10px 6px 32px', fontSize: '0.85rem', width: '100%', outline: 'none', background: 'var(--bg)', color: 'var(--text)' }}
                   />
                 </div>
                 <div>
                   <select 
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 10px', fontSize: '0.85rem', width: '100%', outline: 'none', background: 'white' }}
+                    style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '6px 10px', fontSize: '0.85rem', width: '100%', outline: 'none', background: 'var(--bg)', color: 'var(--text)' }}
                   >
                     <option value="">All Statuses</option>
                     <option value="Present">Present</option>
@@ -2107,7 +2100,7 @@ export default function Attendance() {
                     type="month" 
                     value={selectedMonth} 
                     onChange={(e) => setSelectedMonth(e.target.value)}
-                    style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 10px', fontSize: '0.85rem', width: '100%', outline: 'none', background: 'white' }}
+                    style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '6px 10px', fontSize: '0.85rem', width: '100%', outline: 'none', background: 'var(--bg)', color: 'var(--text)' }}
                   />
                 </div>
                 <div>
@@ -2116,7 +2109,7 @@ export default function Attendance() {
                       setFilterEmployee('');
                       setFilterStatus('');
                     }}
-                    style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '6px 10px', fontSize: '0.85rem', color: '#475569', cursor: 'pointer', width: '100%', fontWeight: '500' }}
+                    style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: '8px', padding: '6px 10px', fontSize: '0.85rem', color: 'var(--text)', cursor: 'pointer', width: '100%', fontWeight: '600' }}
                   >
                     Clear Filters
                   </button>
@@ -2127,33 +2120,33 @@ export default function Attendance() {
             <div style={{ overflowX: 'auto', width: '100%' }}>
               <table>
                 <thead>
-                  <tr style={{ background: '#f8fafc', color: '#475569' }}>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Emp Code</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Name</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Date</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Check In</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Check Out</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Total Hours</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Attendance Status</th>
-                    <th style={{ color: '#475569', fontWeight: '600' }}>Regularization</th>
+                  <tr>
+                    <th>Emp Code</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Total Hours</th>
+                    <th>Attendance Status</th>
+                    <th>Regularization</th>
                   </tr>
                 </thead>
                 <tbody>
                   {teamLogs.length === 0 ? (
                     <tr>
-                      <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
                         No records match the active search/filters.
                       </td>
                     </tr>
                   ) : (
                     teamLogs.map((log, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ fontWeight: '600' }}>{log.employeeCode}</td>
-                        <td style={{ fontWeight: '600' }}>{log.name}</td>
+                      <tr key={idx}>
+                        <td><code>{log.employeeCode}</code></td>
+                        <td style={{ fontWeight: '600', color: 'var(--text)' }}>{log.name}</td>
                         <td>{log.date}</td>
                         <td>{log.checkIn}</td>
                         <td>{log.checkOut}</td>
-                        <td style={{ fontWeight: '500' }}>{log.hours > 0 ? `${log.hours} hrs` : '-'}</td>
+                        <td style={{ fontWeight: '600', color: 'var(--text)' }}>{log.hours > 0 ? `${log.hours} hrs` : '-'}</td>
                         <td>
                           <span className={`status-badge ${
                             log.status === 'Present' ? 'present' :
@@ -2168,13 +2161,13 @@ export default function Attendance() {
                         </td>
                         <td>
                           {log.regularizationStatus === 'Pending' ? (
-                            <span style={{ color: '#d97706', fontSize: '0.8rem', fontWeight: '600' }}>Waiting for Approval</span>
+                            <span style={{ color: '#f59e0b', fontSize: '0.8rem', fontWeight: '700' }}>Waiting for Approval</span>
                           ) : log.regularizationStatus === 'Approved' ? (
-                            <span style={{ color: '#059669', fontSize: '0.8rem', fontWeight: '600' }}>Approved</span>
+                            <span style={{ color: '#10b981', fontSize: '0.8rem', fontWeight: '700' }}>Approved</span>
                           ) : log.regularizationStatus === 'Rejected' ? (
-                            <span style={{ color: '#dc2626', fontSize: '0.8rem', fontWeight: '600' }}>Rejected</span>
+                            <span style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '700' }}>Rejected</span>
                           ) : (
-                            <span style={{ color: '#cbd5e1' }}>-</span>
+                            <span style={{ color: 'var(--text-muted)' }}>-</span>
                           )}
                         </td>
                       </tr>
@@ -2192,15 +2185,15 @@ export default function Attendance() {
         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '30px', padding: '0 30px' }}>
           
           {/* Policy Settings Form */}
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ margin: '0 0 18px', fontWeight: '700', color: '#1e293b', fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', padding: '24px', boxShadow: 'var(--shadow)' }}>
+            <h4 style={{ margin: '0 0 18px', fontWeight: '700', color: 'var(--text)', fontSize: '1.1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
               Working Hours & Policy Configuration
             </h4>
             
             <form onSubmit={handleUpdatePolicy}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
-                  <label className="form-label">Office Shift Start Time</label>
+                  <label className="form-label" style={{ color: 'var(--text)' }}>Office Shift Start Time</label>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -2208,11 +2201,11 @@ export default function Attendance() {
                     onChange={(e) => setStartTimeInput(e.target.value)}
                     placeholder="e.g. 09:00"
                   />
-                  <small style={{ color: '#64748b', fontSize: '0.75rem' }}>Format: HH:MM (24-hour style)</small>
+                  <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Format: HH:MM (24-hour style)</small>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Check-In Buffer Limit (Half Day trigger)</label>
+                  <label className="form-label" style={{ color: 'var(--text)' }}>Check-In Buffer Limit (Half Day trigger)</label>
                   <input 
                     type="text" 
                     className="form-input" 
@@ -2220,12 +2213,12 @@ export default function Attendance() {
                     onChange={(e) => setBufferTimeInput(e.target.value)}
                     placeholder="e.g. 09:30"
                   />
-                  <small style={{ color: '#64748b', fontSize: '0.75rem' }}>E.g. Check-ins after 09:30 become Half Days</small>
+                  <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>E.g. Check-ins after 09:30 become Half Days</small>
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Required Shift Working Hours</label>
+                <label className="form-label" style={{ color: 'var(--text)' }}>Required Shift Working Hours</label>
                 <input 
                   type="number" 
                   step="0.5"
@@ -2233,7 +2226,7 @@ export default function Attendance() {
                   value={requiredHoursInput} 
                   onChange={(e) => setRequiredHoursInput(e.target.value)}
                 />
-                <small style={{ color: '#64748b', fontSize: '0.75rem' }}>Shift length in hours (defaults to 9)</small>
+                <small style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Shift length in hours (defaults to 9)</small>
               </div>
 
               <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px', marginBottom: '24px' }}>
@@ -2244,7 +2237,7 @@ export default function Attendance() {
                   onChange={(e) => setAllowUnderHoursInput(e.target.checked)}
                   style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                 />
-                <label htmlFor="allowUnderHours" style={{ fontSize: '0.85rem', color: '#334155', fontWeight: '500', cursor: 'pointer' }}>
+                <label htmlFor="allowUnderHours" style={{ fontSize: '0.85rem', color: 'var(--text)', fontWeight: '500', cursor: 'pointer' }}>
                   Allow regularization with fewer than required working hours
                 </label>
               </div>
@@ -2256,8 +2249,8 @@ export default function Attendance() {
           </div>
 
           {/* Holidays List Manager */}
-          <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ margin: '0 0 18px', fontWeight: '700', color: '#1e293b', fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
+          <div style={{ background: 'var(--card-bg)', borderRadius: '16px', border: '1px solid var(--border)', padding: '24px', boxShadow: 'var(--shadow)' }}>
+            <h4 style={{ margin: '0 0 18px', fontWeight: '700', color: 'var(--text)', fontSize: '1.1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
               Holidays Management
             </h4>
             
@@ -2813,8 +2806,8 @@ function AdminAttendanceDashboard({ metrics }) {
       {/* Header Panel */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Attendance Dashboard</h1>
-          <p style={{ color: '#64748b', fontSize: '0.85rem', margin: '4px 0 0', fontWeight: '500' }}>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: 0 }}>Attendance Dashboard</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '4px 0 0', fontWeight: '500' }}>
             Attendance &gt; Attendance Dashboard
           </p>
         </div>
@@ -2851,13 +2844,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Total Employees */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Total Employees</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{totalEmployees}</h2>
-            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Total Employees</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{totalEmployees}</h2>
+            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               +3.5% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#ffedd5', color: '#ea580c', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <Users size={22} />
           </div>
         </div>
@@ -2865,13 +2858,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Present Today */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Present Today</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{presentToday}</h2>
-            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Present Today</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{presentToday}</h2>
+            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               +2.2% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#d1fae5', color: '#10b981', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <UserCheck size={22} />
           </div>
         </div>
@@ -2879,13 +2872,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Absent Today */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Absent Today</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{absentToday}</h2>
-            <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '700', background: '#fee2e2', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Absent Today</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{absentToday}</h2>
+            <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '700', background: 'rgba(239, 68, 68, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               +1.5% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#fee2e2', color: '#ef4444', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <UserX size={22} />
           </div>
         </div>
@@ -2893,13 +2886,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Late Arrivals */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Late Arrivals</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{lateArrivals}</h2>
-            <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '700', background: '#fef3c7', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Late Arrivals</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{lateArrivals}</h2>
+            <span style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: '700', background: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               -1.2% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#fef3c7', color: '#d97706', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#d97706', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <ClockIcon size={22} />
           </div>
         </div>
@@ -2907,13 +2900,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Attendance Rate */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Attendance Rate</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{attendanceRate}%</h2>
-            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Attendance Rate</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{attendanceRate}%</h2>
+            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: 'rgba(16, 185, 129, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               +0.8% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#f3e8ff', color: '#8b5cf6', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <TrendingUp size={22} />
           </div>
         </div>
@@ -2921,13 +2914,13 @@ function AdminAttendanceDashboard({ metrics }) {
         {/* Pending Regularizations */}
         <div style={adminCardStyle}>
           <div>
-            <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '600' }}>Pending Regularizations</span>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 4px' }}>{pendingRegularizations}</h2>
-            <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '700', background: '#fee2e2', padding: '2px 8px', borderRadius: '12px' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Pending Regularizations</span>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text)', margin: '8px 0 4px' }}>{pendingRegularizations}</h2>
+            <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: '700', background: 'rgba(239, 68, 68, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>
               +0.3% vs yesterday
             </span>
           </div>
-          <div style={{ background: '#fce7f3', color: '#db2777', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
+          <div style={{ background: 'rgba(219, 39, 119, 0.15)', color: '#db2777', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center' }}>
             <AlertCircle size={22} />
           </div>
         </div>
@@ -3315,23 +3308,23 @@ function AdminAttendanceDashboard({ metrics }) {
 
 // Styling Constants for Admin Attendance Dashboard
 const adminCardStyle = {
-  background: '#ffffff',
+  background: 'var(--card-bg)',
   borderRadius: '16px',
-  border: '1px solid #e2e8f0',
+  border: '1px solid var(--border)',
   padding: '20px',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+  boxShadow: 'var(--shadow)',
   minHeight: '115px'
 };
 
 const adminBigCardStyle = {
-  background: '#ffffff',
+  background: 'var(--card-bg)',
   borderRadius: '16px',
-  border: '1px solid #e2e8f0',
+  border: '1px solid var(--border)',
   padding: '24px',
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+  boxShadow: 'var(--shadow)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
@@ -3342,7 +3335,7 @@ const cardHeaderStyle = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  borderBottom: '1px solid #f1f5f9',
+  borderBottom: '1px solid var(--border)',
   paddingBottom: '12px',
   marginBottom: '12px'
 };
@@ -3351,7 +3344,7 @@ const cardTitleStyle = {
   margin: 0,
   fontSize: '1rem',
   fontWeight: '700',
-  color: '#1e293b'
+  color: 'var(--text)'
 };
 
 const suggestedBtnStyle = {

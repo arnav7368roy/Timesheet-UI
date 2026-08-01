@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
+import { Search, Bell, Menu, Sun, Moon, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -14,36 +14,36 @@ export default function Header({ toggleMobile }) {
   const getPageMeta = (pathname) => {
     switch (pathname) {
       case '/':
-        return { title: 'Dashboard', subtitle: 'Welcome to TimeSheet Management' };
+        return { title: 'Dashboard Overview', subtitle: 'Real-time performance analytics & active monitoring' };
       case '/employees':
-        return { title: 'Employees', subtitle: 'Manage your organization team members' };
+        return { title: 'Team Directory', subtitle: 'Manage team members, roles, and organization structure' };
       case '/projects':
-        return { title: 'Projects', subtitle: 'Track projects and key milestones' };
+        return { title: 'Project Management', subtitle: 'Track active projects, milestones, and deliverables' };
       case '/timesheets':
-        return { title: 'Timesheets', subtitle: 'Monitor and log employee hours' };
+        return { title: 'Timesheet Tracker', subtitle: 'Monitor, log, and audit employee billable hours' };
       case '/attendance':
-        return { title: 'Attendance', subtitle: 'View daily log ins and clock outs' };
+        return { title: 'Attendance Log', subtitle: 'Daily clock-in/out records and monthly summaries' };
       case '/leave':
-        return { title: 'Leave Management', subtitle: 'Manage leave requests and balances' };
+        return { title: 'Leave Management', subtitle: 'Review leave applications and available balances' };
       case '/tasks':
-        return { title: 'Tasks', subtitle: 'Manage assignments and project tasks' };
+        return { title: 'Task Workspace', subtitle: 'Organize assignments, priorities, and execution status' };
       case '/calendar':
-        return { title: 'Calendar', subtitle: 'Keep track of scheduled events and milestones' };
+        return { title: 'Calendar Schedule', subtitle: 'Upcoming events, milestones, and project deadlines' };
       case '/reports':
-        return { title: 'Reports & Analytics', subtitle: 'Analyze work metrics and generate reports' };
+        return { title: 'Reports & Analytics', subtitle: 'Generate detailed analytical reports and export logs' };
       case '/settings':
-        return { title: 'Settings', subtitle: 'Configure application settings' };
+        return { title: 'System Settings', subtitle: 'Configure application preferences and system rules' };
       case '/profile':
-        return { title: 'User Profile', subtitle: 'Manage your personal details and settings' };
+        return { title: 'User Profile', subtitle: 'Personal preferences, credentials, and account details' };
       default:
-        return { title: 'TimeSheet', subtitle: 'Employee Management & Monitoring' };
+        return { title: 'TimeSheet Portal', subtitle: 'Enterprise Employee Management Workspace' };
     }
   };
 
   const meta = getPageMeta(location.pathname);
   const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'User';
   const roleName = user?.roleName || 'Employee';
-  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=2563eb&color=fff`;
+  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=3b82f6&color=fff&bold=true`;
 
   const isDarkMode = theme === 'Dark' || (theme === 'System' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -53,7 +53,7 @@ export default function Header({ toggleMobile }) {
 
   return (
     <header className="topbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <button 
           className="mobile-menu-btn" 
           onClick={toggleMobile}
@@ -61,7 +61,7 @@ export default function Header({ toggleMobile }) {
           style={{
             background: 'var(--bg)',
             border: '1px solid var(--border)',
-            borderRadius: '8px',
+            borderRadius: '10px',
             padding: '8px',
             cursor: 'pointer',
             display: 'none',
@@ -71,15 +71,17 @@ export default function Header({ toggleMobile }) {
           <Menu size={22} />
         </button>
         <div>
-          <h2 id="title">{meta.title}</h2>
+          <h2 id="title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {meta.title}
+          </h2>
           <span className="subtitle">{meta.subtitle}</span>
         </div>
       </div>
 
       <div className="top-right">
         <div className="search-box">
-          <Search size={18} className="search-icon" />
-          <input type="text" placeholder="Search..." />
+          <Search size={18} style={{ color: 'var(--text-muted)' }} />
+          <input type="text" placeholder="Search tasks, members..." />
         </div>
 
         <button 
@@ -91,12 +93,34 @@ export default function Header({ toggleMobile }) {
           {isDarkMode ? <Sun size={18} style={{ color: '#fbbf24' }} /> : <Moon size={18} />}
         </button>
 
-        <button className="notification" aria-label="Notifications">
+        <button className="notification" aria-label="Notifications" style={{ position: 'relative' }}>
           <Bell size={18} />
+          <span style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#ef4444',
+            boxShadow: '0 0 8px #ef4444'
+          }} />
         </button>
 
-        <div className="profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }}>
-          <img src={avatarUrl} alt="Avatar" />
+        <div className="profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer', position: 'relative' }}>
+          <div style={{ position: 'relative' }}>
+            <img src={avatarUrl} alt="Avatar" />
+            <span style={{
+              position: 'absolute',
+              bottom: '2px',
+              right: '2px',
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              background: '#10b981',
+              border: '2px solid var(--white)'
+            }} />
+          </div>
           <div>
             <strong>{fullName}</strong>
             <small>{roleName}</small>

@@ -9,7 +9,9 @@ import {
   Clock, 
   Briefcase,
   Search,
-  Filter
+  Filter,
+  TrendingUp,
+  PieChart
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../utils/api';
@@ -18,12 +20,10 @@ import DataTable from '../../components/Tables/Tables';
 export default function Reports() {
   const { user } = useAuth();
 
-
   const [activeReport, setActiveReport] = useState('attendance'); // 'attendance', 'timesheet', 'project', 'leave'
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
   
   // Date Range Filters
   const [startDate, setStartDate] = useState('');
@@ -47,7 +47,17 @@ export default function Reports() {
       if (res.ok && res.data && Array.isArray(res.data.data)) {
         setReportData(res.data.data);
       } else {
-        setReportData([]);
+        // Fallback for leave if /reports/leave-summary returns empty
+        if (activeReport === 'leave') {
+          const leaveRes = await apiRequest('/leaves');
+          if (leaveRes.ok && leaveRes.data && Array.isArray(leaveRes.data.data)) {
+            setReportData(leaveRes.data.data);
+          } else {
+            setReportData([]);
+          }
+        } else {
+          setReportData([]);
+        }
       }
     } catch (e) {
       console.error('Failed to fetch report data:', e);
@@ -79,7 +89,6 @@ export default function Reports() {
         }).join('\t');
       });
 
-      // BOM header \uFEFF ensures Microsoft Excel opens UTF-8 characters cleanly
       const excelContent = '\uFEFF' + [headers, ...rows].join('\n');
       const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -109,58 +118,59 @@ export default function Reports() {
   const getColumns = () => {
     if (activeReport === 'attendance') {
       return [
-        { header: 'EMP CODE', accessor: 'employeeCode' },
-        { header: 'EMPLOYEE NAME', accessor: 'employeeName' },
-        { header: 'EMAIL', accessor: 'email' },
-        { header: 'RECORD COUNT', accessor: 'totalAttendanceDays' },
+        { header: 'Employee Code', accessor: 'employeeCode' },
+        { header: 'Employee Name', accessor: 'employeeName' },
+        { header: 'Email Address', accessor: 'email' },
+        { header: 'Attendance Days', accessor: 'totalAttendanceDays' },
         { 
-          header: 'TOTAL HOURS', 
+          header: 'Total Working Hours', 
           accessor: 'totalWorkingHours',
-          render: (row) => <span style={{ fontWeight: '700', color: '#10b981' }}>{row.totalWorkingHours} hrs</span>
+          render: (row) => <span style={{ fontWeight: '800', color: '#10b981' }}>{row.totalWorkingHours ?? 0} hrs</span>
         },
       ];
     } else if (activeReport === 'timesheet') {
       return [
-        { header: 'EMP CODE', accessor: 'employeeCode' },
-        { header: 'EMPLOYEE NAME', accessor: 'employeeName' },
-        { header: 'PROJECT NAME', accessor: 'projectName' },
-        { header: 'TASK TITLE', accessor: 'taskTitle' },
+        { header: 'Employee Code', accessor: 'employeeCode' },
+        { header: 'Employee Name', accessor: 'employeeName' },
+        { header: 'Project Name', accessor: 'projectName' },
+        { header: 'Task Title', accessor: 'taskTitle' },
         { 
-          header: 'LOG ACTION', 
+          header: 'Action Log', 
           accessor: 'logAction',
           render: (row) => {
             const action = (row.logAction || 'PENDING').toUpperCase();
-            let bg = '#f1f5f9';
-            let color = '#475569';
-            if (action === 'START') { bg = '#dbeafe'; color = '#1d4ed8'; }
-            else if (action === 'PAUSE') { bg = '#fef3c7'; color = '#b45309'; }
-            else if (action === 'RESUME') { bg = '#e0e7ff'; color = '#4338ca'; }
-            else if (action === 'COMPLETE' || action === 'COMPLETED') { bg = '#dcfce7'; color = '#15803d'; }
+            let bg = 'var(--bg)';
+            let color = 'var(--text-muted)';
+            if (action === 'START') { bg = 'rgba(59, 130, 246, 0.12)'; color = '#2563eb'; }
+            else if (action === 'PAUSE') { bg = 'rgba(245, 158, 11, 0.12)'; color = '#d97706'; }
+            else if (action === 'RESUME') { bg = 'rgba(99, 102, 241, 0.12)'; color = '#4f46e5'; }
+            else if (action === 'COMPLETE' || action === 'COMPLETED') { bg = 'rgba(16, 185, 129, 0.12)'; color = '#10b981'; }
             return (
               <span style={{
                 background: bg,
                 color: color,
                 padding: '4px 10px',
                 borderRadius: '6px',
-                fontWeight: '700',
-                fontSize: '0.75rem'
+                fontWeight: '800',
+                fontSize: '0.75rem',
+                textTransform: 'uppercase'
               }}>
                 {action}
               </span>
             );
           }
         },
-        { header: 'LOG TIME', accessor: 'actionTime' },
+        { header: 'Timestamp', accessor: 'actionTime' },
         { 
-          header: 'TASK STATUS', 
+          header: 'Task Status', 
           accessor: 'taskStatus',
           render: (row) => (
             <span style={{
-              background: row.taskStatus === 'COMPLETED' ? '#dcfce7' : '#fef3c7',
-              color: row.taskStatus === 'COMPLETED' ? '#15803d' : '#b45309',
-              padding: '4px 8px',
+              background: row.taskStatus === 'COMPLETED' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+              color: row.taskStatus === 'COMPLETED' ? '#10b981' : '#d97706',
+              padding: '4px 10px',
               borderRadius: '6px',
-              fontWeight: '600',
+              fontWeight: '700',
               fontSize: '0.75rem'
             }}>
               {row.taskStatus}
@@ -168,86 +178,85 @@ export default function Reports() {
           )
         },
         { 
-          header: 'LOGGED HOURS', 
+          header: 'Logged Hours', 
           accessor: 'totalLoggedHours',
-          render: (row) => <span style={{ fontWeight: '700', color: '#3b82f6' }}>{row.totalLoggedHours} hrs</span>
+          render: (row) => <span style={{ fontWeight: '800', color: 'var(--primary)' }}>{row.totalLoggedHours ?? 0} hrs</span>
         },
       ];
-
-
     } else if (activeReport === 'project') {
       return [
-        { header: 'PROJECT CODE', accessor: 'projectCode' },
-        { header: 'PROJECT NAME', accessor: 'projectName' },
+        { header: 'Project Code', accessor: 'projectCode', render: (row) => row.projectCode || row.code || '-' },
+        { header: 'Project Name', accessor: 'projectName', render: (row) => row.projectName || row.name || '-' },
         { 
-          header: 'STATUS', 
+          header: 'Status', 
           accessor: 'status',
           render: (row) => (
             <span style={{
-              background: row.status === 'ACTIVE' ? '#dcfce7' : '#f1f5f9',
-              color: row.status === 'ACTIVE' ? '#15803d' : '#64748b',
-              padding: '4px 8px',
+              background: row.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg)',
+              color: row.status === 'ACTIVE' ? '#10b981' : 'var(--text-muted)',
+              padding: '4px 10px',
               borderRadius: '6px',
-              fontWeight: '600',
+              fontWeight: '700',
               fontSize: '0.75rem'
             }}>
-              {row.status}
+              {row.status || 'ACTIVE'}
             </span>
           )
         },
-        { header: 'TOTAL TASKS', accessor: 'totalTasks' },
+        { header: 'Total Deliverable Tasks', accessor: 'totalTasks', render: (row) => row.totalTasks ?? row.taskCount ?? 0 },
       ];
     } else {
       return [
-        { header: 'EMP CODE', accessor: 'employeeCode' },
-        { header: 'EMPLOYEE NAME', accessor: 'employeeName' },
-        { header: 'LEAVE TYPE', accessor: 'leaveType' },
-        { header: 'ALLOCATED', accessor: 'allocated' },
-        { header: 'USED', accessor: 'used' },
+        { header: 'Employee Code', accessor: 'employeeCode', render: (row) => row.employeeCode || row.userCode || '-' },
+        { header: 'Employee Name', accessor: 'employeeName', render: (row) => row.employeeName || row.name || '-' },
+        { header: 'Leave Category', accessor: 'leaveType', render: (row) => row.leaveType || row.type || 'Casual' },
+        { header: 'Allocated Days', accessor: 'allocated', render: (row) => row.allocated ?? row.allocatedDays ?? 12 },
+        { header: 'Used Days', accessor: 'used', render: (row) => row.used ?? row.usedDays ?? (row.totalDays || 0) },
         { 
-          header: 'REMAINING', 
+          header: 'Remaining Balance', 
           accessor: 'remaining',
-          render: (row) => <span style={{ fontWeight: '700', color: row.remaining > 0 ? '#10b981' : '#ef4444' }}>{row.remaining}</span>
+          render: (row) => {
+            const rem = row.remaining ?? row.remainingDays ?? ((row.allocated ?? 12) - (row.used ?? row.totalDays ?? 0));
+            return <span style={{ fontWeight: '800', color: rem > 0 ? '#10b981' : '#ef4444' }}>{rem}</span>;
+          }
         },
       ];
     }
   };
 
-
   return (
-
-
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', paddingBottom: '30px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', padding: '0 35px 35px' }}>
       
-      {/* Top Header Controls */}
+      {/* Top Navigation Bar */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#ffffff',
-        padding: '20px 24px',
-        borderRadius: '16px',
-        border: '1px solid #e2e8f0',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+        background: 'var(--card-bg)',
+        padding: '20px 28px',
+        borderRadius: '18px',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow)',
         flexWrap: 'wrap',
         gap: '16px'
       }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => setActiveReport('attendance')}
             style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
+              padding: '10px 20px',
+              borderRadius: '12px',
               border: 'none',
-              fontWeight: '700',
+              fontWeight: '800',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              background: activeReport === 'attendance' ? '#3b82f6' : '#f8fafc',
-              color: activeReport === 'attendance' ? '#ffffff' : '#64748b',
+              background: activeReport === 'attendance' ? 'var(--primary-gradient)' : 'var(--bg)',
+              color: activeReport === 'attendance' ? '#ffffff' : 'var(--text-muted)',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              transition: 'all 0.2s'
+              transition: 'all 0.25s ease',
+              boxShadow: activeReport === 'attendance' ? 'var(--shadow-glow)' : 'none'
             }}
           >
             <Clock size={16} /> Attendance Summary
@@ -256,18 +265,19 @@ export default function Reports() {
           <button
             onClick={() => setActiveReport('timesheet')}
             style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
+              padding: '10px 20px',
+              borderRadius: '12px',
               border: 'none',
-              fontWeight: '700',
+              fontWeight: '800',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              background: activeReport === 'timesheet' ? '#3b82f6' : '#f8fafc',
-              color: activeReport === 'timesheet' ? '#ffffff' : '#64748b',
+              background: activeReport === 'timesheet' ? 'var(--primary-gradient)' : 'var(--bg)',
+              color: activeReport === 'timesheet' ? '#ffffff' : 'var(--text-muted)',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              transition: 'all 0.2s'
+              transition: 'all 0.25s ease',
+              boxShadow: activeReport === 'timesheet' ? 'var(--shadow-glow)' : 'none'
             }}
           >
             <BarChart3 size={16} /> Timesheet Logged Hours
@@ -276,18 +286,19 @@ export default function Reports() {
           <button
             onClick={() => setActiveReport('project')}
             style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
+              padding: '10px 20px',
+              borderRadius: '12px',
               border: 'none',
-              fontWeight: '700',
+              fontWeight: '800',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              background: activeReport === 'project' ? '#3b82f6' : '#f8fafc',
-              color: activeReport === 'project' ? '#ffffff' : '#64748b',
+              background: activeReport === 'project' ? 'var(--primary-gradient)' : 'var(--bg)',
+              color: activeReport === 'project' ? '#ffffff' : 'var(--text-muted)',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              transition: 'all 0.2s'
+              transition: 'all 0.25s ease',
+              boxShadow: activeReport === 'project' ? 'var(--shadow-glow)' : 'none'
             }}
           >
             <Briefcase size={16} /> Project Progress
@@ -296,141 +307,128 @@ export default function Reports() {
           <button
             onClick={() => setActiveReport('leave')}
             style={{
-              padding: '10px 18px',
-              borderRadius: '10px',
+              padding: '10px 20px',
+              borderRadius: '12px',
               border: 'none',
-              fontWeight: '700',
+              fontWeight: '800',
               fontSize: '0.85rem',
               cursor: 'pointer',
-              background: activeReport === 'leave' ? '#3b82f6' : '#f8fafc',
-              color: activeReport === 'leave' ? '#ffffff' : '#64748b',
+              background: activeReport === 'leave' ? 'var(--primary-gradient)' : 'var(--bg)',
+              color: activeReport === 'leave' ? '#ffffff' : 'var(--text-muted)',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              transition: 'all 0.2s'
+              transition: 'all 0.25s ease',
+              boxShadow: activeReport === 'leave' ? 'var(--shadow-glow)' : 'none'
             }}
           >
-            <CalendarIcon size={16} /> Leave Usage
+            <CalendarIcon size={16} /> Leave Utilization
           </button>
         </div>
 
         <button
           onClick={handleExportExcel}
           style={{
-            background: '#10b981',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             color: '#ffffff',
             border: 'none',
-            borderRadius: '10px',
-            padding: '10px 20px',
-            fontWeight: '700',
+            borderRadius: '12px',
+            padding: '10px 22px',
+            fontWeight: '800',
             fontSize: '0.9rem',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)'
+            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)'
           }}
         >
           <Download size={18} /> Export Excel
         </button>
       </div>
 
-      {/* Date Range & Search Filters Card */}
+      {/* Date Range & Search Filters */}
       <div style={{
-        background: '#ffffff',
-        padding: '16px 24px',
-        borderRadius: '16px',
-        border: '1px solid #e2e8f0',
+        background: 'var(--card-bg)',
+        padding: '18px 28px',
+        borderRadius: '18px',
+        border: '1px solid var(--border)',
         display: 'flex',
-        justifyContent: 'space-between',
+        justify: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '16px'
+        gap: '16px',
+        boxShadow: 'var(--shadow-sm)'
       }}>
-        {/* Search */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '8px 16px', borderRadius: '10px', border: '1px solid #cbd5e1', minWidth: '260px' }}>
-          <Search size={16} style={{ color: '#64748b' }} />
+        {/* Search Input */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--bg)', padding: '8px 18px', borderRadius: '12px', border: '1px solid var(--border)', minWidth: '280px' }}>
+          <Search size={16} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search report records..."
+            placeholder="Search records by name, code, task..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '0.85rem' }}
+            style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', fontSize: '0.85rem', color: 'var(--text)' }}
           />
         </div>
 
-        {/* Date Filters (for Attendance & Timesheet) */}
+        {/* Date Range Controls */}
         {(activeReport === 'attendance' || activeReport === 'timesheet') && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>From:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>From:</span>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                style={{ padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border)', fontSize: '0.85rem', background: 'var(--bg)', color: 'var(--text)' }}
               />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>To:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>To:</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                style={{ padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border)', fontSize: '0.85rem', background: 'var(--bg)', color: 'var(--text)' }}
               />
             </div>
             {(startDate || endDate) && (
               <button
                 onClick={() => { setStartDate(''); setEndDate(''); }}
-                style={{ background: '#f1f5f9', border: 'none', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: '700', fontSize: '0.8rem' }}
               >
-                Clear
+                Reset Filter
               </button>
             )}
           </div>
         )}
       </div>
 
-      {/* Main Data Table */}
-      <div className="table-card" style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      {/* Main Table Card */}
+      <div className="table-card" style={{ margin: 0, padding: '28px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
-            <h3 style={{ margin: 0, textTransform: 'capitalize', fontWeight: '800', color: '#0f172a' }}>
-              {activeReport} Summary Report
+            <h3 style={{ margin: 0, textTransform: 'capitalize', fontWeight: '800', color: 'var(--text)', fontSize: '1.25rem' }}>
+              {activeReport} Summary Analytics
             </h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-              Showing {filteredData.length} records
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Showing {filteredData.length} records matching your filter criteria
             </span>
           </div>
           <button
             onClick={fetchReportData}
-            style={{
-              background: '#3b82f6',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '8px 16px',
-              fontWeight: '600',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.2s',
-              boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)'
-            }}
+            className="primary-btn"
+            style={{ padding: '8px 18px', fontSize: '0.85rem' }}
           >
-            <RefreshCw size={16} /> Refresh
+            <RefreshCw size={16} /> Refresh Report
           </button>
-
         </div>
 
         <DataTable
           columns={getColumns()}
           data={filteredData}
           loading={loading}
-          searchPlaceholder="Search records..."
         />
       </div>
 

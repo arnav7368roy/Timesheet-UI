@@ -19,7 +19,8 @@ import {
   AlertTriangle,
   Activity,
   UserX,
-  HelpCircle
+  Sparkles,
+  Award
 } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 
@@ -131,17 +132,17 @@ export default function Dashboard() {
         count: deptCounts[name]
       })).sort((a, b) => b.count - a.count);
 
-      // Real Employment Types breakdown
+      // Employment Types breakdown
       let ft = 0, ct = 0, pb = 0, wfh = 0;
       usersList.forEach(u => {
         const empType = (u.employmentType || u.employment_type || u.type || '').toLowerCase();
         if (empType.includes('contract')) ct++;
         else if (empType.includes('probation')) pb++;
         else if (empType.includes('wfh') || empType.includes('home')) wfh++;
-        else ft++; // default to fullTime
+        else ft++;
       });
 
-      // Real Attendance Rate calculation for today
+      // Attendance Rate
       const attendanceList = attendanceRes.ok && attendanceRes.data?.data ? attendanceRes.data.data : [];
       const todayYear = now.getFullYear();
       const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
@@ -164,7 +165,7 @@ export default function Dashboard() {
         ? Math.round((uniquePresentUsers / usersList.length) * 100) 
         : 0;
 
-      // Real Top Performer calculation from completed tasks
+      // Top Performer
       const userCompletedTaskMap = {};
       tasksList.forEach(t => {
         if (t.status === 'COMPLETED' && (t.assignedToName || t.assignedTo)) {
@@ -184,9 +185,7 @@ export default function Dashboard() {
             u.id === userKey || 
             u.employeeCode === userKey
           );
-          if (foundU) {
-            topUser = foundU;
-          }
+          if (foundU) topUser = foundU;
         }
       });
 
@@ -194,7 +193,7 @@ export default function Dashboard() {
       let topPerfRole = topUser?.designationName || topUser?.roleName || 'Employee';
       const topScore = maxTasks > 0 ? `${Math.min(99, 80 + maxTasks * 5)}%` : (usersList.length > 0 ? '90%' : '0%');
 
-      // Real Recent Activities from task logs and leaves
+      // Recent Activities
       const activities = [];
       if (logsRes.ok && Array.isArray(logsRes.data?.data)) {
         logsRes.data.data.slice(0, 3).forEach((log, i) => {
@@ -261,21 +260,13 @@ export default function Dashboard() {
 
   const handleCheckInOut = async () => {
     if (!isCheckedIn) {
-      // Check In
       const res = await apiRequest('/attendance/check-in', 'POST');
-      if (res.ok) {
-        await fetchLiveStatus();
-      } else {
-        alert(res.data?.message || 'Check-in failed');
-      }
+      if (res.ok) await fetchLiveStatus();
+      else alert(res.data?.message || 'Check-in failed');
     } else {
-      // Check Out
       const res = await apiRequest('/attendance/check-out', 'POST');
-      if (res.ok) {
-        await fetchLiveStatus();
-      } else {
-        alert(res.data?.message || 'Check-out failed');
-      }
+      if (res.ok) await fetchLiveStatus();
+      else alert(res.data?.message || 'Check-out failed');
     }
   };
 
@@ -287,47 +278,59 @@ export default function Dashboard() {
     );
   }
 
-
   const ftPercent = stats.totalUsers > 0 ? Math.round((stats.employeeStatuses.fullTime / stats.totalUsers) * 100) : 0;
   const ctPercent = stats.totalUsers > 0 ? Math.round((stats.employeeStatuses.contract / stats.totalUsers) * 100) : 0;
   const pbPercent = stats.totalUsers > 0 ? Math.round((stats.employeeStatuses.probation / stats.totalUsers) * 100) : 0;
   const wfhPercent = stats.totalUsers > 0 ? Math.round((stats.employeeStatuses.wfh / stats.totalUsers) * 100) : 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', paddingBottom: '30px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', padding: '0 35px 35px' }}>
       
-      {/* 1. Welcome Back Banner */}
+      {/* 1. Welcome Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-        borderRadius: '16px',
-        border: '1px solid #e2e8f0',
-        padding: '30px 40px',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e1b4b 100%)',
+        borderRadius: '20px',
+        padding: '32px 40px',
         color: '#ffffff',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '20px',
-        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.08)',
+        gap: '24px',
+        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.4)',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {/* Glow backdrop element */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-10%',
+          width: '350px',
+          height: '350px',
+          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0, 0, 0, 0) 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none'
+        }} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', zIndex: 1 }}>
           <div style={{
-            width: '60px',
-            height: '60px',
-            borderRadius: '12px',
-            background: '#ffffff',
-            color: '#1e293b',
+            width: '64px',
+            height: '64px',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '22px',
+            fontSize: '24px',
             fontWeight: '800',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            boxShadow: '0 8px 20px rgba(59, 130, 246, 0.4)',
           }}>
             {user?.firstName?.[0] || 'A'}{user?.lastName?.[0] || ''}
           </div>
           <div>
-            <h2 style={{ margin: '0 0 6px', fontSize: '1.6rem', fontWeight: '800', letterSpacing: '-0.02em' }}>
+            <h2 style={{ margin: '0 0 6px', fontSize: '1.75rem', fontWeight: '800', letterSpacing: '-0.02em', color: '#ffffff' }}>
               Welcome Back, {user?.firstName || 'Adrian'} 👋
             </h2>
             <p style={{ margin: '0', fontSize: '0.95rem', color: '#94a3b8', fontWeight: '500' }}>
@@ -335,121 +338,112 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+
+        <div style={{ display: 'flex', gap: '14px', zIndex: 1 }}>
           <button 
             onClick={() => navigate('/tasks')}
-            style={{
-              background: '#3b82f6',
-              color: '#ffffff',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)',
-              transition: 'background 0.2s',
-            }}
-            onMouseOver={(e) => e.target.style.background = '#2563eb'}
-            onMouseOut={(e) => e.target.style.background = '#3b82f6'}
+            className="primary-btn"
+            style={{ padding: '12px 24px' }}
           >
-            View Tasks
+            View Workspace Tasks
           </button>
           <button 
             onClick={() => navigate('/projects')}
             style={{
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.08)',
               color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              padding: '10px 20px',
-              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '12px 24px',
+              borderRadius: '14px',
               fontSize: '0.9rem',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: 'pointer',
-              transition: 'background 0.2s',
+              transition: 'all 0.2s',
+              backdropFilter: 'blur(10px)'
             }}
-            onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
-            onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.1)'}
           >
             View Projects
           </button>
         </div>
       </div>
 
-      {/* 2. Redesigned 4-Column Metrics Grid */}
+      {/* 2. Metrics Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '20px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '24px',
         width: '100%'
       }}>
         <MetricCard 
           title="Attendance Overview" 
           value={`${stats.presentToday}/${stats.totalUsers}`}
-          subtext="View Details"
+          subtext="View Logs"
           icon={UserCheck}
-          color={{ bg: '#eff6ff', text: '#3b82f6' }}
+          gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+          color={{ bg: 'rgba(59, 130, 246, 0.12)', text: '#3b82f6' }}
           onClick={() => navigate('/attendance')}
         />
         <MetricCard 
           title="Total Projects" 
           value={stats.totalProjects}
-          subtext="View All"
+          subtext="View Projects"
           icon={Folder}
-          color={{ bg: '#ecfdf5', text: '#10b981' }}
+          gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
+          color={{ bg: 'rgba(16, 185, 129, 0.12)', text: '#10b981' }}
           onClick={() => navigate('/projects')}
         />
         <MetricCard 
           title="Total Tasks" 
           value={`${stats.completedTasks}/${stats.totalTasks}`}
-          subtext="View All"
+          subtext="View Board"
           icon={ListTodo}
-          color={{ bg: '#f5f3ff', text: '#8b5cf6' }}
+          gradient="linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)"
+          color={{ bg: 'rgba(139, 92, 246, 0.12)', text: '#8b5cf6' }}
           onClick={() => navigate('/tasks')}
         />
         <MetricCard 
           title="Departments" 
           value={stats.departmentsData.length || 5}
-          subtext="View Details"
+          subtext="Team Roster"
           icon={Building2}
-          color={{ bg: '#fff5f5', text: '#ef4444' }}
+          gradient="linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)"
+          color={{ bg: 'rgba(244, 63, 94, 0.12)', text: '#f43f5e' }}
           onClick={() => navigate('/employees')}
         />
       </div>
 
-      {/* 3. Row 3: Swapped to be Attendance Overview Card & Employee Status */}
+      {/* 3. Row 3: Attendance Gauge & Employee Status */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
         gap: '24px',
         width: '100%'
       }}>
-        {/* Attendance Overview Widget */}
+        {/* Attendance Widget */}
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={cardTitleStyle}>Attendance Overview</h3>
-            <span style={{ fontSize: '0.8rem', color: '#ea580c', fontWeight: '700' }}>
-              {isAdmin ? 'Monitoring' : 'Clock Panel'}
+            <h3 style={cardTitleStyle}>Attendance Monitoring</h3>
+            <span style={{ fontSize: '0.8rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', padding: '4px 10px', borderRadius: '20px', fontWeight: '700' }}>
+              {isAdmin ? 'Real-Time Rate' : 'Clock Panel'}
             </span>
           </div>
 
           {isAdmin ? (
-            /* Admin view: Attendance Rate Gauge Chart */
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '20px 0 10px' }}>
-                <svg width="220" height="120" viewBox="0 0 160 90">
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '15px 0' }}>
+                <svg width="240" height="130" viewBox="0 0 160 90">
                   <path
                     d="M20,80 A60,60 0 0,1 140,80"
                     fill="none"
-                    stroke="#f1f5f9"
-                    strokeWidth="12"
+                    stroke="#e2e8f0"
+                    strokeWidth="14"
                     strokeLinecap="round"
                   />
                   <path
                     d="M20,80 A60,60 0 0,1 140,80"
                     fill="none"
                     stroke="url(#gauge-grad)"
-                    strokeWidth="12"
+                    strokeWidth="14"
                     strokeLinecap="round"
                     strokeDasharray="188.5"
                     strokeDashoffset={188.5 - (188.5 * stats.attendanceRate) / 100}
@@ -461,193 +455,191 @@ export default function Dashboard() {
                       <stop offset="100%" stopColor="#10b981" />
                     </linearGradient>
                   </defs>
-                  <text x="80" y="72" textAnchor="middle" style={{ fontSize: '18px', fontWeight: '800', fill: '#0f172a' }}>
+                  <text x="80" y="70" textAnchor="middle" style={{ fontSize: '20px', fontWeight: '800', fill: 'var(--text)' }}>
                     {stats.attendanceRate}%
                   </text>
                 </svg>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f8fafc', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>Present Rate</span>
-                  <span style={{ fontSize: '0.85rem', color: '#10b981', fontWeight: '700' }}>{stats.attendanceRate}%</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>Present Rate</span>
+                  <h3 style={{ margin: '4px 0 0', fontSize: '1.2rem', color: '#10b981', fontWeight: '800' }}>{stats.attendanceRate}%</h3>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: '#f8fafc', borderRadius: '8px' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>Absent Rate</span>
-                  <span style={{ fontSize: '0.85rem', color: '#ef4444', fontWeight: '700' }}>{100 - stats.attendanceRate}%</span>
+                <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>Absent Rate</span>
+                  <h3 style={{ margin: '4px 0 0', fontSize: '1.2rem', color: '#ef4444', fontWeight: '800' }}>{100 - stats.attendanceRate}%</h3>
                 </div>
               </div>
             </div>
           ) : (
-            /* Non-Admin view: Personal Check-In / Check-Out Widget */
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '24px' }}>
               <div style={{ textAlign: 'center' }}>
-                <h4 style={{ margin: 0, fontSize: '1.8rem', fontWeight: '800', color: '#1e293b' }}>
+                <h4 style={{ margin: 0, fontSize: '2rem', fontWeight: '800', color: 'var(--text)' }}>
                   {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </h4>
-                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
+                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                   {time.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', width: '100%' }}>
-                <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Check In</span>
-                  <h4 style={{ margin: '4px 0 0', fontSize: '1.05rem', fontWeight: '700', color: '#1e293b' }}>{checkInTime}</h4>
+                <div style={{ background: 'var(--bg)', padding: '14px', borderRadius: '12px', border: '1px solid var(--border)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>Check In</span>
+                  <h4 style={{ margin: '4px 0 0', fontSize: '1.1rem', fontWeight: '800', color: 'var(--text)' }}>{checkInTime}</h4>
                 </div>
-                <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Check Out</span>
-                  <h4 style={{ margin: '4px 0 0', fontSize: '1.05rem', fontWeight: '700', color: '#1e293b' }}>{checkOutTime}</h4>
+                <div style={{ background: 'var(--bg)', padding: '14px', borderRadius: '12px', border: '1px solid var(--border)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>Check Out</span>
+                  <h4 style={{ margin: '4px 0 0', fontSize: '1.1rem', fontWeight: '800', color: 'var(--text)' }}>{checkOutTime}</h4>
                 </div>
               </div>
 
               {isCheckedOut ? (
                 <div style={{
-                  background: '#f0fdf4',
-                  color: '#15803d',
-                  border: '1px solid #bbf7d0',
-                  padding: '12px 40px',
-                  borderRadius: '50px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  color: '#10b981',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  padding: '12px 30px',
+                  borderRadius: '9999px',
                   fontSize: '0.95rem',
                   fontWeight: '700',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  width: '80%',
-                  justifyContent: 'center'
+                  gap: '8px'
                 }}>
-                  <CheckCircle size={18} style={{ color: '#16a34a' }} /> Shift Completed
+                  <CheckCircle size={18} /> Shift Completed
                 </div>
               ) : (
                 <button 
                   onClick={handleCheckInOut}
                   style={{
-                    background: isCheckedIn ? '#ef4444' : '#10b981',
+                    background: isCheckedIn ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     color: 'white',
                     border: 'none',
-                    padding: '12px 40px',
-                    borderRadius: '50px',
+                    padding: '14px 40px',
+                    borderRadius: '9999px',
                     fontSize: '0.95rem',
-                    fontWeight: '700',
+                    fontWeight: '800',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '8px',
-                    boxShadow: isCheckedIn ? '0 4px 10px rgba(239, 68, 68, 0.2)' : '0 4px 10px rgba(16, 185, 129, 0.2)',
-                    transition: 'background 0.2s',
+                    boxShadow: isCheckedIn ? '0 8px 20px rgba(239, 68, 68, 0.3)' : '0 8px 20px rgba(16, 185, 129, 0.3)',
+                    transition: 'all 0.2s',
                     width: '80%',
                     justifyContent: 'center'
                   }}
                 >
-                  {isCheckedIn ? (
-                    <>
-                      <LogOut size={18} /> Check Out
-                    </>
-                  ) : (
-                    <>
-                      <LogIn size={18} /> Check In
-                    </>
-                  )}
+                  {isCheckedIn ? <><LogOut size={18} /> Check Out</> : <><LogIn size={18} /> Check In</>}
                 </button>
               )}
             </div>
           )}
         </div>
 
-        {/* Employee Status & Top Performer */}
+        {/* Employee Breakdown Card */}
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={cardTitleStyle}>Employee Status</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>Total: {stats.totalUsers}</span>
+            <h3 style={cardTitleStyle}>Employee Distribution</h3>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>Total: {stats.totalUsers}</span>
           </div>
 
-          <div style={{ display: 'flex', height: '12px', borderRadius: '6px', overflow: 'hidden', margin: '20px 0' }}>
-            <div style={{ width: `${ftPercent}%`, background: '#f59e0b', transition: 'width 0.8s' }} />
-            <div style={{ width: `${ctPercent}%`, background: '#3b82f6', transition: 'width 0.8s' }} />
-            <div style={{ width: `${pbPercent}%`, background: '#ef4444', transition: 'width 0.8s' }} />
-            <div style={{ width: `${wfhPercent}%`, background: '#ec4899', transition: 'width 0.8s' }} />
+          <div style={{ display: 'flex', height: '14px', borderRadius: '7px', overflow: 'hidden', margin: '20px 0' }}>
+            <div style={{ width: `${ftPercent}%`, background: '#f59e0b', transition: 'width 0.8s' }} title={`Full Time (${ftPercent}%)`} />
+            <div style={{ width: `${ctPercent}%`, background: '#3b82f6', transition: 'width 0.8s' }} title={`Contract (${ctPercent}%)`} />
+            <div style={{ width: `${pbPercent}%`, background: '#ef4444', transition: 'width 0.8s' }} title={`Probation (${pbPercent}%)`} />
+            <div style={{ width: `${wfhPercent}%`, background: '#ec4899', transition: 'width 0.8s' }} title={`WFH (${wfhPercent}%)`} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div style={statusItemStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
-                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>Full-Time</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Full-Time</span>
               </div>
-              <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>{stats.employeeStatuses.fullTime}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text)' }}>{stats.employeeStatuses.fullTime}</span>
             </div>
             <div style={statusItemStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6' }} />
-                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>Contract</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Contract</span>
               </div>
-              <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>{stats.employeeStatuses.contract}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text)' }}>{stats.employeeStatuses.contract}</span>
             </div>
             <div style={statusItemStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
-                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>Probation</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Probation</span>
               </div>
-              <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>{stats.employeeStatuses.probation}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text)' }}>{stats.employeeStatuses.probation}</span>
             </div>
             <div style={statusItemStyle}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ec4899' }} />
-                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>WFH</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>WFH</span>
               </div>
-              <span style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a' }}>{stats.employeeStatuses.wfh}</span>
+              <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text)' }}>{stats.employeeStatuses.wfh}</span>
             </div>
           </div>
 
           <div style={{
-            background: '#fff7ed',
-            border: '1px solid #ffedd5',
-            borderRadius: '10px',
-            padding: '12px 16px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            borderRadius: '14px',
+            padding: '14px 18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '700', color: '#c2410c', letterSpacing: '0.05em' }}>Top Performer</span>
-              <h4 style={{ margin: '4px 0 0', fontSize: '0.95rem', fontWeight: '700', color: '#7c2d12' }}>{stats.topPerformer.name}</h4>
-              <span style={{ fontSize: '0.8rem', color: '#9a3412' }}>{stats.topPerformer.role}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Award size={24} style={{ color: '#f59e0b' }} />
+              <div>
+                <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: '800', color: '#d97706', letterSpacing: '0.05em' }}>Top Performer</span>
+                <h4 style={{ margin: '2px 0 0', fontSize: '1rem', fontWeight: '800', color: 'var(--text)' }}>{stats.topPerformer.name}</h4>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{stats.topPerformer.role}</span>
+              </div>
             </div>
-            <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#ea580c' }}>{stats.topPerformer.score}</div>
+            <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#d97706' }}>{stats.topPerformer.score}</div>
           </div>
         </div>
       </div>
 
-      {/* 4. Row 4: Swapped to be Employees By Department & Recent Activities */}
+      {/* 4. Departments & Recent Activities */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
         gap: '24px',
         width: '100%'
       }}>
         {/* Employees By Department */}
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={cardTitleStyle}>Employees By Department</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>Active Count</span>
+            <h3 style={cardTitleStyle}>Department Breakdown</h3>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>Active Count</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginTop: '10px' }}>
             {stats.departmentsData.length > 0 ? (
               stats.departmentsData.map((dept, index) => {
-                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
-                const color = colors[index % colors.length];
+                const gradients = [
+                  'linear-gradient(90deg, #3b82f6, #6366f1)',
+                  'linear-gradient(90deg, #10b981, #059669)',
+                  'linear-gradient(90deg, #f59e0b, #d97706)',
+                  'linear-gradient(90deg, #ec4899, #db2777)',
+                  'linear-gradient(90deg, #8b5cf6, #7c3aed)'
+                ];
+                const grad = gradients[index % gradients.length];
                 return (
                   <div key={dept.name} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: '600', color: '#475569' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text)' }}>
                       <span>{dept.name}</span>
                       <span>{dept.count}</span>
                     </div>
-                    <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: '100%', height: '8px', background: 'var(--bg)', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{
                         width: `${(dept.count / stats.totalUsers) * 100}%`,
                         height: '100%',
-                        background: color,
+                        background: grad,
                         borderRadius: '4px',
                         transition: 'width 1s ease'
                       }} />
@@ -656,8 +648,8 @@ export default function Dashboard() {
                 );
               })
             ) : (
-              <div style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>
-                No department data available.
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>
+                No department records available.
               </div>
             )}
           </div>
@@ -666,18 +658,20 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <div style={cardStyle}>
           <div style={cardHeaderStyle}>
-            <h3 style={cardTitleStyle}>Recent Activities</h3>
-            <Clock size={18} style={{ color: '#64748b' }} />
+            <h3 style={cardTitleStyle}>Recent Activity Stream</h3>
+            <Clock size={18} style={{ color: 'var(--text-muted)' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px' }}>
             {recentActivities.map(act => (
-              <div key={act.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+              <div key={act.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '14px' }}>
                 <div>
-                  <strong style={{ display: 'block', color: '#1e293b' }}>{act.action}</strong>
-                  <span style={{ color: '#64748b', fontSize: '0.8rem' }}>by {act.user}</span>
+                  <strong style={{ display: 'block', color: 'var(--text)', fontSize: '0.925rem' }}>{act.action}</strong>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>by {act.user}</span>
                 </div>
-                <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{act.time}</span>
+                <span style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontWeight: '600', background: 'var(--bg)', padding: '4px 8px', borderRadius: '6px' }}>
+                  {act.time}
+                </span>
               </div>
             ))}
           </div>
@@ -691,47 +685,48 @@ export default function Dashboard() {
 // Subcomponent for Metric Card
 const MetricCard = ({ title, value, subtext, icon: Icon, color, onClick }) => {
   return (
-    <div style={{
-      background: '#ffffff',
-      borderRadius: '16px',
-      border: '1px solid #e2e8f0',
-      padding: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.02)',
-      minHeight: '145px',
-      transition: 'transform 0.2s',
-      cursor: 'pointer'
-    }}
-    onClick={onClick}
-    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+    <div 
+      className="card"
+      style={{
+        background: 'var(--card-bg)',
+        borderRadius: '18px',
+        border: '1px solid var(--border)',
+        padding: '26px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: 'var(--shadow)',
+        minHeight: '150px',
+        transition: 'all 0.25s ease',
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+      onClick={onClick}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '600' }}>{title}</span>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '8px 0 0' }}>{value}</h2>
+          <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{title}</span>
+          <h2 style={{ fontSize: '2rem', fontWeight: '800', color: 'var(--text)', margin: '10px 0 0', letterSpacing: '-0.02em' }}>{value}</h2>
         </div>
         <div style={{
           background: color.bg,
           color: color.text,
-          borderRadius: '12px',
-          padding: '10px',
+          borderRadius: '14px',
+          padding: '12px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: `0 4px 12px ${color.bg}`
         }}>
-          <Icon size={22} />
+          <Icon size={24} />
         </div>
       </div>
-      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span 
-          style={{ fontSize: '0.825rem', color: '#3b82f6', fontWeight: '700' }}
-        >
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.85rem', color: 'var(--primary)', fontWeight: '700' }}>
           {subtext}
         </span>
-        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700', background: '#ecfdf5', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '2px' }}>
+        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '800', background: 'rgba(16, 185, 129, 0.12)', padding: '3px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <TrendingUp size={12} /> Live
         </span>
       </div>
@@ -741,39 +736,39 @@ const MetricCard = ({ title, value, subtext, icon: Icon, color, onClick }) => {
 
 // Styling Constants
 const cardStyle = {
-  background: '#ffffff',
-  borderRadius: '16px',
-  border: '1px solid #e2e8f0',
-  padding: '24px',
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.02)',
+  background: 'var(--card-bg)',
+  borderRadius: '18px',
+  border: '1px solid var(--border)',
+  padding: '28px',
+  boxShadow: 'var(--shadow)',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-  minHeight: '340px'
+  minHeight: '350px'
 };
 
 const cardHeaderStyle = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  borderBottom: '1px solid #f1f5f9',
+  borderBottom: '1px solid var(--border)',
   paddingBottom: '16px',
   marginBottom: '16px'
 };
 
 const cardTitleStyle = {
   margin: '0',
-  fontSize: '1.1rem',
-  fontWeight: '700',
-  color: '#0f172a'
+  fontSize: '1.15rem',
+  fontWeight: '800',
+  color: 'var(--text)'
 };
 
 const statusItemStyle = {
   display: 'flex',
   flexDirection: 'column',
   gap: '4px',
-  padding: '12px',
-  background: '#f8fafc',
-  borderRadius: '8px',
-  border: '1px solid #f1f5f9'
+  padding: '14px',
+  background: 'var(--bg)',
+  borderRadius: '12px',
+  border: '1px solid var(--border)'
 };
