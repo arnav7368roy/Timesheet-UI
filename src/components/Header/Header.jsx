@@ -1,14 +1,69 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, Sun, Moon, Sparkles } from 'lucide-react';
+import { Search, Bell, Menu, Sun, Moon, CheckCircle, X, UserPlus, Calendar, Clock, ClipboardList } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { apiRequest } from '../../utils/api';
+
+const getNotificationTypeConfig = (type) => {
+  switch (type) {
+    case 'EMPLOYEE_ADDED':
+      return {
+        label: 'New Team Member',
+        bg: 'rgba(99, 102, 241, 0.15)',
+        color: '#818cf8',
+        icon: UserPlus
+      };
+    case 'LEAVE_REQUEST':
+      return {
+        label: 'Leave Request',
+        bg: 'rgba(59, 130, 246, 0.15)',
+        color: '#60a5fa',
+        icon: Calendar
+      };
+    case 'ATTENDANCE_REGULARIZATION':
+      return {
+        label: 'Attendance',
+        bg: 'rgba(245, 158, 11, 0.15)',
+        color: '#fbbf24',
+        icon: Clock
+      };
+    case 'TASK_COMPLETED':
+      return {
+        label: 'Task Completed',
+        bg: 'rgba(16, 185, 129, 0.15)',
+        color: '#34d399',
+        icon: CheckCircle
+      };
+    case 'TASK_ASSIGNED':
+      return {
+        label: 'Task Assigned',
+        bg: 'rgba(168, 85, 247, 0.15)',
+        color: '#c084fc',
+        icon: ClipboardList
+      };
+    default:
+      return {
+        label: type ? type.replace(/_/g, ' ') : 'General',
+        bg: 'rgba(255, 255, 255, 0.08)',
+        color: 'var(--text-muted)',
+        icon: Bell
+      };
+  }
+};
+
 
 export default function Header({ toggleMobile }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Map pathnames to Titles and Subtitles
   const getPageMeta = (pathname) => {
@@ -39,6 +94,72 @@ export default function Header({ toggleMobile }) {
         return { title: 'TimeSheet Portal', subtitle: 'Enterprise Employee Management Workspace' };
     }
   };
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await apiRequest('/notifications/unread-count');
+      if (res.ok && res.data && res.data.data) {
+        setUnreadCount(res.data.data.unreadCount || 0);
+      }
+    } catch (e) {
+      console.error('Failed to fetch unread notification count:', e);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const res = await apiRequest('/notifications/my?limit=20');
+      if (res.ok && res.data && res.data.data) {
+        setNotifications(res.data.data.notifications || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch notifications:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markAsRead = async (id, e) => {
+    if (e) e.stopPropagation();
+    try {
+      const res = await apiRequest(`/notifications/${id}/read`, 'PATCH');
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (e) {
+      console.error('Failed to mark notification as read:', e);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const res = await apiRequest('/notifications/read-all', 'PATCH');
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (e) {
+      console.error('Failed to mark all notifications as read:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const meta = getPageMeta(location.pathname);
   const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'User';
@@ -93,19 +214,163 @@ export default function Header({ toggleMobile }) {
           {isDarkMode ? <Sun size={18} style={{ color: '#fbbf24' }} /> : <Moon size={18} />}
         </button>
 
-        <button className="notification" aria-label="Notifications" style={{ position: 'relative' }}>
-          <Bell size={18} />
-          <span style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#ef4444',
-            boxShadow: '0 0 8px #ef4444'
-          }} />
-        </button>
+        <div style={{ position: 'relative' }} ref={dropdownRef}>
+          <button 
+            className="notification" 
+            onClick={() => {
+              if (!showDropdown) fetchNotifications();
+              setShowDropdown(!showDropdown);
+            }} 
+            aria-label="Notifications" 
+            style={{ position: 'relative' }}
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-2px',
+                right: '-2px',
+                minWidth: '18px',
+                height: '18px',
+                borderRadius: '9px',
+                background: '#ef4444',
+                color: '#ffffff',
+                fontSize: '0.68rem',
+                fontWeight: '800',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)'
+              }}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {showDropdown && (
+            <div style={{
+              position: 'absolute',
+              top: '52px',
+              right: '0',
+              width: '360px',
+              maxHeight: '480px',
+              background: 'var(--card-bg)',
+              border: '1px solid var(--border)',
+              borderRadius: '16px',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)'
+            }}>
+              <div style={{
+                padding: '14px 18px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'rgba(255,255,255,0.02)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Bell size={16} style={{ color: '#3b82f6' }} />
+                  <strong style={{ fontSize: '0.95rem', color: 'var(--text)' }}>Notifications</strong>
+                  {unreadCount > 0 && (
+                    <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#38bdf8', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '10px', fontWeight: '700' }}>
+                      {unreadCount} new
+                    </span>
+                  )}
+                </div>
+                {unreadCount > 0 && (
+                  <button 
+                    onClick={markAllAsRead} 
+                    style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '0.78rem', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <CheckCircle size={13} /> Mark all read
+                  </button>
+                )}
+              </div>
+
+              <div style={{ overflowY: 'auto', flex: 1, padding: '8px' }}>
+                {loading ? (
+                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Loading notifications...</div>
+                ) : notifications.length === 0 ? (
+                  <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    <Bell size={28} style={{ opacity: 0.3, marginBottom: '8px' }} />
+                    <p style={{ margin: 0, fontSize: '0.85rem' }}>No notifications yet</p>
+                  </div>
+                ) : (
+                  notifications.map(n => {
+                    const cfg = getNotificationTypeConfig(n.type);
+                    const IconComponent = cfg.icon;
+                    return (
+                      <div 
+                        key={n.id} 
+                        onClick={(e) => !n.isRead && markAsRead(n.id, e)}
+                        style={{
+                          padding: '12px 14px',
+                          borderRadius: '10px',
+                          marginBottom: '6px',
+                          background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.08)',
+                          border: n.isRead ? '1px solid transparent' : '1px solid rgba(59, 130, 246, 0.2)',
+                          cursor: n.isRead ? 'default' : 'pointer',
+                          transition: 'all 0.2s',
+                          display: 'flex',
+                          gap: '12px'
+                        }}
+                      >
+                        <div style={{ marginTop: '2px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                          <span style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            background: n.isRead ? 'transparent' : '#3b82f6',
+                            display: 'block'
+                          }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                            <strong style={{ fontSize: '0.85rem', color: 'var(--text)' }}>{n.title}</strong>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', marginLeft: '6px' }}>
+                              {n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                            </span>
+                          </div>
+                          <p style={{ margin: '0 0 8px', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.35' }}>
+                            {n.message}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{
+                              fontSize: '0.68rem',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              background: cfg.bg,
+                              color: cfg.color,
+                              fontWeight: '700',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <IconComponent size={11} />
+                              {cfg.label}
+                            </span>
+                            {n.senderName && (
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', opacity: 0.8 }}>
+                                • From {n.senderName}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer', position: 'relative' }}>
           <div style={{ position: 'relative' }}>
@@ -130,3 +395,4 @@ export default function Header({ toggleMobile }) {
     </header>
   );
 }
+
