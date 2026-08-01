@@ -156,6 +156,8 @@ export default function Profile() {
 
   const p = profileData?.profile || {};
   const isAdmin = user?.roleCode === 'ADMIN';
+  const isSelf = !userId || userId === user?.id;
+  const canEditPersonal = isAdmin || isSelf;
 
   const userDetails = {
     id: profileData?.id || user?.id || '',
@@ -334,24 +336,26 @@ export default function Profile() {
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => setShowEditModal(true)}
-              style={{
-                background: 'var(--bg)',
-                color: 'var(--text)',
-                border: '1px solid var(--border)',
-                padding: '10px 18px',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <Edit3 size={16} /> Edit Personal Details
-            </button>
+            {canEditPersonal && (
+              <button 
+                onClick={() => setShowEditModal(true)}
+                style={{
+                  background: 'var(--bg)',
+                  color: 'var(--text)',
+                  border: '1px solid var(--border)',
+                  padding: '10px 18px',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Edit3 size={16} /> Edit Personal Details
+              </button>
+            )}
             
             {isAdmin && (
               <button 
@@ -375,44 +379,48 @@ export default function Profile() {
               </button>
             )}
 
-            <button 
-              onClick={() => setShowPasswordModal(true)}
-              style={{
-                background: '#3b82f6',
-                color: '#ffffff',
-                border: 'none',
-                padding: '10px 18px',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)'
-              }}
-            >
-              <Key size={16} /> Change Password
-            </button>
-            <button 
-              onClick={logout}
-              style={{
-                background: '#ef4444',
-                color: '#ffffff',
-                border: 'none',
-                padding: '10px 18px',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)'
-              }}
-            >
-              <LogOut size={16} /> Logout
-            </button>
+            {isSelf && (
+              <>
+                <button 
+                  onClick={() => setShowPasswordModal(true)}
+                  style={{
+                    background: '#3b82f6',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)'
+                  }}
+                >
+                  <Key size={16} /> Change Password
+                </button>
+                <button 
+                  onClick={logout}
+                  style={{
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)'
+                  }}
+                >
+                  <LogOut size={16} /> Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -470,13 +478,15 @@ export default function Profile() {
               <User size={20} style={{ color: '#3b82f6' }} />
               <h3 style={{ margin: 0, color: 'var(--text)' }}>Personal & Contact Details</h3>
             </div>
-            <button 
-              className="primary-btn" 
-              onClick={() => setShowEditModal(true)}
-              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-            >
-              <Edit3 size={14} /> Edit Personal Details
-            </button>
+            {canEditPersonal && (
+              <button 
+                className="primary-btn" 
+                onClick={() => setShowEditModal(true)}
+                style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+              >
+                <Edit3 size={14} /> Edit Personal Details
+              </button>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
