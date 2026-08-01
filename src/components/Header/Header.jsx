@@ -251,34 +251,32 @@ export default function Header({ toggleMobile }) {
           {showDropdown && (
             <div style={{
               position: 'absolute',
-              top: '52px',
+              top: '54px',
               right: '0',
-              width: '360px',
-              maxHeight: '480px',
-              background: 'var(--card-bg)',
-              border: '1px solid var(--border)',
+              width: '380px',
+              maxHeight: '490px',
+              background: isDarkMode ? '#0f172a' : '#ffffff',
+              border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
               borderRadius: '16px',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
-              zIndex: 99999,
+              boxShadow: isDarkMode ? '0 25px 50px -12px rgba(0, 0, 0, 0.9)' : '0 20px 40px -10px rgba(0, 0, 0, 0.15)',
+              zIndex: 999999,
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)'
+              overflow: 'hidden'
             }}>
               <div style={{
                 padding: '14px 18px',
-                borderBottom: '1px solid var(--border)',
+                borderBottom: isDarkMode ? '1px solid #1e293b' : '1px solid #e2e8f0',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                background: 'rgba(255,255,255,0.02)'
+                background: isDarkMode ? '#1e293b' : '#f8fafc'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Bell size={16} style={{ color: '#3b82f6' }} />
-                  <strong style={{ fontSize: '0.95rem', color: 'var(--text)' }}>Notifications</strong>
+                  <strong style={{ fontSize: '0.95rem', color: isDarkMode ? '#f8fafc' : '#0f172a' }}>Notifications</strong>
                   {unreadCount > 0 && (
-                    <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#38bdf8', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '10px', fontWeight: '700' }}>
+                    <span style={{ background: 'rgba(59, 130, 246, 0.2)', color: '#38bdf8', fontSize: '0.75rem', padding: '2px 8px', borderRadius: '10px', fontWeight: '700' }}>
                       {unreadCount} new
                     </span>
                   )}
@@ -293,11 +291,11 @@ export default function Header({ toggleMobile }) {
                 )}
               </div>
 
-              <div style={{ overflowY: 'auto', flex: 1, padding: '8px' }}>
+              <div style={{ overflowY: 'auto', flex: 1, padding: '10px', background: isDarkMode ? '#0f172a' : '#ffffff' }}>
                 {loading ? (
-                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Loading notifications...</div>
+                  <div style={{ padding: '24px', textAlign: 'center', color: isDarkMode ? '#94a3b8' : '#64748b', fontSize: '0.85rem' }}>Loading notifications...</div>
                 ) : notifications.length === 0 ? (
-                  <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <div style={{ padding: '32px 16px', textAlign: 'center', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                     <Bell size={28} style={{ opacity: 0.3, marginBottom: '8px' }} />
                     <p style={{ margin: 0, fontSize: '0.85rem' }}>No notifications yet</p>
                   </div>
@@ -305,39 +303,44 @@ export default function Header({ toggleMobile }) {
                   notifications.map(n => {
                     const cfg = getNotificationTypeConfig(n.type);
                     const IconComponent = cfg.icon;
+                    const isUnread = !n.isRead;
                     return (
                       <div 
                         key={n.id} 
-                        onClick={(e) => !n.isRead && markAsRead(n.id, e)}
+                        onClick={(e) => isUnread && markAsRead(n.id, e)}
                         style={{
                           padding: '12px 14px',
-                          borderRadius: '10px',
-                          marginBottom: '6px',
-                          background: n.isRead ? 'transparent' : 'rgba(59, 130, 246, 0.08)',
-                          border: n.isRead ? '1px solid transparent' : '1px solid rgba(59, 130, 246, 0.2)',
-                          cursor: n.isRead ? 'default' : 'pointer',
+                          borderRadius: '12px',
+                          marginBottom: '8px',
+                          background: isUnread 
+                            ? (isDarkMode ? '#1e293b' : '#f0f9ff') 
+                            : (isDarkMode ? '#0b1120' : '#f8fafc'),
+                          border: isUnread 
+                            ? (isDarkMode ? '1px solid #3b82f6' : '1px solid #bae6fd') 
+                            : (isDarkMode ? '1px solid #1e293b' : '1px solid #e2e8f0'),
+                          cursor: isUnread ? 'pointer' : 'default',
                           transition: 'all 0.2s',
                           display: 'flex',
                           gap: '12px'
                         }}
                       >
-                        <div style={{ marginTop: '2px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                        <div style={{ marginTop: '3px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                           <span style={{
                             width: '8px',
                             height: '8px',
                             borderRadius: '50%',
-                            background: n.isRead ? 'transparent' : '#3b82f6',
+                            background: isUnread ? '#3b82f6' : 'transparent',
                             display: 'block'
                           }} />
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                            <strong style={{ fontSize: '0.85rem', color: 'var(--text)' }}>{n.title}</strong>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', marginLeft: '6px' }}>
+                            <strong style={{ fontSize: '0.86rem', color: isDarkMode ? '#f8fafc' : '#0f172a', fontWeight: '700' }}>{n.title}</strong>
+                            <span style={{ fontSize: '0.72rem', color: isDarkMode ? '#94a3b8' : '#64748b', whiteSpace: 'nowrap', marginLeft: '8px' }}>
                               {n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                             </span>
                           </div>
-                          <p style={{ margin: '0 0 8px', fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.35' }}>
+                          <p style={{ margin: '0 0 8px', fontSize: '0.82rem', color: isDarkMode ? '#cbd5e1' : '#334155', lineHeight: '1.4' }}>
                             {n.message}
                           </p>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -356,7 +359,7 @@ export default function Header({ toggleMobile }) {
                               {cfg.label}
                             </span>
                             {n.senderName && (
-                              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', opacity: 0.8 }}>
+                              <span style={{ fontSize: '0.7rem', color: isDarkMode ? '#94a3b8' : '#64748b' }}>
                                 • From {n.senderName}
                               </span>
                             )}
@@ -366,10 +369,10 @@ export default function Header({ toggleMobile }) {
                     );
                   })
                 )}
-
               </div>
             </div>
           )}
+
         </div>
 
         <div className="profile" onClick={() => navigate('/profile')} style={{ cursor: 'pointer', position: 'relative' }}>
