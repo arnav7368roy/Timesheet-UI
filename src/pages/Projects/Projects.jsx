@@ -192,78 +192,80 @@ export default function Projects() {
     : ['Project Code', 'Project Name', 'Manager', 'Start Date', 'End Date', 'Status'];
 
   return (
-    <div className="table-card">
-      <div className="table-header">
-        <h3>Projects Directory</h3>
-        <div className="table-actions">
-          {isAdmin && (
-            <button className="primary-btn" onClick={openCreateModal}>
-              <FolderPlus size={16} /> Create Project
+    <div className="projects-page">
+      <div className="table-card">
+        <div className="table-header">
+          <h3>Projects Directory</h3>
+          <div className="table-actions">
+            {isAdmin && (
+              <button className="primary-btn" onClick={openCreateModal}>
+                <FolderPlus size={16} /> Create Project
+              </button>
+            )}
+            <button className="refresh" onClick={fetchProjects}>
+              <RefreshCw size={16} />
             </button>
-          )}
-          <button className="refresh" onClick={fetchProjects}>
-            <RefreshCw size={16} />
-          </button>
+          </div>
         </div>
-      </div>
 
-      {loading ? (
-        <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
-          <div className="loader"></div>
-        </div>
-      ) : (
-        <DataTable 
-          headers={headers} 
-          data={projects} 
-          renderRow={(project, idx) => (
-            <tr key={idx}>
-              <td>{project.projectCode}</td>
-              <td><strong>{project.projectName}</strong></td>
-              <td>{project.projectManagerName || '-'}</td>
-              <td>{project.startDate || '-'}</td>
-              <td>{project.endDate || '-'}</td>
-              <td>
-                <span className="status active">
-                  {project.status || 'Active'}
-                </span>
-              </td>
-              {isManagerOrAdmin && (
+        {loading ? (
+          <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
+            <div className="loader"></div>
+          </div>
+        ) : (
+          <DataTable 
+            headers={headers} 
+            data={projects} 
+            renderRow={(project, idx) => (
+              <tr key={idx}>
+                <td>{project.projectCode}</td>
+                <td><strong>{project.projectName}</strong></td>
+                <td>{project.managerName || project.projectManagerName || '-'}</td>
+                <td>{project.startDate || '-'}</td>
+                <td>{project.endDate || '-'}</td>
                 <td>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button 
-                      className="primary-btn" 
-                      style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      onClick={() => openAssignModal(project.id)}
-                    >
-                      <UserPlus size={14} /> Assign
-                    </button>
-                    {isAdmin && (
-                      <>
-                        <button 
-                          className="primary-btn" 
-                          style={{ padding: '6px', background: '#3b82f6', display: 'inline-flex', alignItems: 'center' }} 
-                          title="Edit"
-                          onClick={() => openEditModal(project)}
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button 
-                          className="primary-btn" 
-                          style={{ padding: '6px', background: '#ef4444', display: 'inline-flex', alignItems: 'center' }} 
-                          title="Delete"
-                          onClick={() => handleDeleteProject(project.id)}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </>
-                    )}
-                  </div>
+                  <span className="status active">
+                    {project.status || 'Active'}
+                  </span>
                 </td>
-              )}
-            </tr>
-          )}
-        />
-      )}
+                {isManagerOrAdmin && (
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <button 
+                        className="primary-btn" 
+                        style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        onClick={() => openAssignModal(project.id)}
+                      >
+                        <UserPlus size={14} /> Assign
+                      </button>
+                      {isAdmin && (
+                        <>
+                          <button 
+                            className="primary-btn" 
+                            style={{ padding: '6px', background: '#3b82f6', display: 'inline-flex', alignItems: 'center' }} 
+                            title="Edit"
+                            onClick={() => openEditModal(project)}
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button 
+                            className="primary-btn" 
+                            style={{ padding: '6px', background: '#ef4444', display: 'inline-flex', alignItems: 'center' }} 
+                            title="Delete"
+                            onClick={() => handleDeleteProject(project.id)}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                )}
+              </tr>
+            )}
+          />
+        )}
+      </div>
 
       {/* Create Project Modal */}
       {showModal && (

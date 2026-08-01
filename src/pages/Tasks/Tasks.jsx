@@ -366,85 +366,71 @@ export default function Tasks() {
   const headers = ['Task Title', 'Project', 'Assigned Member', 'Priority', 'Status', 'Actions', 'Est. Hours'];
 
   return (
-    <div className="table-card">
-      <div className="table-header">
-        <div>
-          <h3>Task Management Workspace</h3>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Track, assign, and execute project deliverables</span>
+    <div className="tasks-page">
+      <div className="table-card">
+        <div className="table-header">
+          <div>
+            <h3>Task Management Workspace</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Track, assign, and execute project deliverables</span>
+          </div>
+          <div className="table-actions">
+            <button className="primary-btn" onClick={openCreateModal}>
+              <CheckSquare size={16} /> Create Task
+            </button>
+            <button className="refresh" onClick={fetchTasks} title="Refresh tasks">
+              <RefreshCw size={16} />
+            </button>
+          </div>
         </div>
-        <div className="table-actions">
-          <button className="primary-btn" onClick={openCreateModal}>
-            <CheckSquare size={16} /> Create Task
-          </button>
-          <button className="refresh" onClick={fetchTasks} title="Refresh tasks">
-            <RefreshCw size={16} />
-          </button>
-        </div>
-      </div>
 
-      {loading ? (
-        <div style={{ padding: '60px', display: 'flex', justifyContent: 'center' }}>
-          <div className="loader"></div>
-        </div>
-      ) : (
-        <DataTable
-          headers={headers}
-          data={tasks}
-          renderRow={(task, idx) => (
-            <tr key={idx}>
-              <td>
-                <strong style={{ color: 'var(--text)', fontSize: '0.95rem' }}>{task.title}</strong>
-                <br />
-                <small style={{ color: 'var(--text-muted)' }}>{task.description}</small>
-              </td>
-              <td>
-                <span style={{ fontWeight: '600', color: 'var(--text)' }}>{task.projectName}</span>
-              </td>
-              <td>
-                {task.assignedTo ? (
+        {loading ? (
+          <div style={{ padding: '60px', display: 'flex', justifyContent: 'center' }}>
+            <div className="loader"></div>
+          </div>
+        ) : (
+          <DataTable
+            headers={headers}
+            data={tasks}
+            renderRow={(task, idx) => (
+              <tr key={idx}>
+                <td>
                   <div>
-                    <strong style={{ color: 'var(--text)' }}>{task.assignedToName}</strong>
-                    <br />
-                    <small style={{ color: 'var(--text-light)' }}>Assigned by: {task.assignedByName}</small>
+                    <strong style={{ display: 'block', fontSize: '0.95rem' }}>{task.title}</strong>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>
+                      {task.description ? task.description.slice(0, 45) + (task.description.length > 45 ? '...' : '') : 'No description'}
+                    </span>
                   </div>
-                ) : (
-                  <select
-                    className="table-select"
-                    defaultValue=""
-                    style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)' }}
-                    onFocus={() => fetchProjectMembers(task.projectId)}
-                    onChange={(e) => handleAssignTask(task.id, e.target.value)}
-                  >
-                    <option value="">Assign Member...</option>
-                    {employees.map(emp => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.employeeCode} - {emp.name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </td>
-              <td>
-                <span className={`priority-badge ${task.priority.toLowerCase()}`}>
-                  {task.priority}
-                </span>
-              </td>
-              <td>
-                <button
-                  className={`status-btn ${task.status.toLowerCase().replace('_', '-')}`}
-                  onClick={() => handleStatusChange(task.id, task.status)}
-                >
-                  {task.status}
-                </button>
-              </td>
-              <td>{renderActionButtons(task)}</td>
-              <td>
-                <span style={{ fontWeight: '700', color: 'var(--primary)' }}>{task.estimatedHours} hrs</span>
-              </td>
-            </tr>
-          )}
-        />
-      )}
+                </td>
+                <td>{task.projectName}</td>
+                <td>
+                  {(task.assignedToName || task.assignedUserName) ? (
+                    <div>
+                      <span style={{ fontWeight: '600', display: 'block' }}>{task.assignedToName || task.assignedUserName}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Assigned by: {task.assignedByName || task.createdByName || 'System'}</span>
+                    </div>
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Unassigned</span>
+                  )}
+                </td>
+                <td>
+                  <span className={`priority-badge ${(task.priority || 'medium').toLowerCase()}`}>
+                    {task.priority || 'MEDIUM'}
+                  </span>
+                </td>
+                <td>
+                  <span className={`status-btn ${(task.status || 'pending').toLowerCase().replace('_', '-')}`}>
+                    {task.status || 'PENDING'}
+                  </span>
+                </td>
+                <td>{renderActionButtons(task)}</td>
+                <td>
+                  <span style={{ fontWeight: '700', color: 'var(--primary)' }}>{task.estimatedHours} hrs</span>
+                </td>
+              </tr>
+            )}
+          />
+        )}
+      </div>
 
       {/* Task Creation/Editing Modal */}
       {showModal && (
@@ -474,6 +460,17 @@ export default function Tasks() {
                   <select name="projectId" value={formData.projectId} onChange={handleInputChange} required>
                     <option value="">Select Project</option>
                     {projects.map(p => <option key={p.id} value={p.id}>{p.projectName}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)', marginBottom: '6px', display: 'block' }}>Assign Member</label>
+                  <select name="assignedTo" value={formData.assignedTo} onChange={handleInputChange}>
+                    <option value="">Unassigned</option>
+                    {employees.map(emp => (
+                      <option key={emp.id} value={emp.id}>
+                        {emp.employeeCode ? `${emp.employeeCode} - ` : ''}{emp.name || emp.fullName || `${emp.firstName || ''} ${emp.lastName || ''}`}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

@@ -153,14 +153,12 @@ body.dark-mode tbody td strong {
     color: #f8fafc !important;
 }
 
-body.dark-mode input[type="text"],
-body.dark-mode input[type="email"],
-body.dark-mode input[type="password"],
-body.dark-mode input[type="date"],
-body.dark-mode input[type="time"],
-body.dark-mode input[type="number"],
-body.dark-mode select,
-body.dark-mode textarea {
+body.dark-mode input[type="text"]:not(.form-group input),
+body.dark-mode input[type="email"]:not(.form-group input),
+body.dark-mode input[type="password"]:not(.form-group input),
+body.dark-mode input[type="date"]:not(.form-group input),
+body.dark-mode input[type="time"]:not(.form-group input),
+body.dark-mode input[type="number"]:not(.form-group input) {
     background-color: rgba(15, 23, 42, 0.7) !important;
     color: #f8fafc !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
@@ -648,4 +646,213 @@ tbody td {
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+/* ===========================
+   Global Modal & Form Design System (Netlify Style)
+=========================== */
+/* ===========================
+   Global Modal & Form Design System (Netlify Style)
+=========================== */
+.modal,
+.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 999999 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+}
+
+.modal-content,
+.modal-dialog,
+.modal-card {
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 18px !important;
+    width: 100% !important;
+    max-width: 760px !important;
+    max-height: 88vh !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6) !important;
+    color: #f8fafc !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.modal-content form {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+.modal-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 20px 28px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #1e293b !important;
+    flex-shrink: 0 !important;
+}
+
+.modal-header h2,
+.modal-header h3 {
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    color: #f8fafc !important;
+}
+
+.modal-header span,
+.modal-header button,
+.modal-header .close-btn {
+    cursor: pointer !important;
+    color: #94a3b8 !important;
+    transition: color 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 6px !important;
+}
+
+.modal-header span:hover,
+.modal-header button:hover,
+.modal-header .close-btn:hover {
+    color: #ffffff !important;
+}
+
+.form-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px 20px !important;
+    padding: 24px 28px !important;
+    overflow-y: auto !important;
+    max-height: calc(88vh - 140px) !important;
+}
+
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.form-group label,
+.form-label {
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    color: #94a3b8 !important;
+}
+
+.form-group input,
+.form-input,
+body.dark-mode .form-group input,
+body.dark-mode .form-input {
+    width: 100% !important;
+    padding: 11px 14px !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+}
+
+.form-group input[type="date"] {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+.form-group select,
+.form-group textarea,
+.form-select {
+    width: 100% !important;
+    padding: 11px 14px !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    background: #0f172a !important;
+    color: #f8fafc !important;
+    font-size: 0.92rem !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+}
+
+.form-group textarea {
+    min-height: 85px !important;
+    resize: vertical;
+}
+
+.form-group select option {
+    background: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+.modal-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+    padding: 18px 28px 22px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #1e293b !important;
+    flex-shrink: 0 !important;
+}
+
+.modal-footer .cancel {
+    padding: 10px 22px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: #e2e8f0 !important;
+    color: #1e293b !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+.modal-footer .cancel:hover {
+    background: #cbd5e1 !important;
+}
+
+.modal-footer .save,
+.modal-footer button[type="submit"] {
+    padding: 10px 24px !important;
+    border: none !important;
+    border-radius: 10px !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3) !important;
+}
+
+.modal-footer .save:hover,
+.modal-footer button[type="submit"]:hover {
+    background: #1d4ed8 !important;
 }

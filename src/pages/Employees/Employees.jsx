@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../components/Tables/Tables';
-import { UserPlus, RefreshCw, X, Edit2, Trash2, Eye, User } from 'lucide-react';
+import { UserPlus, RefreshCw, X, Edit2, Trash2, Eye, User, Mail, Lock, Phone, Shield, Building, Briefcase, Users } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -185,7 +185,8 @@ export default function Employees() {
     : ['Employee Code', 'Name', 'Email', 'Mobile', 'Role', 'Status'];
 
   return (
-    <div className="table-card">
+    <div className="employees-page">
+      <div className="table-card">
       <div className="table-header">
         <h3>Employee Directory</h3>
         <div className="table-actions">
@@ -282,6 +283,7 @@ export default function Employees() {
           )}
         />
       )}
+      </div>
 
       {/* Modal */}
       {showModal && (
@@ -289,15 +291,15 @@ export default function Employees() {
           <div className="modal-content">
             <div className="modal-header">
               <h2>{isEditMode ? 'Edit Employee' : 'Create Employee'}</h2>
-              <span onClick={() => setShowModal(false)}><X size={20} /></span>
+              <span onClick={() => setShowModal(false)} style={{ cursor: 'pointer' }}><X size={18} /></span>
             </div>
 
             {isEditMode && (
-              <div style={{ padding: '0 28px 12px' }}>
+              <div style={{ padding: '12px 24px 0' }}>
                 <button
                   type="button"
                   style={{
-                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    background: '#0284c7',
                     color: '#ffffff',
                     border: 'none',
                     padding: '8px 16px',
@@ -307,8 +309,7 @@ export default function Employees() {
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 2px 4px rgba(2, 132, 199, 0.25)'
+                    gap: '8px'
                   }}
                   onClick={() => {
                     setShowModal(false);
@@ -326,24 +327,29 @@ export default function Employees() {
                   <label>First Name</label>
                   <input name="firstName" value={formData.firstName} onChange={handleInputChange} required />
                 </div>
+
                 <div className="form-group">
                   <label>Last Name</label>
                   <input name="lastName" value={formData.lastName} onChange={handleInputChange} required />
                 </div>
+
                 <div className="form-group">
                   <label>Email Address</label>
                   <input type="email" name="email" value={formData.email} onChange={handleInputChange} required />
                 </div>
+
                 {!isEditMode && (
                   <div className="form-group">
                     <label>Password</label>
                     <input type="password" name="password" value={formData.password} onChange={handleInputChange} required />
                   </div>
                 )}
+
                 <div className="form-group">
                   <label>Mobile Number</label>
                   <input name="mobileNumber" value={formData.mobileNumber} onChange={handleInputChange} required />
                 </div>
+
                 <div className="form-group">
                   <label>Role</label>
                   <select name="roleId" value={formData.roleId} onChange={handleInputChange} required>
@@ -351,6 +357,7 @@ export default function Employees() {
                     {roles.map(r => <option key={r.id} value={r.id}>{r.roleName}</option>)}
                   </select>
                 </div>
+
                 <div className="form-group">
                   <label>Department</label>
                   <select name="departmentId" value={formData.departmentId} onChange={handleInputChange} required>
@@ -358,6 +365,7 @@ export default function Employees() {
                     {departments.map(d => <option key={d.id} value={d.id}>{d.departmentName}</option>)}
                   </select>
                 </div>
+
                 <div className="form-group">
                   <label>Designation</label>
                   <select name="designationId" value={formData.designationId} onChange={handleInputChange} required>
@@ -365,6 +373,7 @@ export default function Employees() {
                     {designations.map(d => <option key={d.id} value={d.id}>{d.designationName}</option>)}
                   </select>
                 </div>
+
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label>Reporting Manager</label>
                   <select name="reportingManagerId" value={formData.reportingManagerId} onChange={handleInputChange}>
@@ -380,9 +389,10 @@ export default function Employees() {
 
               {message.text && (
                 <div style={{ 
-                  padding: '12px 28px', 
-                  color: message.type === 'success' ? '#16a34a' : '#ef4444',
-                  fontWeight: '500' 
+                  padding: '0 24px 12px', 
+                  color: message.type === 'success' ? '#10b981' : '#ef4444',
+                  fontWeight: '500',
+                  fontSize: '0.88rem'
                 }}>
                   {message.text}
                 </div>
