@@ -155,7 +155,7 @@ export default function Profile() {
   }
 
   const p = profileData?.profile || {};
-  const isAdmin = profileData?.roleCode === 'ADMIN';
+  const isAdmin = user?.roleCode === 'ADMIN';
 
   const userDetails = {
     id: profileData?.id || user?.id || '',
@@ -350,7 +350,7 @@ export default function Profile() {
                 gap: '8px'
               }}
             >
-              <Edit3 size={16} /> Edit Profile
+              <Edit3 size={16} /> Edit Personal Details
             </button>
             
             {isAdmin && (
@@ -371,7 +371,7 @@ export default function Profile() {
                   boxShadow: '0 2px 4px rgba(139, 92, 246, 0.25)'
                 }}
               >
-                <ShieldCheck size={16} /> Edit Statutory (Admin)
+                <ShieldCheck size={16} /> Edit Bank & Statutory (Admin)
               </button>
             )}
 
@@ -465,9 +465,18 @@ export default function Profile() {
       {/* TAB 1: PERSONAL DETAILS */}
       {activeTab === 'personal' && (
         <div className="table-card" style={{ padding: '32px' }}>
-          <div style={sectionHeaderStyle}>
-            <User size={20} style={{ color: '#3b82f6' }} />
-            <h3 style={{ margin: 0, color: 'var(--text)' }}>Personal & Contact Details</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <User size={20} style={{ color: '#3b82f6' }} />
+              <h3 style={{ margin: 0, color: 'var(--text)' }}>Personal & Contact Details</h3>
+            </div>
+            <button 
+              className="primary-btn" 
+              onClick={() => setShowEditModal(true)}
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            >
+              <Edit3 size={14} /> Edit Personal Details
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -492,9 +501,20 @@ export default function Profile() {
       {/* TAB 2: WORK & ORGANIZATION */}
       {activeTab === 'job' && (
         <div className="table-card" style={{ padding: '32px' }}>
-          <div style={sectionHeaderStyle}>
-            <Briefcase size={20} style={{ color: '#10b981' }} />
-            <h3 style={{ margin: 0, color: 'var(--text)' }}>Work & Employment Information</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Briefcase size={20} style={{ color: '#10b981' }} />
+              <h3 style={{ margin: 0, color: 'var(--text)' }}>Work & Employment Information</h3>
+            </div>
+            {isAdmin && (
+              <button 
+                className="primary-btn" 
+                onClick={() => setShowAdminEditModal(true)}
+                style={{ background: '#10b981', padding: '8px 16px', fontSize: '0.85rem' }}
+              >
+                <ShieldCheck size={14} /> Edit Work Details
+              </button>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -513,9 +533,20 @@ export default function Profile() {
       {/* TAB 3: FINANCIAL & STATUTORY */}
       {activeTab === 'financial' && (
         <div className="table-card" style={{ padding: '32px' }}>
-          <div style={sectionHeaderStyle}>
-            <CreditCard size={20} style={{ color: '#8b5cf6' }} />
-            <h3 style={{ margin: 0, color: 'var(--text)' }}>Bank Account & Statutory Information</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <CreditCard size={20} style={{ color: '#8b5cf6' }} />
+              <h3 style={{ margin: 0, color: 'var(--text)' }}>Bank Account & Statutory Information</h3>
+            </div>
+            {isAdmin && (
+              <button 
+                className="primary-btn" 
+                onClick={() => setShowAdminEditModal(true)}
+                style={{ background: '#8b5cf6', padding: '8px 16px', fontSize: '0.85rem' }}
+              >
+                <CreditCard size={14} /> Edit Bank & Statutory Details
+              </button>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
@@ -624,6 +655,32 @@ export default function Profile() {
               <h2>Edit Personal Details</h2>
               <span onClick={() => setShowEditModal(false)}><X size={20} /></span>
             </div>
+            {isAdmin && (
+              <div style={{ padding: '0 28px 12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    background: '#8b5cf6',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setShowAdminEditModal(true);
+                  }}
+                >
+                  <ShieldCheck size={14} /> Switch to Edit Bank & Statutory Details
+                </button>
+              </div>
+            )}
             <form onSubmit={handleSavePersonal}>
               <div className="form-grid">
                 <div className="form-group">
@@ -689,6 +746,30 @@ export default function Profile() {
             <div className="modal-header">
               <h2>Edit Statutory & Financial Info (Admin)</h2>
               <span onClick={() => setShowAdminEditModal(false)}><X size={20} /></span>
+            </div>
+            <div style={{ padding: '0 28px 12px' }}>
+              <button
+                type="button"
+                style={{
+                  background: '#3b82f6',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                onClick={() => {
+                  setShowAdminEditModal(false);
+                  setShowEditModal(true);
+                }}
+              >
+                <Edit3 size={14} /> Switch to Edit Personal Details
+              </button>
             </div>
             <form onSubmit={handleSaveAdmin}>
               <div className="form-grid">

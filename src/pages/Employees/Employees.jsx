@@ -156,15 +156,22 @@ export default function Employees() {
       const res = await apiRequest(url, method, payload);
       
       if (res.ok) {
+        const newUserId = res.data?.data?.id;
         setMessage({ 
-          text: isEditMode ? 'Employee updated successfully!' : 'Employee created successfully!', 
+          text: isEditMode 
+            ? 'Employee updated successfully!' 
+            : 'Employee created successfully! Opening profile setup...', 
           type: 'success' 
         });
         setTimeout(() => {
           setShowModal(false);
           setMessage({ text: '', type: 'success' });
-          fetchEmployees();
-        }, 1500);
+          if (!isEditMode && newUserId) {
+            navigate(`/profile/${newUserId}`);
+          } else {
+            fetchEmployees();
+          }
+        }, 1200);
       } else {
         setMessage({ text: res.data?.message || 'Failed to save employee', type: 'error' });
       }
