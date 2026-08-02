@@ -416,26 +416,38 @@ export default function Payroll() {
           });
         }
 
-        // 3. Try live payslips endpoint first
+        // 3. Query live backend Salary Structures API endpoint
+        const structRes = await apiRequest('/payroll/salary-structures');
+        let dbStructuresMap = {};
+        if (structRes.ok && structRes.data && structRes.data.status && Array.isArray(structRes.data.data)) {
+          structRes.data.data.forEach(st => {
+            if (st.employeeId || st.userId) {
+              dbStructuresMap[st.employeeId || st.userId] = st;
+            }
+          });
+        }
+
+        // 4. Try live payslips endpoint first
         const payslipRes = await apiRequest(`/payroll/payslips?month=${monthFilter}&year=${yearFilter}`);
         if (payslipRes.ok && payslipRes.data && payslipRes.data.status && Array.isArray(payslipRes.data.data) && payslipRes.data.data.length > 0) {
           setPayslips(payslipRes.data.data);
           return;
         }
 
-        // 4. Construct live payslips directly from DB Users and DB Attendance
+        // 5. Construct live payslips directly from DB Users and DB Attendance
         if (dbUsers.length > 0) {
-          // Live Salary Structures directly from DB Users
+          // Live Salary Structures directly from backend DB or user CTC field
           const liveStructures = dbUsers.map(u => {
             const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.employeeCode || 'Employee';
-            const fullNameLower = fullName.toLowerCase();
-            const ctcVal = u.ctc || (fullNameLower.includes('admin') || fullNameLower.includes('rohit') || fullNameLower.includes('sahib') ? 1500000 : 600000);
-            const grossBase = Math.round(ctcVal / 12);
-            const basic = Math.round(grossBase * 0.5);
-            const hra = Math.round(basic * 0.5);
-            const allowances = Math.round(basic * 0.5);
-            const pf = 1800;
-            const tax = ctcVal > 1000000 ? 22500 : 5000;
+            const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
+            
+            const ctcVal = existingSt?.ctc || u.ctc || u.salary || 600000;
+            const grossBase = existingSt?.grossSalary || Math.round(ctcVal / 12);
+            const basic = existingSt?.basicSalary || Math.round(grossBase * 0.5);
+            const hra = existingSt?.hra || Math.round(basic * 0.5);
+            const allowances = existingSt?.allowances || Math.round(basic * 0.5);
+            const pf = existingSt?.pfDeduction || 1800;
+            const tax = existingSt?.taxDeduction || (ctcVal > 1000000 ? 22500 : 5000);
 
             return {
               id: `st-${u.id}`,
@@ -474,13 +486,14 @@ export default function Payroll() {
               realPresent = 0; // Default 0 if no attendance entries in DB
             }
 
-            const ctcVal = u.ctc || (fullNameLower.includes('admin') || fullNameLower.includes('rohit') || fullNameLower.includes('sahib') ? 1500000 : 600000);
-            const grossBase = Math.round(ctcVal / 12);
-            const basic = Math.round(grossBase * 0.5);
-            const hra = Math.round(basic * 0.5);
-            const allowances = Math.round(basic * 0.5);
-            const pf = 1800;
-            const tax = ctcVal > 1000000 ? 22500 : 5000;
+            const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
+            const ctcVal = existingSt?.ctc || u.ctc || u.salary || 600000;
+            const grossBase = existingSt?.grossSalary || Math.round(ctcVal / 12);
+            const basic = existingSt?.basicSalary || Math.round(grossBase * 0.5);
+            const hra = existingSt?.hra || Math.round(basic * 0.5);
+            const allowances = existingSt?.allowances || Math.round(basic * 0.5);
+            const pf = existingSt?.pfDeduction || 1800;
+            const tax = existingSt?.taxDeduction || (ctcVal > 1000000 ? 22500 : 5000);
 
             const totalWorking = 30;
             const realLwp = Math.max(0, totalWorking - realPresent);
