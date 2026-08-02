@@ -489,8 +489,25 @@ export default function Payroll() {
   const filteredPayslips = payslips.filter(p => {
     const matchesSearch = p.employeeName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMonth = monthFilter ? p.month === parseInt(monthFilter) : true;
+
+    if (!isAdmin) {
+      const loggedUserFullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim().toLowerCase();
+      const userFirstName = (user?.firstName || '').trim().toLowerCase();
+      const userEmailPrefix = (user?.email || '').split('@')[0].toLowerCase();
+
+      const isMySlip = 
+        (user?.id && p.employeeId === user.id) ||
+        (userFirstName && p.employeeName?.toLowerCase().includes(userFirstName)) ||
+        (loggedUserFullName && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
+        (userEmailPrefix && p.employeeName?.toLowerCase().includes(userEmailPrefix));
+
+      return isMySlip && matchesMonth;
+    }
+
     return matchesSearch && matchesMonth;
   });
+
+
 
   return (
     <div className="payroll-container">
