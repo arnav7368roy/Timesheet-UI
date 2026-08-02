@@ -43,10 +43,16 @@ export default function Payroll() {
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  // Default to July (Month 7) as completed pay cycle; August pay slips are scheduled for processing at the start of September.
-  const [monthFilter, setMonthFilter] = useState(7);
-  const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
+  // Dynamic System Date Calculation:
+  // Completed pay cycle is always the previous month (currentMonth - 1).
+  // In August (Month 8), maxCompletedMonth = 7 (July).
+  // When September 1st arrives (Month 9), maxCompletedMonth automatically becomes 8 (August)!
+  const currentDate = new Date();
+  const currentMonthNum = currentDate.getMonth() + 1;
+  const maxCompletedMonth = currentMonthNum > 1 ? currentMonthNum - 1 : 12;
+
+  const [monthFilter, setMonthFilter] = useState(maxCompletedMonth);
+  const [yearFilter, setYearFilter] = useState(currentDate.getFullYear());
 
   // Form states for Process Payroll
   const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
@@ -913,7 +919,7 @@ export default function Payroll() {
                   outline: 'none'
                 }}
               >
-                {monthNames.slice(0, 7).map((name, idx) => (
+                {monthNames.slice(0, maxCompletedMonth).map((name, idx) => (
                   <option key={idx + 1} value={idx + 1}>{name}</option>
                 ))}
               </select>
