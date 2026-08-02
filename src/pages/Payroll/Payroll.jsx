@@ -460,7 +460,7 @@ export default function Payroll() {
             const hra = existingSt?.hra || Math.round(basic * 0.5);
             const allowances = existingSt?.allowances || Math.round(basic * 0.5);
             const pf = existingSt?.pfDeduction || 1800;
-            const tax = existingSt?.taxDeduction || (ctcVal > 1000000 ? 22500 : 5000);
+            const tax = existingSt?.taxDeduction ?? (ctcVal <= 700000 ? 0 : (ctcVal > 1000000 ? 22500 : 5000));
             const netVal = grossBase - pf - tax;
 
             return {
@@ -533,7 +533,7 @@ export default function Payroll() {
             const hra = existingSt?.hra || Math.round(basic * 0.5);
             const allowances = existingSt?.allowances || Math.round(basic * 0.5);
             const pf = existingSt?.pfDeduction || 1800;
-            const tax = existingSt?.taxDeduction || (ctcVal > 1000000 ? 22500 : 5000);
+            const tax = existingSt?.taxDeduction ?? (ctcVal <= 700000 ? 0 : (ctcVal > 1000000 ? 22500 : 5000));
 
             const totalWorking = 30;
             const realLwp = Math.max(0, totalWorking - realPresent);
