@@ -43,6 +43,8 @@ export default function Payroll() {
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Dynamic System Date Calculation:
   // Completed pay cycle is always the previous month (currentMonth - 1).
   // In August (Month 8), maxCompletedMonth = 7 (July).
