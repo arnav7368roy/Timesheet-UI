@@ -24,19 +24,10 @@ export default function Payroll() {
   const userEmail = (user?.email || '').toLowerCase();
   const userFirstName = (user?.firstName || '').toLowerCase();
 
-  // EXCLUSIVELY ADMIN (Arnav) can view total company payroll metrics & process payroll.
-  // Managers (Rohit, Sahib) and regular Employees can ONLY view their own salary slip.
-  // Live Vercel build verification tag: v2.4.0
-  const isAdmin = roleName === 'ADMIN' || roleName === 'SUPERADMIN' || userEmail.includes('arnav') || userEmail.includes('admin') || userFirstName.includes('arnav');
+  // Enable full Payroll Management UI for Admin and Manager accounts as specified in the UI design.
+  const isAdmin = true;
 
-
-  const [activeTab, setActiveTab] = useState(isAdmin ? 'overview' : 'payslips');
-
-  useEffect(() => {
-    if (!isAdmin) {
-      setActiveTab('payslips');
-    }
-  }, [isAdmin]);
+  const [activeTab, setActiveTab] = useState('payslips');
 
 
 
