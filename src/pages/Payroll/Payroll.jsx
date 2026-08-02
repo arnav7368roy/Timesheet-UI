@@ -15,11 +15,17 @@ import {
   Filter,
   ArrowUpRight
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import PayslipModal from '../../components/Payroll/PayslipModal';
 import './Payroll.css';
 
 export default function Payroll() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useAuth();
+  const roleName = (user?.role?.name || user?.roleName || 'EMPLOYEE').toUpperCase();
+  const isAdmin = ['ADMIN', 'HR', 'MANAGER'].includes(roleName);
+
+  const [activeTab, setActiveTab] = useState(isAdmin ? 'overview' : 'payslips');
+
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -266,86 +272,95 @@ export default function Payroll() {
           </p>
         </div>
 
-        <button 
-          className="btn-primary-payroll" 
-          onClick={() => setActiveTab('process')}
-        >
-          <Play size={16} /> Run Monthly Payroll
-        </button>
+        {isAdmin && (
+          <button 
+            className="btn-primary-payroll" 
+            onClick={() => setActiveTab('process')}
+          >
+            <Play size={16} /> Run Monthly Payroll
+          </button>
+        )}
       </div>
 
-      {/* KPI Overview Grid */}
-      <div className="payroll-kpi-grid">
-        <div className="payroll-kpi-card">
-          <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
-            <DollarSign size={26} />
+      {/* KPI Overview Grid - Admin Only */}
+      {isAdmin && (
+        <div className="payroll-kpi-grid">
+          <div className="payroll-kpi-card">
+            <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+              <DollarSign size={26} />
+            </div>
+            <div className="payroll-kpi-info">
+              <h4>Total Monthly Payroll</h4>
+              <p>{formatCurrency(payrollRuns[0]?.totalAmount || 1854000)}</p>
+            </div>
           </div>
-          <div className="payroll-kpi-info">
-            <h4>Total Monthly Payroll</h4>
-            <p>{formatCurrency(payrollRuns[0]?.totalAmount || 1854000)}</p>
-          </div>
-        </div>
 
-        <div className="payroll-kpi-card">
-          <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-            <Users size={26} />
+          <div className="payroll-kpi-card">
+            <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+              <Users size={26} />
+            </div>
+            <div className="payroll-kpi-info">
+              <h4>Employees On Payroll</h4>
+              <p>{payrollRuns[0]?.totalEmployees || 24} Active</p>
+            </div>
           </div>
-          <div className="payroll-kpi-info">
-            <h4>Employees On Payroll</h4>
-            <p>{payrollRuns[0]?.totalEmployees || 24} Active</p>
-          </div>
-        </div>
 
-        <div className="payroll-kpi-card">
-          <div className="payroll-kpi-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
-            <TrendingUp size={26} />
+          <div className="payroll-kpi-card">
+            <div className="payroll-kpi-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
+              <TrendingUp size={26} />
+            </div>
+            <div className="payroll-kpi-info">
+              <h4>Average CTC</h4>
+              <p>₹ 7,20,000 /yr</p>
+            </div>
           </div>
-          <div className="payroll-kpi-info">
-            <h4>Average CTC</h4>
-            <p>₹ 7,20,000 /yr</p>
-          </div>
-        </div>
 
-        <div className="payroll-kpi-card">
-          <div className="payroll-kpi-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
-            <CheckCircle2 size={26} />
-          </div>
-          <div className="payroll-kpi-info">
-            <h4>Payroll Status</h4>
-            <p style={{ color: '#34d399', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }}></span> Up to Date
-            </p>
+          <div className="payroll-kpi-card">
+            <div className="payroll-kpi-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+              <CheckCircle2 size={26} />
+            </div>
+            <div className="payroll-kpi-info">
+              <h4>Payroll Status</h4>
+              <p style={{ color: '#34d399', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }}></span> Up to Date
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Tabs */}
       <div className="payroll-tabs">
-        <button 
-          className={`payroll-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
-        >
-          <TrendingUp size={16} /> Overview
-        </button>
-        <button 
-          className={`payroll-tab-btn ${activeTab === 'process' ? 'active' : ''}`}
-          onClick={() => setActiveTab('process')}
-        >
-          <Play size={16} /> Process Payroll
-        </button>
-        <button 
-          className={`payroll-tab-btn ${activeTab === 'structures' ? 'active' : ''}`}
-          onClick={() => setActiveTab('structures')}
-        >
-          <DollarSign size={16} /> Salary Structures
-        </button>
+        {isAdmin && (
+          <>
+            <button 
+              className={`payroll-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveTab('overview')}
+            >
+              <TrendingUp size={16} /> Overview
+            </button>
+            <button 
+              className={`payroll-tab-btn ${activeTab === 'process' ? 'active' : ''}`}
+              onClick={() => setActiveTab('process')}
+            >
+              <Play size={16} /> Process Payroll
+            </button>
+            <button 
+              className={`payroll-tab-btn ${activeTab === 'structures' ? 'active' : ''}`}
+              onClick={() => setActiveTab('structures')}
+            >
+              <DollarSign size={16} /> Salary Structures
+            </button>
+          </>
+        )}
         <button 
           className={`payroll-tab-btn ${activeTab === 'payslips' ? 'active' : ''}`}
           onClick={() => setActiveTab('payslips')}
         >
-          <FileText size={16} /> Payslips
+          <FileText size={16} /> {isAdmin ? 'All Payslips' : 'My Payslips'}
         </button>
       </div>
+
 
       {/* TAB 1: OVERVIEW */}
       {activeTab === 'overview' && (
