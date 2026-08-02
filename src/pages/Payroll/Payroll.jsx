@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PayslipModal from '../../components/Payroll/PayslipModal';
+import './Payroll.css';
+
 export default function Payroll() {
   const { user } = useAuth();
 
