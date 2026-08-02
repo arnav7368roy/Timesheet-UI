@@ -66,11 +66,12 @@ export default function Payroll() {
       id: 'run-jul-2026',
       month: 7,
       year: 2026,
-      totalAmount: 100700,
+      totalAmount: 21533,
       totalEmployees: 1,
       status: 'PAID',
       processedAt: '2026-07-31'
     }
+
   ]);
 
   // Salary Structures for all 8 DB Employees
@@ -365,7 +366,7 @@ export default function Payroll() {
       status: 'APPROVED'
     },
 
-    // --- JULY 2026 PAYSLIP (ONLY ROHIT KUMAR WORKED) ---
+    // --- JULY 2026 PAYSLIP (ONLY ROHIT KUMAR WORKED 11 DAYS) ---
     {
       id: 'ps-jul-01',
       payrollRunId: 'run-jul-2026',
@@ -376,20 +377,21 @@ export default function Payroll() {
       month: 7,
       year: 2026,
       workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
+      presentDays: 11,
+      lwpDays: 19,
       basicSalary: 62500,
       hra: 31250,
       allowances: 31250,
       grossSalary: 125000,
       pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 TDS Tax + ₹12,500 Performance Cut
-      lwpDeduction: 0,
-      totalDeductions: 24300,
-      netSalary: 100700,
+      taxDeduction: 22500, // ₹10,000 TDS Tax + ₹12,500 10% Performance Cut
+      lwpDeduction: 79167, // 19 days LWP deduction (125000 * 19/30)
+      totalDeductions: 103467,
+      netSalary: 21533, // Net pay for 11 working days present
       status: 'PAID'
     }
   ]);
+
 
 
 
