@@ -635,14 +635,33 @@ export default function Payroll() {
     }, 1200);
   };
 
-  const handleSaveSalaryStructure = (e) => {
+  const handleSaveSalaryStructure = async (e) => {
     e.preventDefault();
     const basic = parseFloat(structForm.basicSalary) || 0;
     const hra = parseFloat(structForm.hra) || 0;
     const allowances = parseFloat(structForm.allowances) || 0;
     const pf = parseFloat(structForm.pfDeduction) || 0;
     const tax = parseFloat(structForm.taxDeduction) || 0;
-    const net = basic + hra + allowances - pf - tax;
+    const gross = basic + hra + allowances;
+    const net = gross - pf - tax;
+
+    const payload = {
+      employeeId: structForm.employeeId,
+      ctc: parseFloat(structForm.ctc),
+      basicSalary: basic,
+      hra: hra,
+      allowances: allowances,
+      pfDeduction: pf,
+      taxDeduction: tax,
+      grossSalary: gross,
+      netSalary: net
+    };
+
+    try {
+      await apiRequest('/payroll/salary-structures', 'POST', payload);
+    } catch (err) {
+      console.log('Salary structure update:', err);
+    }
 
     if (editingStructure) {
       setSalaryStructures(salaryStructures.map(s => s.id === editingStructure.id ? {
