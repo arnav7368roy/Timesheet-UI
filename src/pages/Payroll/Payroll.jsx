@@ -461,6 +461,7 @@ export default function Payroll() {
             const allowances = existingSt?.allowances || Math.round(basic * 0.5);
             const pf = existingSt?.pfDeduction || 1800;
             const tax = existingSt?.taxDeduction || (ctcVal > 1000000 ? 22500 : 5000);
+            const netVal = grossBase - pf - tax;
 
             return {
               id: `st-${u.id}`,
@@ -471,11 +472,35 @@ export default function Payroll() {
               basicSalary: basic,
               hra: hra,
               allowances: allowances,
+              grossSalary: grossBase,
               pfDeduction: pf,
-              taxDeduction: tax
+              taxDeduction: tax,
+              netSalary: netVal
             };
           });
+          
           setSalaryStructures(liveStructures);
+
+          // Auto-insert salary structure records into Neon PostgreSQL database if empty
+          if (Object.keys(dbStructuresMap).length === 0 && liveStructures.length > 0) {
+            liveStructures.forEach(async (st) => {
+              try {
+                await apiRequest('/payroll/salary-structures', 'POST', {
+                  employeeId: st.employeeId,
+                  ctc: st.ctc,
+                  basicSalary: st.basicSalary,
+                  hra: st.hra,
+                  allowances: st.allowances,
+                  pfDeduction: st.pfDeduction,
+                  taxDeduction: st.taxDeduction,
+                  grossSalary: st.grossSalary,
+                  netSalary: st.netSalary
+                });
+              } catch (e) {
+                console.log('Seeding structure record to DB:', e);
+              }
+            });
+          }
 
           // Live Payslips directly from DB Users & DB Attendance
           const livePayslips = payrollUsers.map(u => {
@@ -1044,7 +1069,9 @@ export default function Payroll() {
                   <td style={{ color: '#f87171' }}>
                     {formatCurrency(parseFloat(st.pfDeduction) + parseFloat(st.taxDeduction))}
                   </td>
-                  <td style={{ fontWeight: '700', color: '#34d399' }}>{formatCurrency(st.netSalary)}</td>
+                  <td style={{ fontWeight: '700', color: '#34d399' }}>
+                    {formatCurrency(st.netSalary || ((parseFloat(st.basicSalary) || 0) + (parseFloat(st.hra) || 0) + (parseFloat(st.allowances) || 0) - (parseFloat(st.pfDeduction) || 0) - (parseFloat(st.taxDeduction) || 0)))}
+                  </td>
                   <td>
                     <button 
                       onClick={() => {
