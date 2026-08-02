@@ -431,21 +431,27 @@ export default function Payroll() {
 
             // Prorated salary calculations: Gross per day = grossSalary / totalWorking
             const dailyGross = ps.grossSalary / totalWorking;
+            const earnedGross = Math.round(dailyGross * realPresent);
             const lwpDeduction = Math.round(realLwp * dailyGross);
-            const actualGross = Math.max(0, ps.grossSalary - lwpDeduction);
             
-            // Recalculate deductions and net salary
-            const fixedDeductions = (ps.pfDeduction || 0) + (ps.taxDeduction || 0);
-            const totalDeduction = fixedDeductions + lwpDeduction;
-            const netSalary = Math.max(0, ps.grossSalary - totalDeduction);
+            // Deductions (PF & Tax) are also prorated by worked days ratio so 1-day worked employees receive their 1-day net pay
+            const attendanceRatio = realPresent / totalWorking;
+            const proratedPf = Math.round((ps.pfDeduction || 0) * attendanceRatio);
+            const proratedTax = Math.round((ps.taxDeduction || 0) * attendanceRatio);
+            const proratedFixedDeductions = proratedPf + proratedTax;
+            
+            const totalDeduction = proratedFixedDeductions + lwpDeduction;
+            const netSalary = Math.round(earnedGross - proratedFixedDeductions);
 
             return {
               ...ps,
               presentDays: realPresent,
               lwpDays: realLwp,
               lwpDeduction: lwpDeduction,
+              pfDeduction: proratedPf,
+              taxDeduction: proratedTax,
               totalDeductions: totalDeduction,
-              netSalary: netSalary
+              netSalary: Math.max(0, netSalary)
             };
           }));
         }
