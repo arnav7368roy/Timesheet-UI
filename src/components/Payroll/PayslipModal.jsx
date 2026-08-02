@@ -130,26 +130,19 @@ export default function PayslipModal({ payslip, onClose }) {
           }
         }
       `}</style>
-      <div className="modal-content payslip-modal-content" style={{
-
-        background: '#0f172a',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+      <div className="modal-content payslip-modal-content payslip-modal-container" style={{
         borderRadius: '16px',
         width: '100%',
         maxWidth: '750px',
         maxHeight: '90vh',
-        overflowY: 'auto',
-        color: '#f8fafc',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        overflowY: 'auto'
       }}>
         {/* Modal Header */}
-        <div style={{
+        <div className="payslip-modal-header" style={{
           padding: '20px 24px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'rgba(30, 41, 59, 0.5)'
+          alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
@@ -160,7 +153,7 @@ export default function PayslipModal({ payslip, onClose }) {
               <CreditCard size={20} color="#ffffff" />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
+              <h3 className="payslip-modal-title" style={{ margin: 0, fontSize: '18px', fontWeight: '700' }}>
                 Salary Slip - {monthText} {payslip.year}
               </h3>
               <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
@@ -246,33 +239,31 @@ export default function PayslipModal({ payslip, onClose }) {
           </div>
 
           {/* Employee & Attendance Info Grid */}
-          <div className="print-bg-slate" style={{
+          <div className="payslip-bg-slate print-bg-slate" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '16px',
-            background: 'rgba(30, 41, 59, 0.4)',
             padding: '16px',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
             marginBottom: '24px'
           }}>
             <div>
-              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8' }}>Employee Name</p>
-              <p style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#f8fafc' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', opacity: 0.8 }}>Employee Name</p>
+              <p style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>
                 {payslip.employeeName || 'N/A'}
               </p>
-              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8' }}>Department</p>
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: '#f8fafc' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', opacity: 0.8 }}>Department</p>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>
                 {payslip.departmentName || 'Engineering'}
               </p>
             </div>
             <div>
-              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8' }}>Designation</p>
-              <p style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#f8fafc' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', opacity: 0.8 }}>Designation</p>
+              <p style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600' }}>
                 {payslip.designationName || 'Software Engineer'}
               </p>
-              <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8' }}>Attendance Summary</p>
-              <p style={{ margin: 0, fontSize: '13px', color: '#cbd5e1' }}>
+              <p style={{ margin: '0 0 4px 0', fontSize: '12px', opacity: 0.8 }}>Attendance Summary</p>
+              <p style={{ margin: 0, fontSize: '13px' }}>
                 Working Days: <strong>{payslip.workingDays}</strong> | Present: <strong>{payslip.presentDays}</strong> | LWP: <strong style={{ color: '#ef4444' }}>{payslip.lwpDays}</strong>
               </p>
             </div>
