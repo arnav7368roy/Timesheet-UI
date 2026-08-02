@@ -44,7 +44,8 @@ export default function Payroll() {
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [monthFilter, setMonthFilter] = useState(new Date().getMonth() + 1);
+  // Default to July (Month 7) as completed pay cycle; August pay slips are scheduled for processing at the start of September.
+  const [monthFilter, setMonthFilter] = useState(7);
   const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
 
   // Form states for Process Payroll
