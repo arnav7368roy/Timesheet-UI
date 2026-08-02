@@ -302,10 +302,16 @@ export default function PayslipModal({ payslip, onClose }) {
                   <span style={{ color: '#cbd5e1' }}>House Rent Allowance (HRA)</span>
                   <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.hra)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
                   <span style={{ color: '#cbd5e1' }}>Special Allowances</span>
                   <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.allowances)}</span>
                 </div>
+                {payslip.quarterlyBonusPayout > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px', background: 'rgba(52, 211, 153, 0.1)', paddingLeft: '8px', borderRadius: '4px' }}>
+                    <span style={{ color: '#34d399', fontWeight: '700' }}>Quarterly Performance Bonus (3 Months)</span>
+                    <span style={{ fontWeight: '700', color: '#34d399' }}>+{formatCurrency(payslip.quarterlyBonusPayout)}</span>
+                  </div>
+                )}
               </div>
               <div style={{
                 background: 'rgba(15, 23, 42, 0.6)',
@@ -318,7 +324,7 @@ export default function PayslipModal({ payslip, onClose }) {
                 color: '#38bdf8'
               }}>
                 <span>Gross Earnings</span>
-                <span>{formatCurrency(payslip.grossSalary)}</span>
+                <span>{formatCurrency((payslip.grossSalary || 0) + (payslip.quarterlyBonusPayout || 0))}</span>
               </div>
             </div>
 
@@ -348,6 +354,12 @@ export default function PayslipModal({ payslip, onClose }) {
                   <span style={{ color: '#cbd5e1' }}>Tax / TDS</span>
                   <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.taxDeduction)}</span>
                 </div>
+                {payslip.performanceIncentiveHold > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                    <span style={{ color: '#fbbf24' }}>Performance Reserve (10% Basic Hold)</span>
+                    <span style={{ fontWeight: '600', color: '#fbbf24' }}>{formatCurrency(payslip.performanceIncentiveHold)}</span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px' }}>
                   <span style={{ color: '#cbd5e1' }}>Leave Without Pay (LWP)</span>
                   <span style={{ fontWeight: '600', color: '#f87171' }}>{formatCurrency(payslip.lwpDeduction)}</span>

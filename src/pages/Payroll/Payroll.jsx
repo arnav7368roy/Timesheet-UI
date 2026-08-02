@@ -535,6 +535,12 @@ export default function Payroll() {
             const pf = existingSt?.pfDeduction || 1800;
             const tax = existingSt?.taxDeduction ?? (ctcVal <= 700000 ? 0 : (ctcVal > 1000000 ? 22500 : 5000));
 
+            // 10% Basic Performance Incentive Rule
+            const perfIncentiveMonthly = Math.round(basic * 0.10);
+            const isQuarterlyPayoutMonth = (parseInt(monthFilter, 10) % 3 === 0);
+            const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
+            const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
+
             const totalWorking = 30;
             const realLwp = Math.max(0, totalWorking - realPresent);
 
@@ -545,10 +551,12 @@ export default function Payroll() {
             const attendanceRatio = realPresent / totalWorking;
             const proratedPf = Math.round(pf * attendanceRatio);
             const proratedTax = Math.round(tax * attendanceRatio);
-            const proratedFixedDeductions = proratedPf + proratedTax;
+            const proratedPerfHold = Math.round(monthlyPerfHold * attendanceRatio);
+            const proratedFixedDeductions = proratedPf + proratedTax + proratedPerfHold;
             
             const totalDeduction = proratedFixedDeductions + lwpDeduction;
-            const netSalary = Math.max(0, Math.round(earnedGross - proratedFixedDeductions));
+            const baseNetSalary = Math.max(0, Math.round(earnedGross - proratedFixedDeductions));
+            const netSalary = baseNetSalary + (realPresent > 0 ? quarterlyBonusPayout : 0);
 
             return {
               id: `ps-${u.id}-${monthFilter}`,
@@ -569,6 +577,9 @@ export default function Payroll() {
               grossSalary: grossBase,
               pfDeduction: proratedPf,
               taxDeduction: proratedTax,
+              performanceIncentiveHold: proratedPerfHold,
+              quarterlyBonusPayout: (realPresent > 0 ? quarterlyBonusPayout : 0),
+              isQuarterlyPayout: isQuarterlyPayoutMonth,
               lwpDeduction: lwpDeduction,
               totalDeductions: totalDeduction,
               netSalary: netSalary,
