@@ -53,20 +53,47 @@ export default function PayslipModal({ payslip, onClose }) {
           body * {
             visibility: hidden !important;
           }
-          #printable-payslip, #printable-payslip * {
+          .modal-overlay,
+          .modal-content,
+          .payslip-modal-content,
+          #printable-payslip,
+          #printable-payslip * {
             visibility: visible !important;
           }
+          .modal-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            backdrop-filter: none !important;
+          }
+          .modal-content,
+          .payslip-modal-content {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            max-height: none !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+            overflow: visible !important;
+          }
           #printable-payslip {
-            position: fixed !important;
+            position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
-            margin: 0 !important;
-            padding: 20px !important;
+            padding: 24px !important;
             background: #ffffff !important;
             color: #0f172a !important;
-            border: none !important;
-            box-shadow: none !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           #printable-payslip h2 {
             color: #0284c7 !important;
@@ -75,28 +102,31 @@ export default function PayslipModal({ payslip, onClose }) {
           }
           #printable-payslip p, 
           #printable-payslip span, 
-          #printable-payslip div {
-            color: #334155 !important;
+          #printable-payslip div,
+          #printable-payslip td,
+          #printable-payslip th {
+            color: #1e293b !important;
+            -webkit-text-fill-color: #1e293b !important;
           }
           #printable-payslip strong {
             color: #0f172a !important;
+            -webkit-text-fill-color: #0f172a !important;
           }
           #printable-payslip .print-bg-slate {
-            background: #f1f5f9 !important;
+            background: #f8fafc !important;
             border: 1px solid #cbd5e1 !important;
           }
           #printable-payslip .print-bg-green {
             background: #f0fdf4 !important;
             border: 1px solid #bbf7d0 !important;
-            color: #166534 !important;
           }
           #printable-payslip .print-bg-red {
             background: #fef2f2 !important;
             border: 1px solid #fecaca !important;
-            color: #991b1b !important;
           }
-          #printable-payslip .print-border {
-            border-bottom: 1px solid #e2e8f0 !important;
+          #printable-payslip h1 {
+            color: #166534 !important;
+            -webkit-text-fill-color: #166534 !important;
           }
         }
       `}</style>
