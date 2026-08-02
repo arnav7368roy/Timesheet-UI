@@ -30,6 +30,13 @@ export default function Payroll() {
 
   const [activeTab, setActiveTab] = useState(isAdmin ? 'overview' : 'payslips');
 
+  useEffect(() => {
+    if (!isAdmin) {
+      setActiveTab('payslips');
+    }
+  }, [isAdmin]);
+
+
 
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -586,41 +593,40 @@ export default function Payroll() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="payroll-tabs">
-        {isAdmin && (
-          <>
-            <button 
-              className={`payroll-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-              onClick={() => setActiveTab('overview')}
-            >
-              <TrendingUp size={16} /> Overview
-            </button>
-            <button 
-              className={`payroll-tab-btn ${activeTab === 'process' ? 'active' : ''}`}
-              onClick={() => setActiveTab('process')}
-            >
-              <Play size={16} /> Process Payroll
-            </button>
-            <button 
-              className={`payroll-tab-btn ${activeTab === 'structures' ? 'active' : ''}`}
-              onClick={() => setActiveTab('structures')}
-            >
-              <DollarSign size={16} /> Salary Structures
-            </button>
-          </>
-        )}
-        <button 
-          className={`payroll-tab-btn ${activeTab === 'payslips' ? 'active' : ''}`}
-          onClick={() => setActiveTab('payslips')}
-        >
-          <FileText size={16} /> {isAdmin ? 'All Payslips' : 'My Payslips'}
-        </button>
-      </div>
+      {/* Tabs - Admin Only */}
+      {isAdmin && (
+        <div className="payroll-tabs">
+          <button 
+            className={`payroll-tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            <TrendingUp size={16} /> Overview
+          </button>
+          <button 
+            className={`payroll-tab-btn ${activeTab === 'process' ? 'active' : ''}`}
+            onClick={() => setActiveTab('process')}
+          >
+            <Play size={16} /> Process Payroll
+          </button>
+          <button 
+            className={`payroll-tab-btn ${activeTab === 'structures' ? 'active' : ''}`}
+            onClick={() => setActiveTab('structures')}
+          >
+            <DollarSign size={16} /> Salary Structures
+          </button>
+          <button 
+            className={`payroll-tab-btn ${activeTab === 'payslips' ? 'active' : ''}`}
+            onClick={() => setActiveTab('payslips')}
+          >
+            <FileText size={16} /> All Payslips
+          </button>
+        </div>
+      )}
 
 
-      {/* TAB 1: OVERVIEW */}
-      {activeTab === 'overview' && (
+
+      {/* TAB 1: OVERVIEW - ADMIN ONLY */}
+      {isAdmin && activeTab === 'overview' && (
         <div>
           <div className="payroll-card">
             <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
@@ -685,8 +691,8 @@ export default function Payroll() {
         </div>
       )}
 
-      {/* TAB 2: PROCESS PAYROLL */}
-      {activeTab === 'process' && (
+      {/* TAB 2: PROCESS PAYROLL - ADMIN ONLY */}
+      {isAdmin && activeTab === 'process' && (
         <div className="payroll-card" style={{ maxWidth: '650px' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
             Run Monthly Payroll Engine
@@ -771,8 +777,9 @@ export default function Payroll() {
         </div>
       )}
 
-      {/* TAB 3: SALARY STRUCTURES */}
-      {activeTab === 'structures' && (
+      {/* TAB 3: SALARY STRUCTURES - ADMIN ONLY */}
+      {isAdmin && activeTab === 'structures' && (
+
         <div className="payroll-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
@@ -844,12 +851,13 @@ export default function Payroll() {
       )}
 
       {/* TAB 4: PAYSLIPS */}
-      {activeTab === 'payslips' && (
+      {(!isAdmin || activeTab === 'payslips') && (
         <div className="payroll-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
             <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
-              Generated Payslips
+              {isAdmin ? 'Generated Payslips' : 'My Payslips'}
             </h3>
+
 
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <div style={{ position: 'relative' }}>
