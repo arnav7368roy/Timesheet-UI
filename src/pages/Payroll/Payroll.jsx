@@ -436,12 +436,25 @@ export default function Payroll() {
 
         // 5. Construct live payslips directly from DB Users and DB Attendance
         if (dbUsers.length > 0) {
-          // Live Salary Structures directly from backend DB or user CTC field
-          const liveStructures = dbUsers.map(u => {
+          // Filter DB Users: Exclude Admin accounts with no CTC
+          const payrollUsers = dbUsers.filter(u => {
+            const fullNameLower = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
+            const roleNameLower = (u.role?.name || u.roleName || u.role || '').toLowerCase();
+            const emailLower = (u.email || '').toLowerCase();
+            const isNoCtcAdmin = (roleNameLower.includes('admin') || emailLower.includes('admin') || fullNameLower.includes('arnav')) && !u.ctc && !u.salary;
+            return !isNoCtcAdmin;
+          });
+
+          // Live Salary Structures directly from backend DB or CTC rules
+          const liveStructures = payrollUsers.map(u => {
             const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.employeeCode || 'Employee';
+            const fullNameLower = fullName.toLowerCase();
             const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
             
-            const ctcVal = existingSt?.ctc || u.ctc || u.salary || 600000;
+            // Sahib Chopra & Rohit Kumar: 15 LPA; Other 5 Employees: 6 LPA
+            const defaultCtc = (fullNameLower.includes('rohit') || fullNameLower.includes('sahib')) ? 1500000 : 600000;
+            const ctcVal = existingSt?.ctc || u.ctc || u.salary || defaultCtc;
+            
             const grossBase = existingSt?.grossSalary || Math.round(ctcVal / 12);
             const basic = existingSt?.basicSalary || Math.round(grossBase * 0.5);
             const hra = existingSt?.hra || Math.round(basic * 0.5);
@@ -465,7 +478,7 @@ export default function Payroll() {
           setSalaryStructures(liveStructures);
 
           // Live Payslips directly from DB Users & DB Attendance
-          const livePayslips = dbUsers.map(u => {
+          const livePayslips = payrollUsers.map(u => {
             const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.employeeCode || 'Employee';
             const empCodeLower = (u.employeeCode || '').toLowerCase().trim();
             const empIdLower = (u.id || '').toLowerCase().trim();
@@ -487,7 +500,9 @@ export default function Payroll() {
             }
 
             const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
-            const ctcVal = existingSt?.ctc || u.ctc || u.salary || 600000;
+            const defaultCtc = (fullNameLower.includes('rohit') || fullNameLower.includes('sahib')) ? 1500000 : 600000;
+            const ctcVal = existingSt?.ctc || u.ctc || u.salary || defaultCtc;
+            
             const grossBase = existingSt?.grossSalary || Math.round(ctcVal / 12);
             const basic = existingSt?.basicSalary || Math.round(grossBase * 0.5);
             const hra = existingSt?.hra || Math.round(basic * 0.5);
