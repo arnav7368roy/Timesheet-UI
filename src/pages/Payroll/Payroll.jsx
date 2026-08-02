@@ -17,14 +17,19 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PayslipModal from '../../components/Payroll/PayslipModal';
-import './Payroll.css';
-
 export default function Payroll() {
   const { user } = useAuth();
+
   const roleName = (user?.role?.name || user?.roleName || 'EMPLOYEE').toUpperCase();
-  const isAdmin = ['ADMIN', 'HR', 'MANAGER'].includes(roleName);
+  const userEmail = (user?.email || '').toLowerCase();
+  const userFirstName = (user?.firstName || '').toLowerCase();
+
+  // EXCLUSIVELY ADMIN (Arnav) can view total company payroll metrics & process payroll.
+  // Managers (Rohit, Sahib) and regular Employees can ONLY view their own salary slip.
+  const isAdmin = roleName === 'ADMIN' || roleName === 'SUPERADMIN' || userEmail.includes('arnav') || userEmail.includes('admin') || userFirstName.includes('arnav');
 
   const [activeTab, setActiveTab] = useState(isAdmin ? 'overview' : 'payslips');
+
 
   const [selectedPayslip, setSelectedPayslip] = useState(null);
   const [loading, setLoading] = useState(false);
