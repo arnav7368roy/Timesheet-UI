@@ -26,10 +26,17 @@ export default function Payroll() {
   const userEmail = (user?.email || '').toLowerCase();
   const userFirstName = (user?.firstName || '').toLowerCase();
 
-  // Enable full Payroll Management UI for Admin and Manager accounts as specified in the UI design.
-  const isAdmin = true;
+  // ADMIN role can view company-wide financial metrics, salary structures & run payroll.
+  // Managers (Rohit, Sahib) and Employees can ONLY view their own personal payslips and salary metrics.
+  const isAdmin = roleName === 'ADMIN' || roleName === 'SUPERADMIN';
 
-  const [activeTab, setActiveTab] = useState('payslips');
+  const [activeTab, setActiveTab] = useState(isAdmin ? 'overview' : 'payslips');
+
+  useEffect(() => {
+    if (!isAdmin) {
+      setActiveTab('payslips');
+    }
+  }, [isAdmin]);
 
 
 
@@ -495,15 +502,14 @@ export default function Payroll() {
     setEditingStructure(null);
   };
 
+  const loggedUserFullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim().toLowerCase();
+  const userEmailPrefix = (user?.email || '').split('@')[0].toLowerCase();
+
   const filteredPayslips = payslips.filter(p => {
     const matchesSearch = p.employeeName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMonth = monthFilter ? p.month === parseInt(monthFilter) : true;
 
     if (!isAdmin) {
-      const loggedUserFullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim().toLowerCase();
-      const userFirstName = (user?.firstName || '').trim().toLowerCase();
-      const userEmailPrefix = (user?.email || '').split('@')[0].toLowerCase();
-
       const isMySlip = 
         (user?.id && p.employeeId === user.id) ||
         (userFirstName && p.employeeName?.toLowerCase().includes(userFirstName)) ||
@@ -516,6 +522,16 @@ export default function Payroll() {
     return matchesSearch && matchesMonth;
   });
 
+  const mySlips = payslips.filter(p => {
+    return (
+      (user?.id && p.employeeId === user.id) ||
+      (userFirstName && p.employeeName?.toLowerCase().includes(userFirstName)) ||
+      (loggedUserFullName && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
+      (userEmailPrefix && p.employeeName?.toLowerCase().includes(userEmailPrefix))
+    );
+  });
+  const myLatestSlip = mySlips.length > 0 ? mySlips[0] : (filteredPayslips[0] || payslips[0]);
+
 
 
   return (
@@ -527,7 +543,7 @@ export default function Payroll() {
             <CreditCard size={28} color="#38bdf8" /> Payroll Management
           </h1>
           <p style={{ margin: '4px 0 0 0', color: '#94a3b8', fontSize: '14px' }}>
-            Automated salary calculations, CTC structures, and monthly payslip generation
+            {isAdmin ? 'Automated salary calculations, CTC structures, and monthly payslip generation' : 'View your monthly payslips, gross pay, and salary breakdown'}
           </p>
         </div>
 
@@ -541,52 +557,98 @@ export default function Payroll() {
         )}
       </div>
 
-      {/* KPI Overview Grid - Admin Only */}
-      {isAdmin && (
-        <div className="payroll-kpi-grid">
-          <div className="payroll-kpi-card">
-            <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
-              <DollarSign size={26} />
+      {/* KPI Overview Grid */}
+      <div className="payroll-kpi-grid">
+        {isAdmin ? (
+          <>
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+                <DollarSign size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Total Monthly Payroll</h4>
+                <p>{formatCurrency(payrollRuns[0]?.totalAmount || 1854000)}</p>
+              </div>
             </div>
-            <div className="payroll-kpi-info">
-              <h4>Total Monthly Payroll</h4>
-              <p>{formatCurrency(payrollRuns[0]?.totalAmount || 1854000)}</p>
-            </div>
-          </div>
 
-          <div className="payroll-kpi-card">
-            <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-              <Users size={26} />
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                <Users size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Employees On Payroll</h4>
+                <p>{payrollRuns[0]?.totalEmployees || 24} Active</p>
+              </div>
             </div>
-            <div className="payroll-kpi-info">
-              <h4>Employees On Payroll</h4>
-              <p>{payrollRuns[0]?.totalEmployees || 24} Active</p>
-            </div>
-          </div>
 
-          <div className="payroll-kpi-card">
-            <div className="payroll-kpi-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
-              <TrendingUp size={26} />
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc' }}>
+                <TrendingUp size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Average CTC</h4>
+                <p>₹ 7,20,000 /yr</p>
+              </div>
             </div>
-            <div className="payroll-kpi-info">
-              <h4>Average CTC</h4>
-              <p>₹ 7,20,000 /yr</p>
-            </div>
-          </div>
 
-          <div className="payroll-kpi-card">
-            <div className="payroll-kpi-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
-              <CheckCircle2 size={26} />
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+                <CheckCircle2 size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Payroll Status</h4>
+                <p style={{ color: '#34d399', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }}></span> Up to Date
+                </p>
+              </div>
             </div>
-            <div className="payroll-kpi-info">
-              <h4>Payroll Status</h4>
-              <p style={{ color: '#34d399', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }}></span> Up to Date
-              </p>
+          </>
+        ) : (
+          <>
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+                <DollarSign size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>My Take-Home Pay</h4>
+                <p>{formatCurrency(myLatestSlip?.netSalary || 100700)}</p>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
+                <TrendingUp size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Gross Monthly Pay</h4>
+                <p>{formatCurrency(myLatestSlip?.grossSalary || 125000)}</p>
+              </div>
+            </div>
+
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}>
+                <FileText size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Total Deductions</h4>
+                <p>{formatCurrency(myLatestSlip?.totalDeductions || 24300)}</p>
+              </div>
+            </div>
+
+            <div className="payroll-kpi-card">
+              <div className="payroll-kpi-icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
+                <CheckCircle2 size={26} />
+              </div>
+              <div className="payroll-kpi-info">
+                <h4>Payslip Status</h4>
+                <p style={{ color: '#34d399', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#34d399' }}></span> {myLatestSlip?.status || 'APPROVED'}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Tabs - Admin Only */}
       {isAdmin && (
