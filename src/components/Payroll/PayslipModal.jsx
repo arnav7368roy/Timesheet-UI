@@ -38,7 +38,60 @@ export default function PayslipModal({ payslip, onClose }) {
       zIndex: 9999,
       padding: '20px'
     }}>
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #printable-payslip, #printable-payslip * {
+            visibility: visible !important;
+          }
+          #printable-payslip {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+          #printable-payslip h2 {
+            color: #0284c7 !important;
+            background: none !important;
+            -webkit-text-fill-color: #0284c7 !important;
+          }
+          #printable-payslip p, 
+          #printable-payslip span, 
+          #printable-payslip div {
+            color: #334155 !important;
+          }
+          #printable-payslip strong {
+            color: #0f172a !important;
+          }
+          #printable-payslip .print-bg-slate {
+            background: #f1f5f9 !important;
+            border: 1px solid #cbd5e1 !important;
+          }
+          #printable-payslip .print-bg-green {
+            background: #f0fdf4 !important;
+            border: 1px solid #bbf7d0 !important;
+            color: #166534 !important;
+          }
+          #printable-payslip .print-bg-red {
+            background: #fef2f2 !important;
+            border: 1px solid #fecaca !important;
+            color: #991b1b !important;
+          }
+          #printable-payslip .print-border {
+            border-bottom: 1px solid #e2e8f0 !important;
+          }
+        }
+      `}</style>
       <div className="modal-content payslip-modal-content" style={{
+
         background: '#0f172a',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '16px',
@@ -153,7 +206,7 @@ export default function PayslipModal({ payslip, onClose }) {
           </div>
 
           {/* Employee & Attendance Info Grid */}
-          <div style={{
+          <div className="print-bg-slate" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: '16px',
@@ -193,7 +246,7 @@ export default function PayslipModal({ payslip, onClose }) {
             marginBottom: '24px'
           }}>
             {/* Earnings Column */}
-            <div style={{
+            <div className="print-bg-green" style={{
               background: 'rgba(30, 41, 59, 0.3)',
               borderRadius: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -239,7 +292,7 @@ export default function PayslipModal({ payslip, onClose }) {
             </div>
 
             {/* Deductions Column */}
-            <div style={{
+            <div className="print-bg-red" style={{
               background: 'rgba(30, 41, 59, 0.3)',
               borderRadius: '12px',
               border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -286,7 +339,7 @@ export default function PayslipModal({ payslip, onClose }) {
           </div>
 
           {/* Net Salary Highlight Box */}
-          <div style={{
+          <div className="print-bg-green" style={{
             background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%)',
             border: '1px solid rgba(16, 185, 129, 0.3)',
             borderRadius: '12px',
@@ -307,6 +360,7 @@ export default function PayslipModal({ payslip, onClose }) {
               <ShieldCheck size={18} color="#10b981" /> System Verified & Approved
             </div>
           </div>
+
         </div>
       </div>
     </div>
