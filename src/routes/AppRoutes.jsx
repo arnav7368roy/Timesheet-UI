@@ -17,6 +17,8 @@ import Calendar from '../pages/Calendar/Calendar';
 import Reports from '../pages/Reports/Reports';
 import Settings from '../pages/Settings/Settings';
 import Profile from '../pages/Profile/Profile';
+import Payroll from '../pages/Payroll/Payroll';
+
 
 export default function AppRoutes() {
   return (
@@ -113,6 +115,14 @@ export default function AppRoutes() {
         } 
       />
       <Route 
+        path="/payroll" 
+        element={
+          <PrivateRoute>
+            <Layout><Payroll /></Layout>
+          </PrivateRoute>
+        } 
+      />
+      <Route 
         path="/profile/:userId?" 
         element={
           <PrivateRoute>
@@ -123,3 +133,4 @@ export default function AppRoutes() {
     </Routes>
   );
 }
+

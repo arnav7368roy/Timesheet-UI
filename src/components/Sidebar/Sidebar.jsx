@@ -11,6 +11,7 @@ import {
    CheckSquare, 
    Calendar, 
    BarChart3, 
+   CreditCard,
    Settings, 
    User, 
    LogOut,
@@ -29,12 +30,14 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
     { path: '/timesheets', label: 'Timesheets', icon: Clock },
     { path: '/attendance', label: 'Attendance', icon: CalendarCheck },
     { path: '/leave', label: 'Leave', icon: FileText },
+    { path: '/payroll', label: 'Payroll', icon: CreditCard },
     { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
     { path: '/reports', label: 'Reports', icon: BarChart3 },
     { path: '/settings', label: 'Settings', icon: Settings },
     { path: '/profile', label: 'Profile', icon: User },
   ];
+
 
   const handleNavigate = (path) => {
     navigate(path);
