@@ -11,8 +11,18 @@ export default function PayslipModal({ payslip, onClose }) {
   const monthText = monthNames[(payslip.month || 1) - 1] || payslip.month;
 
   const handlePrint = () => {
+    const originalTitle = document.title;
+    const cleanEmpName = (payslip.employeeName || 'Employee').trim().replace(/[^a-zA-Z0-9]/g, '_');
+    const pdfFileName = `${cleanEmpName}_Salary_Slip_${monthText}_${payslip.year || 2026}`;
+
+    document.title = pdfFileName;
     window.print();
+
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
   };
+
 
   const formatCurrency = (val) => {
     const num = parseFloat(val || 0);
