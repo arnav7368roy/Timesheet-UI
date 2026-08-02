@@ -66,27 +66,26 @@ export default function Payroll() {
     taxDeduction: '2000'
   });
 
-  // Payroll Runs for August (All 8 employees) and July (Only Rohit present)
+  // Payroll Runs for completed months (July 2026 and prior)
   const [payrollRuns, setPayrollRuns] = useState([
-    {
-      id: 'run-aug-2026',
-      month: 8,
-      year: 2026,
-      totalAmount: 518100,
-      totalEmployees: 8,
-      status: 'APPROVED',
-      processedAt: '2026-08-01'
-    },
     {
       id: 'run-jul-2026',
       month: 7,
       year: 2026,
-      totalAmount: 21533,
-      totalEmployees: 1,
+      totalAmount: 518100,
+      totalEmployees: 8,
       status: 'PAID',
       processedAt: '2026-07-31'
+    },
+    {
+      id: 'run-jun-2026',
+      month: 6,
+      year: 2026,
+      totalAmount: 518100,
+      totalEmployees: 8,
+      status: 'PAID',
+      processedAt: '2026-06-30'
     }
-
   ]);
 
   // Salary Structures for all 8 DB Employees
@@ -102,8 +101,7 @@ export default function Payroll() {
       hra: 31250,
       allowances: 31250,
       pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 Income Tax (TDS) + ₹12,500 10% Performance Cut
-      netSalary: 100700
+      taxDeduction: 22500
     },
     {
       id: 'st-rohit',
@@ -114,8 +112,7 @@ export default function Payroll() {
       hra: 31250,
       allowances: 31250,
       pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 Income Tax (TDS) + ₹12,500 10% Performance Cut
-      netSalary: 100700
+      taxDeduction: 22500
     },
     {
       id: 'st-sahib',
@@ -126,8 +123,7 @@ export default function Payroll() {
       hra: 31250,
       allowances: 31250,
       pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 Income Tax (TDS) + ₹12,500 10% Performance Cut
-      netSalary: 100700
+      taxDeduction: 22500
     },
     {
       id: 'st-pappu',
@@ -138,8 +134,7 @@ export default function Payroll() {
       hra: 12500,
       allowances: 12500,
       pfDeduction: 1800,
-      taxDeduction: 5000, // 0 Income Tax (TDS) + ₹5,000 10% Performance Cut
-      netSalary: 43200
+      taxDeduction: 5000
     },
     {
       id: 'st-rupesh',
@@ -150,8 +145,7 @@ export default function Payroll() {
       hra: 12500,
       allowances: 12500,
       pfDeduction: 1800,
-      taxDeduction: 5000,
-      netSalary: 43200
+      taxDeduction: 5000
     },
     {
       id: 'st-laddu',
@@ -162,8 +156,7 @@ export default function Payroll() {
       hra: 12500,
       allowances: 12500,
       pfDeduction: 1800,
-      taxDeduction: 5000,
-      netSalary: 43200
+      taxDeduction: 5000
     },
     {
       id: 'st-raja',
@@ -174,8 +167,7 @@ export default function Payroll() {
       hra: 12500,
       allowances: 12500,
       pfDeduction: 1800,
-      taxDeduction: 5000,
-      netSalary: 43200
+      taxDeduction: 5000
     },
     {
       id: 'st-paritosh',
@@ -186,202 +178,12 @@ export default function Payroll() {
       hra: 12500,
       allowances: 12500,
       pfDeduction: 1800,
-      taxDeduction: 5000,
-      netSalary: 43200
+      taxDeduction: 5000
     }
   ]);
 
-  // Generated Payslips:
-  // July 2026: ONLY Rohit Kumar worked (Present = 30d). Others 0d present / LWP.
-  // August 2026: All 8 Employees worked (Present = 30d).
+  // Generated Payslips for Completed Pay Cycles Only (July 2026 and prior)
   const [payslips, setPayslips] = useState([
-    // --- AUGUST 2026 PAYSLIPS (All 8 Employees Active) ---
-    {
-      id: 'ps-aug-01',
-      payrollRunId: 'run-aug-2026',
-      employeeId: 'cd549502-5ca3-43de-96e6-4555542953b7',
-      employeeName: 'Rohit Kumar',
-      departmentName: 'Engineering Management',
-      designationName: 'Project Manager',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 62500,
-      hra: 31250,
-      allowances: 31250,
-      grossSalary: 125000,
-      pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 TDS Tax + ₹12,500 10% Performance Cut
-      lwpDeduction: 0,
-      totalDeductions: 24300,
-      netSalary: 100700,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-02',
-      payrollRunId: 'run-aug-2026',
-      employeeId: '56c3ad4f-1a2f-4229-82de-f0cdb5610029',
-      employeeName: 'Sahib Chopra',
-      departmentName: 'Product',
-      designationName: 'Senior Engineering Manager',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 62500,
-      hra: 31250,
-      allowances: 31250,
-      grossSalary: 125000,
-      pfDeduction: 1800,
-      taxDeduction: 22500,
-      lwpDeduction: 0,
-      totalDeductions: 24300,
-      netSalary: 100700,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-03',
-      payrollRunId: 'run-aug-2026',
-      employeeId: 'aa177e7b-5743-4077-a318-cd5b9dfc09ba',
-      employeeName: 'Arnav Roy',
-      departmentName: 'Administration',
-      designationName: 'HR & Tech Administrator',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 62500,
-      hra: 31250,
-      allowances: 31250,
-      grossSalary: 125000,
-      pfDeduction: 1800,
-      taxDeduction: 22500,
-      lwpDeduction: 0,
-      totalDeductions: 24300,
-      netSalary: 100700,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-04',
-      payrollRunId: 'run-aug-2026',
-      employeeId: '3cdbed37-1200-4b38-9058-556ea68928fc',
-      employeeName: 'Pappu Kumar',
-      departmentName: 'Engineering',
-      designationName: 'Software Engineer',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 25000,
-      hra: 12500,
-      allowances: 12500,
-      grossSalary: 50000,
-      pfDeduction: 1800,
-      taxDeduction: 5000,
-      lwpDeduction: 0,
-      totalDeductions: 6800,
-      netSalary: 43200,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-05',
-      payrollRunId: 'run-aug-2026',
-      employeeId: '282a0d02-ac29-4e58-96b1-16c96ab80220',
-      employeeName: 'Rupesh Kumar',
-      departmentName: 'Engineering',
-      designationName: 'Frontend Engineer',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 25000,
-      hra: 12500,
-      allowances: 12500,
-      grossSalary: 50000,
-      pfDeduction: 1800,
-      taxDeduction: 5000,
-      lwpDeduction: 0,
-      totalDeductions: 6800,
-      netSalary: 43200,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-06',
-      payrollRunId: 'run-aug-2026',
-      employeeId: '4b0b2133-5ced-4578-af45-d6bb223eb9e4',
-      employeeName: 'Laddu Kumar',
-      departmentName: 'Engineering',
-      designationName: 'Backend Developer',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 25000,
-      hra: 12500,
-      allowances: 12500,
-      grossSalary: 50000,
-      pfDeduction: 1800,
-      taxDeduction: 5000,
-      lwpDeduction: 0,
-      totalDeductions: 6800,
-      netSalary: 43200,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-07',
-      payrollRunId: 'run-aug-2026',
-      employeeId: 'f1930709-8474-40de-b85d-790d2de8584d',
-      employeeName: 'Raja Kumar',
-      departmentName: 'Quality Assurance',
-      designationName: 'QA Engineer',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 25000,
-      hra: 12500,
-      allowances: 12500,
-      grossSalary: 50000,
-      pfDeduction: 1800,
-      taxDeduction: 5000,
-      lwpDeduction: 0,
-      totalDeductions: 6800,
-      netSalary: 43200,
-      status: 'APPROVED'
-    },
-    {
-      id: 'ps-aug-08',
-      payrollRunId: 'run-aug-2026',
-      employeeId: 'bd3d118d-d645-4447-9de2-66a601eff098',
-      employeeName: 'Paritosh Kumar',
-      departmentName: 'Engineering',
-      designationName: 'Full Stack Engineer',
-      month: 8,
-      year: 2026,
-      workingDays: 30,
-      presentDays: 30,
-      lwpDays: 0,
-      basicSalary: 25000,
-      hra: 12500,
-      allowances: 12500,
-      grossSalary: 50000,
-      pfDeduction: 1800,
-      taxDeduction: 5000,
-      lwpDeduction: 0,
-      totalDeductions: 6800,
-      netSalary: 43200,
-      status: 'APPROVED'
-    },
-
-    // --- JULY 2026 PAYSLIP (ONLY ROHIT KUMAR WORKED 11 DAYS) ---
     {
       id: 'ps-jul-01',
       payrollRunId: 'run-jul-2026',
@@ -392,17 +194,178 @@ export default function Payroll() {
       month: 7,
       year: 2026,
       workingDays: 30,
-      presentDays: 11,
-      lwpDays: 19,
+      presentDays: 30,
+      lwpDays: 0,
       basicSalary: 62500,
       hra: 31250,
       allowances: 31250,
       grossSalary: 125000,
       pfDeduction: 1800,
-      taxDeduction: 22500, // ₹10,000 TDS Tax + ₹12,500 10% Performance Cut
-      lwpDeduction: 79167, // 19 days LWP deduction (125000 * 19/30)
-      totalDeductions: 103467,
-      netSalary: 21533, // Net pay for 11 working days present
+      taxDeduction: 22500,
+      lwpDeduction: 0,
+      totalDeductions: 24300,
+      netSalary: 100700,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-02',
+      payrollRunId: 'run-jul-2026',
+      employeeId: '56c3ad4f-1a2f-4229-82de-f0cdb5610029',
+      employeeName: 'Sahib Chopra',
+      departmentName: 'Product',
+      designationName: 'Senior Engineering Manager',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 62500,
+      hra: 31250,
+      allowances: 31250,
+      grossSalary: 125000,
+      pfDeduction: 1800,
+      taxDeduction: 22500,
+      lwpDeduction: 0,
+      totalDeductions: 24300,
+      netSalary: 100700,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-03',
+      payrollRunId: 'run-jul-2026',
+      employeeId: 'aa177e7b-5743-4077-a318-cd5b9dfc09ba',
+      employeeName: 'Arnav Roy',
+      departmentName: 'Administration',
+      designationName: 'HR & Tech Administrator',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 62500,
+      hra: 31250,
+      allowances: 31250,
+      grossSalary: 125000,
+      pfDeduction: 1800,
+      taxDeduction: 22500,
+      lwpDeduction: 0,
+      totalDeductions: 24300,
+      netSalary: 100700,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-04',
+      payrollRunId: 'run-jul-2026',
+      employeeId: '3cdbed37-1200-4b38-9058-556ea68928fc',
+      employeeName: 'Pappu Kumar',
+      departmentName: 'Engineering',
+      designationName: 'Software Engineer',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 25000,
+      hra: 12500,
+      allowances: 12500,
+      grossSalary: 50000,
+      pfDeduction: 1800,
+      taxDeduction: 5000,
+      lwpDeduction: 0,
+      totalDeductions: 6800,
+      netSalary: 43200,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-05',
+      payrollRunId: 'run-jul-2026',
+      employeeId: '282a0d02-ac29-4e58-96b1-16c96ab80220',
+      employeeName: 'Rupesh Kumar',
+      departmentName: 'Engineering',
+      designationName: 'Frontend Engineer',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 25000,
+      hra: 12500,
+      allowances: 12500,
+      grossSalary: 50000,
+      pfDeduction: 1800,
+      taxDeduction: 5000,
+      lwpDeduction: 0,
+      totalDeductions: 6800,
+      netSalary: 43200,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-06',
+      payrollRunId: 'run-jul-2026',
+      employeeId: '4b0b2133-5ced-4578-af45-d6bb223eb9e4',
+      employeeName: 'Laddu Kumar',
+      departmentName: 'Engineering',
+      designationName: 'Backend Developer',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 25000,
+      hra: 12500,
+      allowances: 12500,
+      grossSalary: 50000,
+      pfDeduction: 1800,
+      taxDeduction: 5000,
+      lwpDeduction: 0,
+      totalDeductions: 6800,
+      netSalary: 43200,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-07',
+      payrollRunId: 'run-jul-2026',
+      employeeId: 'f1930709-8474-40de-b85d-790d2de8584d',
+      employeeName: 'Raja Kumar',
+      departmentName: 'Quality Assurance',
+      designationName: 'QA Engineer',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 25000,
+      hra: 12500,
+      allowances: 12500,
+      grossSalary: 50000,
+      pfDeduction: 1800,
+      taxDeduction: 5000,
+      lwpDeduction: 0,
+      totalDeductions: 6800,
+      netSalary: 43200,
+      status: 'PAID'
+    },
+    {
+      id: 'ps-jul-08',
+      payrollRunId: 'run-jul-2026',
+      employeeId: 'bd3d118d-d645-4447-9de2-66a601eff098',
+      employeeName: 'Paritosh Kumar',
+      departmentName: 'Engineering',
+      designationName: 'Full Stack Engineer',
+      month: 7,
+      year: 2026,
+      workingDays: 30,
+      presentDays: 30,
+      lwpDays: 0,
+      basicSalary: 25000,
+      hra: 12500,
+      allowances: 12500,
+      grossSalary: 50000,
+      pfDeduction: 1800,
+      taxDeduction: 5000,
+      lwpDeduction: 0,
+      totalDeductions: 6800,
+      netSalary: 43200,
       status: 'PAID'
     }
   ]);
@@ -950,8 +913,7 @@ export default function Payroll() {
                   outline: 'none'
                 }}
               >
-                <option value="">All Months</option>
-                {monthNames.map((name, idx) => (
+                {monthNames.slice(0, 7).map((name, idx) => (
                   <option key={idx + 1} value={idx + 1}>{name}</option>
                 ))}
               </select>
