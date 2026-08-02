@@ -126,10 +126,11 @@ export default function PayslipModal({ payslip, onClose }) {
           }}>
             <div>
               <h2 style={{ margin: '0 0 4px 0', fontSize: '22px', fontWeight: '800', background: 'linear-gradient(135deg, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                TimeSheet HRMS Inc.
+                ABC Technology Private Ltd.
               </h2>
-              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>100 Technology Parkway, Tech City</p>
-              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>Contact: hr@timesheet-hrms.com</p>
+              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>Corporate Office, Cyber City</p>
+              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>Contact: hr@abctechnology.com</p>
+
             </div>
             <div style={{ textAlign: 'right' }}>
               <span style={{
