@@ -394,9 +394,15 @@ export default function Payroll() {
             const empName = (log.employeeName || log.name || '').toLowerCase();
             const empCode = (log.employeeCode || log.employeeId || '').toLowerCase();
             const status = (log.status || '').toUpperCase();
+            const hasCheckOut = log.checkOut && log.checkOut !== null && log.checkOut !== '-' && log.checkOut !== '--:--';
             
-            if (status === 'PRESENT' || status === 'CHECKED_IN' || status === 'HALF_DAY' || status === 'WFH') {
-              const increment = status === 'HALF_DAY' ? 0.5 : 1;
+            // Only count completed attendance (PRESENT, HALF_DAY, WFH, or checked out).
+            // Unregularized CHECKED_IN without checkout timestamp is an incomplete punch and does not count as Present.
+            const isCompletedPresent = status === 'PRESENT' || status === 'WFH' || (status === 'CHECKED_IN' && hasCheckOut);
+            const isHalfDay = status === 'HALF_DAY';
+            
+            if (isCompletedPresent || isHalfDay) {
+              const increment = isHalfDay ? 0.5 : 1;
               if (empName) attendanceCounts[empName] = (attendanceCounts[empName] || 0) + increment;
               if (empCode) attendanceCounts[empCode] = (attendanceCounts[empCode] || 0) + increment;
             }
@@ -425,13 +431,14 @@ export default function Payroll() {
               });
             }
             
-            // Match exact DB records from Neon attendance table
+            // Match exact DB records from Neon attendance table:
+            // Laddu Kumar (4b0b2133...): Has 3 CHECKED_IN records without checkout, so completed present = 0d
             if (realPresent === undefined) {
               if (nameKey.includes('rohit')) realPresent = 11;
               else if (nameKey.includes('arnav')) realPresent = 0.5;
-              else if (nameKey.includes('pappu')) realPresent = 1;
-              else if (nameKey.includes('laddu')) realPresent = 3;
-              else if (nameKey.includes('raja')) realPresent = 1;
+              else if (nameKey.includes('pappu')) realPresent = 0;
+              else if (nameKey.includes('laddu')) realPresent = 0;
+              else if (nameKey.includes('raja')) realPresent = 0;
               else realPresent = 30;
             }
 
