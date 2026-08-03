@@ -373,9 +373,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Department Live Status Slider / Widget */}
-      <DepartmentLiveSlider />
-
       {/* 2. Metrics Grid */}
       <div style={{
         display: 'grid',
@@ -664,6 +661,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Department Live Status Slider / Widget */}
+      <DepartmentLiveSlider />
 
       {/* 4. Departments & Recent Activities */}
       <div style={{
