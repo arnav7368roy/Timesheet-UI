@@ -429,9 +429,8 @@ export default function Payroll() {
             const empName = (log.employeeName || log.name || '').toLowerCase().trim();
             const status = (log.status || '').toUpperCase();
             
-            // Count PRESENT, CHECKED_IN, WFH, or valid checkIn punch as 1.0 day, HALF_DAY as 0.5 day
-            const hasCheckIn = log.checkIn && log.checkIn !== null && log.checkIn !== '-' && log.checkIn !== '--:--';
-            const isFullPresent = status === 'PRESENT' || status === 'CHECKED_IN' || status === 'WFH' || hasCheckIn;
+            // Strictly count only explicit PRESENT, WFH (1.0 day) or HALF_DAY (0.5 day) status entries
+            const isFullPresent = status === 'PRESENT' || status === 'WFH';
             const isHalfDay = status === 'HALF_DAY';
             
             if (isFullPresent || isHalfDay) {
