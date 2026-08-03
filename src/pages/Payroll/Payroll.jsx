@@ -57,10 +57,21 @@ export default function Payroll() {
   const [monthFilter, setMonthFilter] = useState(maxCompletedMonth);
   const [yearFilter, setYearFilter] = useState(currentDate.getFullYear());
 
+  const getDaysInMonth = (m, y) => new Date(y, m, 0).getDate();
+
   // Form states for Process Payroll
   const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
   const [processYear, setProcessYear] = useState(new Date().getFullYear());
-  const [workingDays, setWorkingDays] = useState(30);
+  const [workingDays, setWorkingDays] = useState(getDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear()));
+
+  // Automatically update workingDays when processMonth or processYear changes
+  useEffect(() => {
+    const m = parseInt(processMonth, 10);
+    const y = parseInt(processYear, 10);
+    if (m && y) {
+      setWorkingDays(getDaysInMonth(m, y));
+    }
+  }, [processMonth, processYear]);
 
   // Edit Salary Structure State
   const [editingStructure, setEditingStructure] = useState(null);
@@ -541,7 +552,7 @@ export default function Payroll() {
             const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
             const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
 
-            const totalWorking = 30;
+            const totalWorking = new Date(parseInt(yearFilter, 10), parseInt(monthFilter, 10), 0).getDate() || 30;
             const realLwp = Math.max(0, totalWorking - realPresent);
 
             const dailyGross = grossBase / totalWorking;
