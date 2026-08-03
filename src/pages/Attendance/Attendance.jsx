@@ -1094,16 +1094,26 @@ export default function Attendance() {
     for (let d = daysInMonth; d >= 1; d--) {
       const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const dbLog = mergedLogs.find(log => log.employeeCode === currentUserCode && log.date === dateStr);
+      const isToday = dateStr === todayStr;
+      const activeTodayLog = (isToday && todayLog && todayLog.checkIn && todayLog.checkIn !== '-') ? todayLog : null;
+      const targetLog = dbLog || activeTodayLog;
+
       const matchedReg = regularizationRequests.find(r => 
         r.employeeCode === currentUserCode && 
         r.date === dateStr
       );
 
-      if (dbLog) {
+      if (targetLog) {
+        const computedHrs = calculateHoursDiff(targetLog.checkIn, targetLog.checkOut);
         calendarLogs.push({
-          ...dbLog,
-          regularizationStatus: matchedReg ? matchedReg.status : (dbLog.regularizationStatus || '-'),
-          regularizationId: matchedReg ? matchedReg.id : (dbLog.regularizationId || null),
+          ...targetLog,
+          date: dateStr,
+          checkIn: targetLog.checkIn || '-',
+          checkOut: targetLog.checkOut || '-',
+          hours: computedHrs > 0 ? computedHrs : (targetLog.hours || 0),
+          status: targetLog.status || (targetLog.checkIn ? 'Checked In' : 'Present'),
+          regularizationStatus: matchedReg ? matchedReg.status : (targetLog.regularizationStatus || '-'),
+          regularizationId: matchedReg ? matchedReg.id : (targetLog.regularizationId || null),
           isRealDbRecord: true
         });
       } else {
@@ -1122,9 +1132,7 @@ export default function Attendance() {
           );
           if (hasLeave) {
             status = 'Leave';
-          } else if (dateStr > todayStr) {
-            status = '-';
-          } else if (dateStr === todayStr) {
+          } else if (dateStr >= todayStr) {
             status = '-';
           } else {
             status = 'Absent';
@@ -1148,7 +1156,7 @@ export default function Attendance() {
     }
 
     return calendarLogs;
-  }, [mergedLogs, currentUserCode, selectedMonth, currentUserName, leaveRequests, settings, regularizationRequests]);
+  }, [mergedLogs, currentUserCode, selectedMonth, currentUserName, leaveRequests, settings, regularizationRequests, todayLog]);
 
   // Statistics calculation for Employee summary
   const summaryStats = useMemo(() => {
@@ -1168,7 +1176,7 @@ export default function Attendance() {
       }
     }
 
-    const present = logs.filter(l => l.status === 'Present' || l.status === 'Checked In').length;
+    const present = logs.filter(l => l.status === 'Present' || l.status === 'Checked In' || (l.checkIn && l.checkIn !== '-')).length;
     const halfDays = logs.filter(l => l.status === 'Half Day').length;
     const leaves = logs.filter(l => l.status === 'Leave').length;
     
@@ -1188,7 +1196,13 @@ export default function Attendance() {
     ).length;
 
     // Total working hours
-    const totalDecimalHours = logs.reduce((sum, log) => sum + parseFloat(log.hours || 0), 0);
+    const totalDecimalHours = logs.reduce((sum, log) => {
+      let logHrs = parseFloat(log.hours || 0);
+      if ((!logHrs || logHrs === 0) && log.checkIn && log.checkIn !== '-' && log.checkIn !== '--:--') {
+        logHrs = calculateHoursDiff(log.checkIn, log.checkOut);
+      }
+      return sum + logHrs;
+    }, 0);
     const totalMins = Math.round(totalDecimalHours * 60);
     const totalHoursStr = `${Math.floor(totalMins / 60)}h ${totalMins % 60}m`;
 

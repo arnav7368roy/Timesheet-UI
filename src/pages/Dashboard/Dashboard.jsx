@@ -381,7 +381,27 @@ export default function Dashboard() {
       }}>
         <MetricCard 
           title="Attendance Overview" 
-          value={`${stats.presentToday}/${stats.totalUsers}`}
+          value={
+            isAdmin 
+              ? `${stats.presentToday}/${stats.totalUsers}`
+              : (isCheckedIn 
+                  ? (() => {
+                      if (!checkInTime || checkInTime === '--:--') return 'Checked In';
+                      const match = checkInTime.match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+                      if (!match) return 'Checked In';
+                      let hr = parseInt(match[1], 10);
+                      const min = parseInt(match[2], 10);
+                      if (match[3].toUpperCase() === 'PM' && hr !== 12) hr += 12;
+                      if (match[3].toUpperCase() === 'AM' && hr === 12) hr = 0;
+                      const checkInMins = hr * 60 + min;
+                      const currentMins = time.getHours() * 60 + time.getMinutes();
+                      let diff = currentMins - checkInMins;
+                      if (diff < 0) diff += 24 * 60;
+                      return `${Math.floor(diff / 60)}h ${String(diff % 60).padStart(2, '0')}m`;
+                    })()
+                  : 'Checked Out'
+                )
+          }
           subtext="View Logs"
           icon={UserCheck}
           gradient="linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
