@@ -23,6 +23,7 @@ import {
   Award
 } from 'lucide-react';
 import { apiRequest } from '../../utils/api';
+import DepartmentLiveSlider from '../../components/Dashboard/DepartmentLiveSlider';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -371,6 +372,9 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Department Live Status Slider / Widget */}
+      <DepartmentLiveSlider />
 
       {/* 2. Metrics Grid */}
       <div style={{

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { apiRequest } from '../../utils/api';
+import ApplyOnDutyModal from '../../components/Attendance/ApplyOnDutyModal';
 
 // Helper: Convert time string (e.g., "09:15 AM") to minutes from midnight
 const parseTimeToMinutes = (timeStr) => {
@@ -786,6 +787,7 @@ export default function Attendance() {
   const [regError, setRegError] = useState('');
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showOnDutyModal, setShowOnDutyModal] = useState(false);
   const [leaveType, setLeaveType] = useState('Casual Leave');
   const [leaveStart, setLeaveStart] = useState('');
   const [leaveEnd, setLeaveEnd] = useState('');
@@ -1761,6 +1763,27 @@ export default function Attendance() {
                       <CheckCircle2 size={16} style={{ color: '#34d399' }} /> Shift Completed
                     </div>
                   )}
+
+                  <button
+                    onClick={() => setShowOnDutyModal(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '50px',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.35)',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    🏠 Apply On Duty (WFH)
+                  </button>
                 </div>
               </div>
 
@@ -2775,6 +2798,16 @@ export default function Attendance() {
           </div>
         </div>
       )}
+
+      {/* APPLY ON DUTY (WFH) MODAL */}
+      <ApplyOnDutyModal 
+        isOpen={showOnDutyModal} 
+        onClose={() => setShowOnDutyModal(false)} 
+        onSuccess={() => {
+          fetchLiveLogs();
+          fetchLiveStatus();
+        }} 
+      />
     </div>
     </AttendanceErrorBoundary>
   );
