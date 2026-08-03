@@ -397,3 +397,83 @@ body.dark-mode .payslip-bg-red,
     print-color-adjust: exact !important;
   }
 }
+
+/* =========================================================
+   RESPONSIVE LAYOUT COMPATIBILITY (Mobile, Tablet, Widescreen)
+   ========================================================= */
+
+/* Tablets & Laptops (Up to 1024px) */
+@media (max-width: 1024px) {
+  .payroll-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .payroll-container {
+    padding: 18px;
+  }
+}
+
+/* Mobile & Small Screens (Up to 768px) */
+@media (max-width: 768px) {
+  .payroll-container {
+    padding: 14px;
+  }
+
+  .payroll-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .payroll-header h1 {
+    font-size: 20px;
+  }
+
+  .payroll-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .payroll-card {
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .payroll-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .payroll-table {
+    min-width: 600px;
+  }
+
+  .btn-primary-payroll {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Small Mobile Screens (Up to 480px) */
+@media (max-width: 480px) {
+  .payroll-container {
+    padding: 10px;
+  }
+
+  .payroll-kpi-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .payroll-kpi-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .payroll-kpi-info p {
+    font-size: 18px;
+  }
+}
