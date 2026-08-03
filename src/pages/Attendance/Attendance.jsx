@@ -3022,7 +3022,7 @@ function AdminAttendanceDashboard({ metrics }) {
               const totalM = presentM + wfhM + lopM + leaveM + absentM || 1;
               return (
                 <>
-                  <div style={{ display: 'flex', height: '16px', borderRadius: '8px', overflow: 'hidden', width: '100%', background: '#f1f5f9' }}>
+                  <div style={{ display: 'flex', height: '16px', borderRadius: '8px', overflow: 'hidden', width: '100%', background: 'var(--bg)' }}>
                     <div style={{ width: `${(presentM / totalM) * 100}%`, background: '#10b981' }} />
                     <div style={{ width: `${(wfhM / totalM) * 100}%`, background: '#3b82f6' }} />
                     <div style={{ width: `${(absentM / totalM) * 100}%`, background: '#ef4444' }} />
@@ -3032,34 +3032,34 @@ function AdminAttendanceDashboard({ metrics }) {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '500' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} /> Present
                       </span>
-                      <strong style={{ color: '#1e293b' }}>{presentM}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{presentM}</strong>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '500' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#3b82f6' }} /> WFH
                       </span>
-                      <strong style={{ color: '#1e293b' }}>{wfhM}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{wfhM}</strong>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '500' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} /> LOP
                       </span>
-                      <strong style={{ color: '#1e293b' }}>{lopM}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{lopM}</strong>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '500' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#94a3b8' }} /> On Leave
                       </span>
-                      <strong style={{ color: '#1e293b' }}>{leaveM}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{leaveM}</strong>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#64748b', fontWeight: '500' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontWeight: '500' }}>
                         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} /> Absent
                       </span>
-                      <strong style={{ color: '#1e293b' }}>{absentM}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{absentM}</strong>
                     </div>
                   </div>
                 </>
@@ -3121,25 +3121,25 @@ function AdminAttendanceDashboard({ metrics }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, justifyContent: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                <span style={{ color: '#64748b', fontWeight: '600' }}>Avg Working Hours</span>
-                <strong style={{ color: '#1e293b' }}>{avgHrsStr}</strong>
+                <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Avg Working Hours</span>
+                <strong style={{ color: 'var(--text)' }}>{avgHrsStr}</strong>
               </div>
-              <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px' }}>
+              <div style={{ width: '100%', height: '8px', background: 'var(--bg)', borderRadius: '4px' }}>
                 <div style={{ width: `${Math.min(100, (parseFloat(avgHrsVal) / 12) * 100)}%`, height: '100%', background: '#8b5cf6', borderRadius: '4px' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', textAlign: 'center', marginTop: '10px' }}>
-              <div style={{ background: '#f8fafc', padding: '12px 6px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Check Ins</span>
+              <div style={{ background: 'var(--bg)', padding: '12px 6px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Check Ins</span>
                 <span style={{ fontSize: '1rem', fontWeight: '800', color: '#10b981' }}>{totalCheckIns}</span>
               </div>
-              <div style={{ background: '#f8fafc', padding: '12px 6px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Check Outs</span>
+              <div style={{ background: 'var(--bg)', padding: '12px 6px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Check Outs</span>
                 <span style={{ fontSize: '1rem', fontWeight: '800', color: '#f97316' }}>{totalCheckOuts}</span>
               </div>
-              <div style={{ background: '#f8fafc', padding: '12px 6px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Avg In-Time</span>
+              <div style={{ background: 'var(--bg)', padding: '12px 6px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600', display: 'block', marginBottom: '4px' }}>Avg In-Time</span>
                 <span style={{ fontSize: '1rem', fontWeight: '800', color: '#3b82f6' }}>{avgInTimeStr}</span>
               </div>
             </div>
@@ -3153,27 +3153,27 @@ function AdminAttendanceDashboard({ metrics }) {
         <div style={adminBigCardStyle}>
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Frequent Late Arrivals</h3>
-            <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: '700', background: '#fee2e2', padding: '2px 8px', borderRadius: '12px' }}>Alerts</span>
+            <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: '700', background: 'rgba(239, 68, 68, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>Alerts</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
             {frequentLate.length === 0 ? (
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
                 No frequent late arrivals recorded this month.
               </span>
             ) : (
               frequentLate.map((emp, i) => {
                 const color = ['#ef4444', '#f97316', '#f59e0b'][i] || '#f59e0b';
                 return (
-                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                       <div>
-                        <strong style={{ color: '#1e293b', display: 'block' }}>{emp.name}</strong>
-                        <span style={{ color: '#64748b', fontSize: '0.75rem' }}>{emp.dept}</span>
+                        <strong style={{ color: 'var(--text)', display: 'block' }}>{emp.name}</strong>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{emp.dept}</span>
                       </div>
                       <span style={{ color: color, fontWeight: '700' }}>{emp.count} times</span>
                     </div>
-                    <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px' }}>
+                    <div style={{ width: '100%', height: '6px', background: 'var(--bg)', borderRadius: '3px' }}>
                       <div style={{ width: `${Math.min(100, (emp.count / 6) * 100)}%`, height: '100%', background: color, borderRadius: '3px' }} />
                     </div>
                   </div>
@@ -3187,24 +3187,24 @@ function AdminAttendanceDashboard({ metrics }) {
         <div style={adminBigCardStyle}>
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Missing Punches</h3>
-            <span style={{ fontSize: '0.8rem', color: '#c2410c', fontWeight: '700', background: '#fff7ed', padding: '2px 8px', borderRadius: '12px' }}>{missingPunches.length} Pending</span>
+            <span style={{ fontSize: '0.8rem', color: '#c2410c', fontWeight: '700', background: 'rgba(234, 88, 12, 0.15)', padding: '2px 8px', borderRadius: '12px' }}>{missingPunches.length} Pending</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
             {missingPunches.length === 0 ? (
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
                 No missing punches detected.
               </span>
             ) : (
               missingPunches.map((emp, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
                   <div>
-                    <strong style={{ color: '#1e293b', display: 'block', fontSize: '0.85rem' }}>{emp.name}</strong>
-                    <span style={{ color: '#64748b', fontSize: '0.75rem' }}>{emp.dept}</span>
+                    <strong style={{ color: 'var(--text)', display: 'block', fontSize: '0.85rem' }}>{emp.name}</strong>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{emp.dept}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>In: {emp.inTime}</span>
-                    <span style={{ fontSize: '0.7rem', color: '#ea580c', fontWeight: '700', background: '#fff7ed', padding: '2px 6px', borderRadius: '4px' }}>Out Missing</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>In: {emp.inTime}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#ea580c', fontWeight: '700', background: 'rgba(234, 88, 12, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>Out Missing</span>
                   </div>
                 </div>
               ))
@@ -3216,7 +3216,7 @@ function AdminAttendanceDashboard({ metrics }) {
         <div style={adminBigCardStyle}>
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Violations Statistics</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>Rate %</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>Rate %</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center', flex: 1 }}>
@@ -3226,11 +3226,11 @@ function AdminAttendanceDashboard({ metrics }) {
               { label: 'Attendance Below 75%', value: 20, color: '#f59e0b' }
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', color: 'var(--text)' }}>
                   <span>{item.label}</span>
                   <span>{item.value}%</span>
                 </div>
-                <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px' }}>
+                <div style={{ width: '100%', height: '8px', background: 'var(--bg)', borderRadius: '4px' }}>
                   <div style={{ width: `${item.value}%`, height: '100%', background: item.color, borderRadius: '4px' }} />
                 </div>
               </div>
@@ -3245,23 +3245,23 @@ function AdminAttendanceDashboard({ metrics }) {
         <div style={adminBigCardStyle}>
           <div style={cardHeaderStyle}>
             <h3 style={cardTitleStyle}>Late Arrivals & Alerts</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>Live Feed</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>Live Feed</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '250px', overflowY: 'auto' }}>
             {alertsFeed.length === 0 ? (
-              <span style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '20px' }}>
                 No recent late arrival alerts.
               </span>
             ) : (
               alertsFeed.map((item, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
                   <div>
-                    <strong style={{ color: '#1e293b' }}>{item.name}</strong>
-                    <span style={{ color: '#64748b', fontSize: '0.75rem', display: 'block' }}>{item.dept}</span>
+                    <strong style={{ color: 'var(--text)' }}>{item.name}</strong>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', display: 'block' }}>{item.dept}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ color: '#334155', fontWeight: '600' }}>In: {item.checkIn}</span>
+                    <span style={{ color: 'var(--text)', fontWeight: '600' }}>In: {item.checkIn}</span>
                     <span style={{ display: 'block', fontSize: '0.75rem', color: '#ef4444', fontWeight: '700' }}>{item.delay}</span>
                   </div>
                 </div>
