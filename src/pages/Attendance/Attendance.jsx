@@ -551,23 +551,25 @@ export default function Attendance() {
 
       const pendingRegs = (regularizationRequests || []).filter(r => r && r.status === 'Pending').length;
 
-      const presentM = (liveLogs || []).filter(log => log && (log.status === 'Present' || log.status === 'Checked In')).length;
-      const wfhM = (liveLogs || []).filter(log => log && log.status === 'WFH').length;
-      const lopM = (liveLogs || []).filter(log => log && (log.status === 'LOP' || log.status === 'Half Day' || log.status === 'Late')).length;
-      const leaveM = (liveLogs || []).filter(log => log && (log.status === 'Leave' || log.status === 'On Leave')).length;
-      const absentM = (liveLogs || []).filter(log => log && log.status === 'Absent').length;
+      const monthLogs = (liveLogs || []).filter(log => log && log.date && log.date.startsWith(selectedMonth));
 
-      const workingLogs = (liveLogs || []).filter(log => log && log.hours > 0);
+      const presentM = monthLogs.filter(log => log && (log.status === 'Present' || log.status === 'Checked In')).length;
+      const wfhM = monthLogs.filter(log => log && log.status === 'WFH').length;
+      const lopM = monthLogs.filter(log => log && (log.status === 'LOP' || log.status === 'Half Day' || log.status === 'Late')).length;
+      const leaveM = monthLogs.filter(log => log && (log.status === 'Leave' || log.status === 'On Leave')).length;
+      const absentM = monthLogs.filter(log => log && log.status === 'Absent').length;
+
+      const workingLogs = monthLogs.filter(log => log && log.hours > 0);
       const rawAvgHrsVal = workingLogs.length > 0 ? (workingLogs.reduce((acc, log) => acc + (log.hours || 0), 0) / workingLogs.length) : 8.5;
       const avgHrsVal = isNaN(rawAvgHrsVal) ? 8.5 : rawAvgHrsVal;
       const avgHours = Math.floor(avgHrsVal);
       const avgMins = Math.round((avgHrsVal - avgHours) * 60);
       const avgHrsStr = `${avgHours}h ${avgMins}m`;
 
-      const totalCheckIns = (liveLogs || []).filter(log => log && log.checkIn && log.checkIn !== '-').length;
-      const totalCheckOuts = (liveLogs || []).filter(log => log && log.checkOut && log.checkOut !== '-').length;
+      const totalCheckIns = monthLogs.filter(log => log && log.checkIn && log.checkIn !== '-').length;
+      const totalCheckOuts = monthLogs.filter(log => log && log.checkOut && log.checkOut !== '-').length;
 
-      const checkInLogs = (liveLogs || []).filter(log => log && log.checkIn && log.checkIn !== '-' && log.checkIn !== '--:--');
+      const checkInLogs = monthLogs.filter(log => log && log.checkIn && log.checkIn !== '-' && log.checkIn !== '--:--');
       let avgInTimeStr = '09:12 AM';
       if (checkInLogs.length > 0) {
         let totalMins = 0;
@@ -595,7 +597,7 @@ export default function Attendance() {
       }
 
       const lateMap = {};
-      (liveLogs || []).forEach(log => {
+      monthLogs.forEach(log => {
         if (!log || !log.checkIn || log.checkIn === '-' || log.checkIn === '--:--') return;
         const inMins = parseTimeToMinutes(log.checkIn);
         const isLateCheckIn = inMins !== null && inMins > lateCutoffMins;
