@@ -429,8 +429,9 @@ export default function Payroll() {
             const empName = (log.employeeName || log.name || '').toLowerCase().trim();
             const status = (log.status || '').toUpperCase();
             
-            // Strictly count only explicit PRESENT, WFH (1.0 day) or HALF_DAY (0.5 day)
-            const isFullPresent = status === 'PRESENT' || status === 'WFH';
+            // Count PRESENT, CHECKED_IN, WFH, or valid checkIn punch as 1.0 day, HALF_DAY as 0.5 day
+            const hasCheckIn = log.checkIn && log.checkIn !== null && log.checkIn !== '-' && log.checkIn !== '--:--';
+            const isFullPresent = status === 'PRESENT' || status === 'CHECKED_IN' || status === 'WFH' || hasCheckIn;
             const isHalfDay = status === 'HALF_DAY';
             
             if (isFullPresent || isHalfDay) {
@@ -539,7 +540,7 @@ export default function Payroll() {
             const empIdLower = (u.id || '').toLowerCase().trim();
             const fullNameLower = fullName.toLowerCase().trim();
             
-            // Match count from attendanceCounts by ID, Code, Name, or Partial Name
+            // Match count from attendanceCounts by exact ID, Code, Full Name, or First Name
             let realPresent = attendanceCounts[empIdLower] ?? attendanceCounts[empCodeLower] ?? attendanceCounts[fullNameLower];
             
             if (realPresent === undefined && empIdLower.length >= 8) {
@@ -548,22 +549,13 @@ export default function Payroll() {
 
             if (realPresent === undefined) {
               const firstName = (u.firstName || '').toLowerCase().trim();
-              const lastName = (u.lastName || '').toLowerCase().trim();
-              Object.keys(attendanceCounts).forEach(key => {
-                if (key && (
-                  empIdLower.includes(key) || 
-                  empCodeLower.includes(key) || 
-                  fullNameLower.includes(key) || 
-                  (firstName && firstName.length > 2 && key.includes(firstName)) || 
-                  (lastName && lastName.length > 2 && key.includes(lastName))
-                )) {
-                  realPresent = attendanceCounts[key];
-                }
-              });
+              if (firstName && firstName.length > 2) {
+                realPresent = attendanceCounts[firstName];
+              }
             }
 
             if (realPresent === undefined) {
-              realPresent = 0; // Default 0 if no attendance entries in DB
+              realPresent = 0; // Default 0 if no attendance entries in DB for target month
             }
 
             const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
