@@ -65,6 +65,22 @@ export default function Payroll() {
     return new Date(year, month, 0).getDate() || 31;
   };
 
+  // Calculate business working days (excluding Saturdays and Sundays, e.g. 23 days for July)
+  const getWorkingDaysInMonth = (m, y) => {
+    const month = parseInt(m, 10);
+    const year = parseInt(y, 10);
+    if (!month || !year) return 23;
+    const totalDays = new Date(year, month, 0).getDate();
+    let count = 0;
+    for (let day = 1; day <= totalDays; day++) {
+      const dayOfWeek = new Date(year, month - 1, day).getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude Sunday (0) & Saturday (6)
+        count++;
+      }
+    }
+    return count || 23;
+  };
+
   // Form states for Process Payroll
   const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
   const [processYear, setProcessYear] = useState(new Date().getFullYear());
@@ -566,7 +582,7 @@ export default function Payroll() {
             const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
             const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
 
-            const totalWorking = getDaysInMonth(monthFilter, yearFilter);
+            const totalWorking = getWorkingDaysInMonth(monthFilter, yearFilter);
             const realLwp = Math.max(0, totalWorking - realPresent);
 
             const dailyGross = grossBase / totalWorking;
