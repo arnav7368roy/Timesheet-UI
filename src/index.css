@@ -447,18 +447,21 @@ body {
 =========================== */
 .table-card {
     background: var(--card-bg);
-    margin: 0 35px 35px;
+    margin: 0 0 24px 0;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
-    overflow: hidden;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .table-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 20px 24px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -471,13 +474,14 @@ body {
 .table-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1000px;
+    min-width: 700px;
     background: transparent;
 }
 

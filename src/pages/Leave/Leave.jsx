@@ -639,7 +639,7 @@ export default function Leave() {
 
       <div className="table-card" style={{ margin: 0 }}>
         <div className="table-header">
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
             <h3 style={{ margin: 0 }}>Leave Management</h3>
             <div style={{ display: 'flex', background: 'var(--bg)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border)' }}>
               <button
