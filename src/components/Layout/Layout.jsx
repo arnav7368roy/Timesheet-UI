@@ -20,7 +20,7 @@ export default function Layout({ children }) {
             inset: 0,
             background: 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(4px)',
-            zIndex: 999
+            zIndex: 9999
           }}
         />
       )}
