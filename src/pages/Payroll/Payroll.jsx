@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   CreditCard, 
-  DollarSign, 
+  IndianRupee, 
   TrendingUp, 
   Users, 
   Calendar, 
@@ -57,33 +57,25 @@ export default function Payroll() {
   const [monthFilter, setMonthFilter] = useState(maxCompletedMonth);
   const [yearFilter, setYearFilter] = useState(currentDate.getFullYear());
 
-  // Calculate exact business working days in a month (excluding Saturdays and Sundays)
-  const getWorkingDaysInMonth = (m, y) => {
+  // Calculate total calendar days in a month (e.g. 31 days for August)
+  const getDaysInMonth = (m, y) => {
     const month = parseInt(m, 10);
     const year = parseInt(y, 10);
-    if (!month || !year) return 23;
-    const totalDays = new Date(year, month, 0).getDate();
-    let count = 0;
-    for (let day = 1; day <= totalDays; day++) {
-      const dayOfWeek = new Date(year, month - 1, day).getDay();
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude Sunday (0) & Saturday (6)
-        count++;
-      }
-    }
-    return count || 23;
+    if (!month || !year) return 31;
+    return new Date(year, month, 0).getDate() || 31;
   };
 
   // Form states for Process Payroll
   const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
   const [processYear, setProcessYear] = useState(new Date().getFullYear());
-  const [workingDays, setWorkingDays] = useState(getWorkingDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear()));
+  const [workingDays, setWorkingDays] = useState(getDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear()));
 
   // Automatically update workingDays when processMonth or processYear changes
   useEffect(() => {
     const m = parseInt(processMonth, 10);
     const y = parseInt(processYear, 10);
     if (m && y) {
-      setWorkingDays(getWorkingDaysInMonth(m, y));
+      setWorkingDays(getDaysInMonth(m, y));
     }
   }, [processMonth, processYear]);
 
@@ -574,7 +566,7 @@ export default function Payroll() {
             const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
             const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
 
-            const totalWorking = getWorkingDaysInMonth(monthFilter, yearFilter);
+            const totalWorking = getDaysInMonth(monthFilter, yearFilter);
             const realLwp = Math.max(0, totalWorking - realPresent);
 
             const dailyGross = grossBase / totalWorking;
@@ -808,7 +800,7 @@ export default function Payroll() {
           <>
             <div className="payroll-kpi-card">
               <div className="payroll-kpi-icon" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
-                <DollarSign size={26} />
+                <IndianRupee size={26} />
               </div>
               <div className="payroll-kpi-info">
                 <h4>Total Monthly Payroll</h4>
@@ -852,7 +844,7 @@ export default function Payroll() {
           <>
             <div className="payroll-kpi-card">
               <div className="payroll-kpi-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-                <DollarSign size={26} />
+                <IndianRupee size={26} />
               </div>
               <div className="payroll-kpi-info">
                 <h4>My Take-Home Pay</h4>
@@ -914,7 +906,7 @@ export default function Payroll() {
             className={`payroll-tab-btn ${activeTab === 'structures' ? 'active' : ''}`}
             onClick={() => setActiveTab('structures')}
           >
-            <DollarSign size={16} /> Salary Structures
+            <IndianRupee size={16} /> Salary Structures
           </button>
           <button 
             className={`payroll-tab-btn ${activeTab === 'payslips' ? 'active' : ''}`}
