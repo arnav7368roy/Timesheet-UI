@@ -580,8 +580,8 @@ tbody td {
 
 /* Buttons */
 .primary-btn {
-    height: 42px;
-    padding: 0 20px;
+    min-height: 42px;
+    padding: 8px 20px;
     border: none;
     border-radius: var(--radius);
     background: var(--primary-gradient);
@@ -590,10 +590,12 @@ tbody td {
     font-weight: 700;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     cursor: pointer;
     transition: all 0.25s ease;
     box-shadow: var(--shadow-glow);
+    white-space: nowrap;
 }
 
 .primary-btn:hover {
@@ -1010,6 +1012,11 @@ img, svg, canvas {
 }
 
 @media (max-width: 768px) {
+    .dashboard-welcome-banner {
+        padding: 20px 16px !important;
+        gap: 16px !important;
+    }
+
     .main > div {
         padding: 12px !important;
         gap: 14px !important;

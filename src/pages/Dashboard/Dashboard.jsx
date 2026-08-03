@@ -287,10 +287,10 @@ export default function Dashboard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       
       {/* 1. Welcome Banner */}
-      <div style={{
+      <div className="dashboard-welcome-banner" style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e1b4b 100%)',
         borderRadius: '20px',
-        padding: '32px 40px',
+        padding: '28px 36px',
         color: '#ffffff',
         display: 'flex',
         alignItems: 'center',
@@ -339,13 +339,13 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '14px', zIndex: 1 }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', width: '100%', maxWidth: '100%', zIndex: 1 }}>
           <button 
             onClick={() => navigate('/tasks')}
             className="primary-btn"
-            style={{ padding: '12px 24px' }}
+            style={{ padding: '12px 20px', whiteSpace: 'nowrap', flex: '1 1 140px', justifyContent: 'center' }}
           >
-            View Workspace Tasks
+            View Tasks
           </button>
           <button 
             onClick={() => navigate('/projects')}
@@ -353,13 +353,18 @@ export default function Dashboard() {
               background: 'rgba(255, 255, 255, 0.08)',
               color: '#ffffff',
               border: '1px solid rgba(255, 255, 255, 0.15)',
-              padding: '12px 24px',
+              padding: '12px 20px',
               borderRadius: '14px',
               fontSize: '0.9rem',
               fontWeight: '700',
               cursor: 'pointer',
               transition: 'all 0.2s',
-              backdropFilter: 'blur(10px)'
+              backdropFilter: 'blur(10px)',
+              whiteSpace: 'nowrap',
+              flex: '1 1 140px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             View Projects
