@@ -270,116 +270,130 @@ export default function PayslipModal({ payslip, onClose }) {
           </div>
 
           {/* Earnings & Deductions Tables */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '20px',
-            marginBottom: '24px'
-          }}>
-            {/* Earnings Column */}
-            <div className="print-bg-green" style={{
-              background: 'rgba(30, 41, 59, 0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                background: 'rgba(16, 185, 129, 0.1)',
-                padding: '10px 16px',
-                borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
-                color: '#34d399',
-                fontWeight: '700',
-                fontSize: '14px'
-              }}>
-                EARNINGS
-              </div>
-              <div style={{ padding: '12px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>Basic Salary</span>
-                  <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.basicSalary)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>House Rent Allowance (HRA)</span>
-                  <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.hra)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>Special Allowances</span>
-                  <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.allowances)}</span>
-                </div>
-                {payslip.quarterlyBonusPayout > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px', background: 'rgba(52, 211, 153, 0.1)', paddingLeft: '8px', borderRadius: '4px' }}>
-                    <span style={{ color: '#34d399', fontWeight: '700' }}>Quarterly Performance Bonus (3 Months)</span>
-                    <span style={{ fontWeight: '700', color: '#34d399' }}>+{formatCurrency(payslip.quarterlyBonusPayout)}</span>
-                  </div>
-                )}
-              </div>
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.6)',
-                padding: '10px 16px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontWeight: '700',
-                fontSize: '14px',
-                color: '#38bdf8'
-              }}>
-                <span>Gross Earnings</span>
-                <span>{formatCurrency((payslip.grossSalary || 0) + (payslip.quarterlyBonusPayout || 0))}</span>
-              </div>
-            </div>
+          {(() => {
+            const totalWork = payslip.workingDays || 23;
+            const pres = payslip.presentDays ?? totalWork;
+            const ratio = totalWork > 0 ? (pres / totalWork) : 1;
+            const isZeroPres = pres === 0;
 
-            {/* Deductions Column */}
-            <div className="print-bg-red" style={{
-              background: 'rgba(30, 41, 59, 0.3)',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              overflow: 'hidden'
-            }}>
+            const earnedBasic = isZeroPres ? 0 : Math.round((payslip.basicSalary || 0) * ratio);
+            const earnedHra = isZeroPres ? 0 : Math.round((payslip.hra || 0) * ratio);
+            const earnedAllowances = isZeroPres ? 0 : Math.round((payslip.allowances || 0) * ratio);
+            const totalGrossEarned = isZeroPres ? 0 : Math.round((payslip.grossSalary || 0) * ratio) + (payslip.quarterlyBonusPayout || 0);
+
+            return (
               <div style={{
-                background: 'rgba(239, 68, 68, 0.1)',
-                padding: '10px 16px',
-                borderBottom: '1px solid rgba(239, 68, 68, 0.2)',
-                color: '#f87171',
-                fontWeight: '700',
-                fontSize: '14px'
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '20px',
+                marginBottom: '24px'
               }}>
-                DEDUCTIONS
-              </div>
-              <div style={{ padding: '12px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>Provident Fund (PF)</span>
-                  <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.pfDeduction)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>Tax / TDS</span>
-                  <span style={{ fontWeight: '600' }}>{formatCurrency(payslip.taxDeduction)}</span>
-                </div>
-                {payslip.performanceIncentiveHold > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
-                    <span style={{ color: '#fbbf24' }}>Performance Reserve (10% Basic Hold)</span>
-                    <span style={{ fontWeight: '600', color: '#fbbf24' }}>{formatCurrency(payslip.performanceIncentiveHold)}</span>
+                {/* Earnings Column */}
+                <div className="print-bg-green" style={{
+                  background: 'rgba(30, 41, 59, 0.3)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    background: 'rgba(16, 185, 129, 0.1)',
+                    padding: '10px 16px',
+                    borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
+                    color: '#34d399',
+                    fontWeight: '700',
+                    fontSize: '14px'
+                  }}>
+                    EARNINGS
                   </div>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px' }}>
-                  <span style={{ color: '#cbd5e1' }}>Leave Without Pay (LWP)</span>
-                  <span style={{ fontWeight: '600', color: '#f87171' }}>{formatCurrency(payslip.lwpDeduction)}</span>
+                  <div style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Basic Salary</span>
+                      <span style={{ fontWeight: '600' }}>{formatCurrency(earnedBasic)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>House Rent Allowance (HRA)</span>
+                      <span style={{ fontWeight: '600' }}>{formatCurrency(earnedHra)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Special Allowances</span>
+                      <span style={{ fontWeight: '600' }}>{formatCurrency(earnedAllowances)}</span>
+                    </div>
+                    {payslip.quarterlyBonusPayout > 0 && !isZeroPres && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px', background: 'rgba(52, 211, 153, 0.1)', paddingLeft: '8px', borderRadius: '4px' }}>
+                        <span style={{ color: '#34d399', fontWeight: '700' }}>Quarterly Performance Bonus (3 Months)</span>
+                        <span style={{ fontWeight: '700', color: '#34d399' }}>+{formatCurrency(payslip.quarterlyBonusPayout)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    padding: '10px 16px',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontWeight: '700',
+                    fontSize: '14px',
+                    color: '#38bdf8'
+                  }}>
+                    <span>Gross Earnings</span>
+                    <span>{formatCurrency(totalGrossEarned)}</span>
+                  </div>
+                </div>
+
+                {/* Deductions Column */}
+                <div className="print-bg-red" style={{
+                  background: 'rgba(30, 41, 59, 0.3)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    padding: '10px 16px',
+                    borderBottom: '1px solid rgba(239, 68, 68, 0.2)',
+                    color: '#f87171',
+                    fontWeight: '700',
+                    fontSize: '14px'
+                  }}>
+                    DEDUCTIONS
+                  </div>
+                  <div style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Provident Fund (PF)</span>
+                      <span style={{ fontWeight: '600' }}>{formatCurrency(isZeroPres ? 0 : payslip.pfDeduction)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Tax / TDS</span>
+                      <span style={{ fontWeight: '600' }}>{formatCurrency(isZeroPres ? 0 : payslip.taxDeduction)}</span>
+                    </div>
+                    {payslip.performanceIncentiveHold > 0 && !isZeroPres && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '13px' }}>
+                        <span style={{ color: '#fbbf24' }}>Performance Reserve (10% Basic Hold)</span>
+                        <span style={{ fontWeight: '600', color: '#fbbf24' }}>{formatCurrency(payslip.performanceIncentiveHold)}</span>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '13px' }}>
+                      <span style={{ color: '#cbd5e1' }}>Leave Without Pay (LWP)</span>
+                      <span style={{ fontWeight: '600', color: '#f87171' }}>{formatCurrency(isZeroPres ? (payslip.grossSalary || 50000) : payslip.lwpDeduction)}</span>
+                    </div>
+                  </div>
+                  <div style={{
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    padding: '10px 16px',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontWeight: '700',
+                    fontSize: '14px',
+                    color: '#f87171'
+                  }}>
+                    <span>Total Deductions</span>
+                    <span>{formatCurrency(isZeroPres ? (payslip.grossSalary || 50000) : payslip.totalDeductions)}</span>
+                  </div>
                 </div>
               </div>
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.6)',
-                padding: '10px 16px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontWeight: '700',
-                fontSize: '14px',
-                color: '#f87171'
-              }}>
-                <span>Total Deductions</span>
-                <span>{formatCurrency(payslip.totalDeductions)}</span>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Net Salary Highlight Box */}
           <div className="print-bg-green" style={{

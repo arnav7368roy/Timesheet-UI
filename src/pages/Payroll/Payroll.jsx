@@ -473,11 +473,18 @@ export default function Payroll() {
           });
         }
 
-        // 4. Try live payslips endpoint first
+        // 4. Query live payslips endpoint and map existing saved records
+        let backendPayslipsMap = {};
         const payslipRes = await apiRequest(`/payroll/payslips?month=${monthFilter}&year=${yearFilter}`);
-        if (payslipRes.ok && payslipRes.data && payslipRes.data.status && Array.isArray(payslipRes.data.data) && payslipRes.data.data.length > 0) {
-          setPayslips(payslipRes.data.data);
-          return;
+        if (payslipRes.ok && payslipRes.data && payslipRes.data.status && Array.isArray(payslipRes.data.data)) {
+          payslipRes.data.data.forEach(p => {
+            if (p) {
+              const k1 = (p.employeeId || '').toLowerCase();
+              const k2 = (p.employeeName || '').toLowerCase();
+              if (k1) backendPayslipsMap[k1] = p;
+              if (k2) backendPayslipsMap[k2] = p;
+            }
+          });
         }
 
         // 5. Construct live payslips directly from DB Users and DB Attendance
