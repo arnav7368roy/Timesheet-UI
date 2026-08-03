@@ -561,8 +561,10 @@ export default function Payroll() {
               }
             }
 
-            if (realPresent === undefined) {
-              realPresent = 0; // Default 0 if no attendance entries in DB for target month
+            const totalWorking = getWorkingDaysInMonth(monthFilter, yearFilter);
+
+            if (realPresent === undefined || realPresent === null) {
+              realPresent = totalWorking; // Default to full working days for standard pay cycle
             }
 
             const existingSt = dbStructuresMap[u.id] || dbStructuresMap[u.employeeCode];
@@ -582,7 +584,6 @@ export default function Payroll() {
             const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
             const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
 
-            const totalWorking = getWorkingDaysInMonth(monthFilter, yearFilter);
             const realLwp = Math.max(0, totalWorking - realPresent);
 
             const dailyGross = grossBase / totalWorking;
@@ -776,16 +777,23 @@ export default function Payroll() {
   });
 
   const mySlips = payslips.filter(p => {
+    if (!user) return false;
+    const uId = (user.id || user.userId || '').toLowerCase();
+    const pEmpId = (p.employeeId || '').toLowerCase();
+    const uEmail = (user.email || '').toLowerCase();
+    const uCode = (user.employeeCode || '').toLowerCase();
+    const uFirstName = (user.firstName || '').toLowerCase().trim();
+
     return (
-      (user?.id && p.employeeId === user.id) ||
-      (userFirstName && p.employeeName?.toLowerCase().includes(userFirstName)) ||
-      (loggedUserFullName && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
-      (userEmailPrefix && p.employeeName?.toLowerCase().includes(userEmailPrefix))
+      (uId && pEmpId === uId) ||
+      (uCode && (p.employeeCode || '').toLowerCase() === uCode) ||
+      (uEmail && (p.employeeEmail || '').toLowerCase() === uEmail) ||
+      (uFirstName && uFirstName.length >= 2 && p.employeeName?.toLowerCase().includes(uFirstName)) ||
+      (loggedUserFullName && loggedUserFullName.length >= 2 && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
+      (userEmailPrefix && userEmailPrefix.length >= 2 && p.employeeName?.toLowerCase().includes(userEmailPrefix))
     );
   });
-  const myLatestSlip = mySlips.length > 0 ? mySlips[0] : (filteredPayslips[0] || payslips[0]);
-
-
+  const myLatestSlip = mySlips.length > 0 ? mySlips[0] : (filteredPayslips.length > 0 ? filteredPayslips[0] : null);
 
   return (
     <div className="payroll-container">
@@ -864,7 +872,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>My Take-Home Pay</h4>
-                <p>{formatCurrency(myLatestSlip?.netSalary || 100700)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.netSalary : 43200)}</p>
               </div>
             </div>
 
@@ -874,7 +882,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>Gross Monthly Pay</h4>
-                <p>{formatCurrency(myLatestSlip?.grossSalary || 125000)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.grossSalary : 50000)}</p>
               </div>
             </div>
 
@@ -884,7 +892,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>Total Deductions</h4>
-                <p>{formatCurrency(myLatestSlip?.totalDeductions || 24300)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.totalDeductions : 6800)}</p>
               </div>
             </div>
 
