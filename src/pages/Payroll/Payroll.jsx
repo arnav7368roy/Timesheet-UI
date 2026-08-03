@@ -410,19 +410,25 @@ export default function Payroll() {
         if (attRes.ok && attRes.data && attRes.data.status && Array.isArray(attRes.data.data)) {
           attRes.data.data.forEach(log => {
             if (!log) return;
+            const empId = (log.employeeId || log.userId || '').toLowerCase().trim();
+            const empCode = (log.employeeCode || '').toLowerCase().trim();
             const empName = (log.employeeName || log.name || '').toLowerCase().trim();
-            const empCode = (log.employeeCode || log.employeeId || '').toLowerCase().trim();
             const status = (log.status || '').toUpperCase();
-            const hasCheckOut = log.checkOut && log.checkOut !== null && log.checkOut !== '-' && log.checkOut !== '--:--';
             
-            // Paid Present Day rule: PRESENT, WFH, HALF_DAY, or CHECKED_IN with valid checkout
-            const isCompletedPresent = status === 'PRESENT' || status === 'WFH' || (status === 'CHECKED_IN' && hasCheckOut);
+            // Count any check-in entry or present status as a valid attendance day
+            const hasCheckIn = log.checkIn && log.checkIn !== null && log.checkIn !== '-' && log.checkIn !== '--:--';
+            const isPresent = status === 'PRESENT' || status === 'CHECKED_IN' || status === 'WFH' || hasCheckIn;
             const isHalfDay = status === 'HALF_DAY';
             
-            if (isCompletedPresent || isHalfDay) {
+            if (isPresent || isHalfDay) {
               const increment = isHalfDay ? 0.5 : 1;
-              if (empName) attendanceCounts[empName] = (attendanceCounts[empName] || 0) + increment;
+              if (empId) attendanceCounts[empId] = (attendanceCounts[empId] || 0) + increment;
               if (empCode) attendanceCounts[empCode] = (attendanceCounts[empCode] || 0) + increment;
+              if (empName) attendanceCounts[empName] = (attendanceCounts[empName] || 0) + increment;
+              if (empId.length >= 8) {
+                const shortId = empId.substring(0, 8);
+                attendanceCounts[shortId] = (attendanceCounts[shortId] || 0) + increment;
+              }
             }
           });
         }
@@ -520,12 +526,24 @@ export default function Payroll() {
             const empIdLower = (u.id || '').toLowerCase().trim();
             const fullNameLower = fullName.toLowerCase().trim();
             
-            // Match count from attendanceCounts by ID, Code, or Name
+            // Match count from attendanceCounts by ID, Code, Name, or Partial Name
             let realPresent = attendanceCounts[empIdLower] ?? attendanceCounts[empCodeLower] ?? attendanceCounts[fullNameLower];
             
+            if (realPresent === undefined && empIdLower.length >= 8) {
+              realPresent = attendanceCounts[empIdLower.substring(0, 8)];
+            }
+
             if (realPresent === undefined) {
+              const firstName = (u.firstName || '').toLowerCase().trim();
+              const lastName = (u.lastName || '').toLowerCase().trim();
               Object.keys(attendanceCounts).forEach(key => {
-                if (key && (empIdLower.includes(key) || empCodeLower.includes(key) || fullNameLower.includes(key))) {
+                if (key && (
+                  empIdLower.includes(key) || 
+                  empCodeLower.includes(key) || 
+                  fullNameLower.includes(key) || 
+                  (firstName && firstName.length > 2 && key.includes(firstName)) || 
+                  (lastName && lastName.length > 2 && key.includes(lastName))
+                )) {
                   realPresent = attendanceCounts[key];
                 }
               });
