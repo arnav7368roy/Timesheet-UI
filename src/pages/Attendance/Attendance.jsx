@@ -275,7 +275,12 @@ export default function Attendance() {
   }, [leaveRequests]);
 
   // Filters for Personal / Team grids
-  const [selectedMonth, setSelectedMonth] = useState('2026-07');
+  const getCurrentMonthStr = () => {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${d.getFullYear()}-${m}`;
+  };
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthStr());
   const [filterEmployee, setFilterEmployee] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
 
@@ -484,12 +489,27 @@ export default function Attendance() {
     if (!isActualAdmin && simulatedRole !== 'admin') return null;
 
     try {
-      const total = totalRealEmployees || 9;
+      const total = totalRealEmployees || 8;
       const todayDateStr = new Date().toLocaleDateString('en-CA');
-      const targetDateStr = todayDateStr;
-      const targetLogs = (liveLogs || []).filter(log => log && log.date === todayDateStr);
+      let targetDateStr = todayDateStr;
+      let targetLogs = (liveLogs || []).filter(log => log && log.date === todayDateStr);
 
-      const present = targetLogs.filter(log => log && (log.status === 'Present' || log.status === 'Checked In' || log.status === 'Half Day' || log.status === 'WFH')).length;
+      // Fallback: If no logs for today yet, pick the most recent date in liveLogs that has attendance check-ins
+      if (targetLogs.length === 0 && liveLogs && liveLogs.length > 0) {
+        const sortedDates = [...new Set(liveLogs.map(l => l.date).filter(Boolean))].sort().reverse();
+        if (sortedDates.length > 0) {
+          targetDateStr = sortedDates[0];
+          targetLogs = liveLogs.filter(log => log && log.date === targetDateStr);
+        }
+      }
+
+      const present = targetLogs.filter(log => log && (
+        log.status === 'Present' || 
+        log.status === 'Checked In' || 
+        log.status === 'Half Day' || 
+        log.status === 'WFH' ||
+        (log.checkIn && log.checkIn !== '-' && log.checkIn !== '--:--')
+      )).length;
       
       const dateParts = targetDateStr.split('-');
       const targetDate = new Date(dateParts[0], (parseInt(dateParts[1], 10) || 1) - 1, parseInt(dateParts[2], 10) || 1);
