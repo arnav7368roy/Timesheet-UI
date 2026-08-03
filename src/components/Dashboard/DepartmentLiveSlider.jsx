@@ -1,71 +1,145 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Home, CheckCircle2, LogOut, Clock, ChevronRight, ShieldCheck } from 'lucide-react';
-
-const MOCK_DEPARTMENTS = [
-  { id: 'all', name: 'All Departments' },
-  { id: 'pd', name: 'Product Development' },
-  { id: 'eng', name: 'Engineering' },
-  { id: 'sales', name: 'Sales & Marketing' },
-  { id: 'hr', name: 'HR & Admin' },
-];
-
-const MOCK_EMPLOYEES = [
-  { id: '1', name: 'Sahib Chopra', departmentId: 'pd', departmentName: 'Product Development', status: 'CHECKED_IN', checkInTime: '09:05 AM', checkOutTime: null },
-  { id: '2', name: 'Rohit Kumar', departmentId: 'pd', departmentName: 'Product Development', status: 'ON_DUTY', checkInTime: '09:00 AM', checkOutTime: null },
-  { id: '3', name: 'Pappu Kumar', departmentId: 'eng', departmentName: 'Engineering', status: 'CHECKED_IN', checkInTime: '09:15 AM', checkOutTime: null },
-  { id: '4', name: 'Rupesh Kumar', departmentId: 'eng', departmentName: 'Engineering', status: 'CHECKED_OUT', checkInTime: '09:00 AM', checkOutTime: '05:30 PM' },
-  { id: '5', name: 'Laddu Kumar', departmentId: 'sales', departmentName: 'Sales & Marketing', status: 'ON_DUTY', checkInTime: '09:00 AM', checkOutTime: null },
-  { id: '6', name: 'Paritosh Kumar', departmentId: 'eng', departmentName: 'Engineering', status: 'YET_TO_CHECK_IN', checkInTime: null, checkOutTime: null },
-  { id: '7', name: 'Raja Kumar', departmentId: 'hr', departmentName: 'HR & Admin', status: 'CHECKED_IN', checkInTime: '09:30 AM', checkOutTime: null },
-  { id: '8', name: 'Mohd Alam', departmentId: 'sales', departmentName: 'Sales & Marketing', status: 'YET_TO_CHECK_IN', checkInTime: null, checkOutTime: null },
-];
+import { Users, Home, CheckCircle2, LogOut, Clock } from 'lucide-react';
+import { apiRequest } from '../../utils/api';
 
 export default function DepartmentLiveSlider() {
-  const [departments, setDepartments] = useState(MOCK_DEPARTMENTS);
+  const [departments, setDepartments] = useState([{ id: 'all', name: 'All Departments' }]);
   const [selectedDept, setSelectedDept] = useState('all');
-  const [employees, setEmployees] = useState(MOCK_EMPLOYEES);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('ALL');
 
-  const fetchLiveStatus = async (deptId) => {
+  const fetchLiveData = async () => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-      const url = `${apiBaseUrl}/api/v1/attendance/department-live-status?department_id=${deptId}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.status && data.employees && data.employees.length > 0) {
-        setEmployees(data.employees);
-        if (data.departments && data.departments.length > 0) {
-          const formattedDepts = [
-            { id: 'all', name: 'All Departments' },
-            ...data.departments.map(d => ({ id: d.id, name: d.name }))
-          ];
-          setDepartments(formattedDepts);
+      // 1. Try dedicated endpoint first
+      const endpoint = `/attendance/department-live-status${selectedDept !== 'all' ? `?department_id=${selectedDept}` : ''}`;
+      const liveRes = await apiRequest(endpoint);
+      
+      let deptList = [];
+      let empList = [];
+
+      if (liveRes.ok && liveRes.data && liveRes.data.status && Array.isArray(liveRes.data.employees) && liveRes.data.employees.length > 0) {
+        empList = liveRes.data.employees;
+        if (Array.isArray(liveRes.data.departments) && liveRes.data.departments.length > 0) {
+          deptList = liveRes.data.departments;
         }
+      } else {
+        // 2. Aggregate directly from live /users, /departments, /attendance, /attendance/on-duty/list
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+        const todayStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        const [usersRes, deptsRes, attendanceRes, onDutyRes] = await Promise.all([
+          apiRequest('/users?page=1&limit=100'),
+          apiRequest('/departments?page=1&limit=100'),
+          apiRequest(`/attendance?limit=100&month=${currentMonth}&year=${currentYear}`),
+          apiRequest('/attendance/on-duty/list')
+        ]);
+
+        const usersData = usersRes.ok && usersRes.data?.data ? usersRes.data.data : [];
+        const deptsData = deptsRes.ok && deptsRes.data?.data ? deptsRes.data.data : [];
+        const attendanceData = attendanceRes.ok && attendanceRes.data?.data ? attendanceRes.data.data : [];
+        const onDutyData = onDutyRes.ok && onDutyRes.data?.data ? onDutyRes.data.data : [];
+
+        // Build departments list
+        deptList = deptsData.map(d => ({ id: d.id, name: d.departmentName || d.name }));
+
+        // Active On Duty employee IDs today
+        const activeOnDutySet = new Set(
+          onDutyData
+            .filter(od => od.startDate <= todayStr && od.endDate >= todayStr)
+            .map(od => od.employeeId)
+        );
+
+        // Attendance map for today
+        const todayAttMap = {};
+        attendanceData.forEach(att => {
+          const dStr = String(att.attendanceDate || att.date || '').split('T')[0];
+          if (dStr === todayStr) {
+            const empId = att.employeeId || att.userId;
+            if (empId) todayAttMap[empId] = att;
+          }
+        });
+
+        // Map live users to employee roster
+        empList = usersData.map(u => {
+          const empId = u.id || u.employeeCode;
+          const name = `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email || 'Employee';
+          const deptName = u.departmentName || u.department?.name || 'General';
+          const att = todayAttMap[empId];
+          const isOnDuty = activeOnDutySet.has(empId) || (att && String(att.status).toUpperCase() === 'ON_DUTY');
+
+          let status = 'YET_TO_CHECK_IN';
+          let checkInTime = null;
+          let checkOutTime = null;
+
+          if (isOnDuty) {
+            status = 'ON_DUTY';
+          } else if (att) {
+            const statusUpper = String(att.status || '').toUpperCase();
+            if (att.checkIn) {
+              const d = new Date(att.checkIn);
+              checkInTime = isNaN(d.getTime()) ? att.checkIn : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+            if (att.checkOut) {
+              const d = new Date(att.checkOut);
+              checkOutTime = isNaN(d.getTime()) ? att.checkOut : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+              status = 'CHECKED_OUT';
+            } else if (att.checkIn || statusUpper === 'CHECKED_IN' || statusUpper === 'PRESENT') {
+              status = 'CHECKED_IN';
+            }
+          }
+
+          return {
+            id: empId,
+            name,
+            departmentId: u.departmentId || 'gen',
+            departmentName: deptName,
+            status,
+            checkInTime,
+            checkOutTime
+          };
+        });
       }
-    } catch (err) {
-      console.log('Using mock department live presence data:', err);
+
+      // Format department tabs list
+      const formattedDepts = [{ id: 'all', name: 'All Departments' }];
+      deptList.forEach(d => {
+        if (d && d.name && !formattedDepts.some(fd => fd.name === d.name)) {
+          formattedDepts.push({ id: d.id || d.name, name: d.name });
+        }
+      });
+
+      setDepartments(formattedDepts);
+      setEmployees(empList);
+    } catch (e) {
+      console.error('Error fetching live department status:', e);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLiveStatus(selectedDept);
+    fetchLiveData();
   }, [selectedDept]);
 
-  // Filter employees by department and status
+  // Filter employees by selected department
   const deptFiltered = employees.filter((emp) => {
     if (selectedDept === 'all') return true;
-    return emp.departmentId === selectedDept || emp.departmentName?.toLowerCase().includes(selectedDept.toLowerCase());
+    return emp.departmentId === selectedDept || 
+           emp.departmentName?.toLowerCase() === selectedDept.toLowerCase() ||
+           departments.find(d => d.id === selectedDept)?.name.toLowerCase() === emp.departmentName?.toLowerCase();
   });
 
+  // Filter employees by status category
   const filteredEmployees = deptFiltered.filter((emp) => {
     if (activeFilter === 'ALL') return true;
     return emp.status === activeFilter;
   });
 
-  // Calculate live summary stats dynamically from filtered department employees
+  // Calculate live summary stats directly from real database employees
   const summary = {
     totalEmployees: deptFiltered.length,
     checkedIn: deptFiltered.filter(e => e.status === 'CHECKED_IN').length,
@@ -258,8 +332,12 @@ export default function DepartmentLiveSlider() {
         </div>
       </div>
 
-      {/* Employee Grid (Full 100% width) */}
-      {filteredEmployees.length === 0 ? (
+      {/* Employee Grid */}
+      {loading ? (
+        <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-secondary, #94a3b8)', fontSize: '0.9rem' }}>
+          Loading live department status...
+        </div>
+      ) : filteredEmployees.length === 0 ? (
         <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-secondary, #94a3b8)', fontSize: '0.9rem' }}>
           No employees found for this status category.
         </div>
