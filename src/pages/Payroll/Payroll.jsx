@@ -57,19 +57,33 @@ export default function Payroll() {
   const [monthFilter, setMonthFilter] = useState(maxCompletedMonth);
   const [yearFilter, setYearFilter] = useState(currentDate.getFullYear());
 
-  const getDaysInMonth = (m, y) => new Date(y, m, 0).getDate();
+  // Calculate exact business working days in a month (excluding Saturdays and Sundays)
+  const getWorkingDaysInMonth = (m, y) => {
+    const month = parseInt(m, 10);
+    const year = parseInt(y, 10);
+    if (!month || !year) return 23;
+    const totalDays = new Date(year, month, 0).getDate();
+    let count = 0;
+    for (let day = 1; day <= totalDays; day++) {
+      const dayOfWeek = new Date(year, month - 1, day).getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Exclude Sunday (0) & Saturday (6)
+        count++;
+      }
+    }
+    return count || 23;
+  };
 
   // Form states for Process Payroll
   const [processMonth, setProcessMonth] = useState(new Date().getMonth() + 1);
   const [processYear, setProcessYear] = useState(new Date().getFullYear());
-  const [workingDays, setWorkingDays] = useState(getDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear()));
+  const [workingDays, setWorkingDays] = useState(getWorkingDaysInMonth(new Date().getMonth() + 1, new Date().getFullYear()));
 
   // Automatically update workingDays when processMonth or processYear changes
   useEffect(() => {
     const m = parseInt(processMonth, 10);
     const y = parseInt(processYear, 10);
     if (m && y) {
-      setWorkingDays(getDaysInMonth(m, y));
+      setWorkingDays(getWorkingDaysInMonth(m, y));
     }
   }, [processMonth, processYear]);
 
@@ -415,12 +429,11 @@ export default function Payroll() {
             const empName = (log.employeeName || log.name || '').toLowerCase().trim();
             const status = (log.status || '').toUpperCase();
             
-            // Count any check-in entry or present status as a valid attendance day
-            const hasCheckIn = log.checkIn && log.checkIn !== null && log.checkIn !== '-' && log.checkIn !== '--:--';
-            const isPresent = status === 'PRESENT' || status === 'CHECKED_IN' || status === 'WFH' || hasCheckIn;
+            // Strictly count only explicit PRESENT, WFH (1.0 day) or HALF_DAY (0.5 day)
+            const isFullPresent = status === 'PRESENT' || status === 'WFH';
             const isHalfDay = status === 'HALF_DAY';
             
-            if (isPresent || isHalfDay) {
+            if (isFullPresent || isHalfDay) {
               const increment = isHalfDay ? 0.5 : 1;
               if (empId) attendanceCounts[empId] = (attendanceCounts[empId] || 0) + increment;
               if (empCode) attendanceCounts[empCode] = (attendanceCounts[empCode] || 0) + increment;
@@ -570,7 +583,7 @@ export default function Payroll() {
             const quarterlyBonusPayout = isQuarterlyPayoutMonth ? (perfIncentiveMonthly * 3) : 0;
             const monthlyPerfHold = isQuarterlyPayoutMonth ? 0 : perfIncentiveMonthly;
 
-            const totalWorking = new Date(parseInt(yearFilter, 10), parseInt(monthFilter, 10), 0).getDate() || 30;
+            const totalWorking = getWorkingDaysInMonth(monthFilter, yearFilter);
             const realLwp = Math.max(0, totalWorking - realPresent);
 
             const dailyGross = grossBase / totalWorking;
