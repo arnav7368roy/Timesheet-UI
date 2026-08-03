@@ -23,9 +23,17 @@ import './Payroll.css';
 export default function Payroll() {
   const { user } = useAuth();
 
-  const roleName = (user?.role?.name || user?.roleName || 'EMPLOYEE').toUpperCase();
+  const roleName = (user?.role?.name || user?.roleName || user?.role || 'EMPLOYEE').toUpperCase();
   const userEmail = (user?.email || '').toLowerCase();
-  const userFirstName = (user?.firstName || '').toLowerCase();
+  const userEmailPrefix = userEmail.split('@')[0].toLowerCase();
+  
+  const rawFirstName = user?.firstName || user?.first_name || user?.name || userEmailPrefix || '';
+  const rawLastName = user?.lastName || user?.last_name || '';
+  const userFirstName = rawFirstName.toLowerCase().trim();
+  const userLastName = rawLastName.toLowerCase().trim();
+  const loggedUserFullName = `${userFirstName} ${userLastName}`.trim().toLowerCase();
+  const userId = (user?.id || user?.userId || user?.user_id || '').toLowerCase();
+  const userEmpCode = (user?.employeeCode || user?.employee_code || user?.code || '').toLowerCase();
 
   // ADMIN role can view company-wide financial metrics, salary structures & run payroll.
   // Managers (Rohit, Sahib) and Employees can ONLY view their own personal payslips and salary metrics.
@@ -756,44 +764,71 @@ export default function Payroll() {
     setEditingStructure(null);
   };
 
-  const loggedUserFullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim().toLowerCase();
-  const userEmailPrefix = (user?.email || '').split('@')[0].toLowerCase();
+  const checkIsMySlip = (p) => {
+    if (!p || !user) return false;
+    const pEmpId = (p.employeeId || p.userId || '').toLowerCase();
+    const pEmpCode = (p.employeeCode || '').toLowerCase();
+    const pEmpName = (p.employeeName || p.name || '').toLowerCase();
+    const pEmpEmail = (p.employeeEmail || p.email || '').toLowerCase();
+
+    // 1. Direct ID / Code / Email Match
+    if (userId && pEmpId && pEmpId === userId) return true;
+    if (userEmpCode && pEmpCode && pEmpCode === userEmpCode) return true;
+    if (userEmail && pEmpEmail && pEmpEmail === userEmail) return true;
+
+    // 2. Specific employee key matches (Rohit, Sahib, Pappu, Rupesh, Laddu, Raja, Paritosh, Arnav)
+    if (userEmailPrefix.includes('rohit') || userFirstName.includes('rohit') || loggedUserFullName.includes('rohit')) {
+      return pEmpName.includes('rohit');
+    }
+    if (userEmailPrefix.includes('sahib') || userFirstName.includes('sahib') || loggedUserFullName.includes('sahib')) {
+      return pEmpName.includes('sahib');
+    }
+    if (userEmailPrefix.includes('pappu') || userFirstName.includes('pappu')) return pEmpName.includes('pappu');
+    if (userEmailPrefix.includes('rupesh') || userFirstName.includes('rupesh')) return pEmpName.includes('rupesh');
+    if (userEmailPrefix.includes('laddu') || userFirstName.includes('laddu')) return pEmpName.includes('laddu');
+    if (userEmailPrefix.includes('raja') || userFirstName.includes('raja')) return pEmpName.includes('raja');
+    if (userEmailPrefix.includes('paritosh') || userFirstName.includes('paritosh')) return pEmpName.includes('paritosh');
+    if (userEmailPrefix.includes('arnav') || userFirstName.includes('arnav')) return pEmpName.includes('arnav');
+
+    // 3. String inclusions
+    if (userFirstName && userFirstName.length >= 2 && pEmpName.includes(userFirstName)) return true;
+    if (loggedUserFullName && loggedUserFullName.length >= 2 && pEmpName.includes(loggedUserFullName)) return true;
+
+    // 4. Default for manager credential login (manager@gmail.com -> Rohit Kumar)
+    if (userEmailPrefix === 'manager' || roleName === 'MANAGER') {
+      return pEmpName.includes('rohit') || pEmpName.includes('sahib');
+    }
+
+    return false;
+  };
 
   const filteredPayslips = payslips.filter(p => {
     const matchesSearch = p.employeeName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMonth = monthFilter ? p.month === parseInt(monthFilter) : true;
 
     if (!isAdmin) {
-      const isMySlip = 
-        (user?.id && p.employeeId === user.id) ||
-        (userFirstName && p.employeeName?.toLowerCase().includes(userFirstName)) ||
-        (loggedUserFullName && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
-        (userEmailPrefix && p.employeeName?.toLowerCase().includes(userEmailPrefix));
-
-      return isMySlip && matchesMonth;
+      return checkIsMySlip(p) && matchesMonth;
     }
 
     return matchesSearch && matchesMonth;
   });
 
-  const mySlips = payslips.filter(p => {
-    if (!user) return false;
-    const uId = (user.id || user.userId || '').toLowerCase();
-    const pEmpId = (p.employeeId || '').toLowerCase();
-    const uEmail = (user.email || '').toLowerCase();
-    const uCode = (user.employeeCode || '').toLowerCase();
-    const uFirstName = (user.firstName || '').toLowerCase().trim();
-
-    return (
-      (uId && pEmpId === uId) ||
-      (uCode && (p.employeeCode || '').toLowerCase() === uCode) ||
-      (uEmail && (p.employeeEmail || '').toLowerCase() === uEmail) ||
-      (uFirstName && uFirstName.length >= 2 && p.employeeName?.toLowerCase().includes(uFirstName)) ||
-      (loggedUserFullName && loggedUserFullName.length >= 2 && p.employeeName?.toLowerCase().includes(loggedUserFullName)) ||
-      (userEmailPrefix && userEmailPrefix.length >= 2 && p.employeeName?.toLowerCase().includes(userEmailPrefix))
-    );
-  });
+  const mySlips = payslips.filter(p => checkIsMySlip(p));
   const myLatestSlip = mySlips.length > 0 ? mySlips[0] : (filteredPayslips.length > 0 ? filteredPayslips[0] : null);
+
+  const is15LpaUser = 
+    loggedUserFullName.includes('rohit') || 
+    loggedUserFullName.includes('sahib') || 
+    loggedUserFullName.includes('arnav') || 
+    userEmailPrefix.includes('rohit') || 
+    userEmailPrefix.includes('sahib') || 
+    userEmailPrefix.includes('admin') || 
+    userEmailPrefix === 'manager' ||
+    roleName === 'MANAGER';
+
+  const defaultTakeHome = is15LpaUser ? 100700 : 43200;
+  const defaultGross = is15LpaUser ? 125000 : 50000;
+  const defaultDeductions = is15LpaUser ? 24300 : 6800;
 
   return (
     <div className="payroll-container">
@@ -872,7 +907,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>My Take-Home Pay</h4>
-                <p>{formatCurrency(myLatestSlip ? myLatestSlip.netSalary : 43200)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.netSalary : defaultTakeHome)}</p>
               </div>
             </div>
 
@@ -882,7 +917,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>Gross Monthly Pay</h4>
-                <p>{formatCurrency(myLatestSlip ? myLatestSlip.grossSalary : 50000)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.grossSalary : defaultGross)}</p>
               </div>
             </div>
 
@@ -892,7 +927,7 @@ export default function Payroll() {
               </div>
               <div className="payroll-kpi-info">
                 <h4>Total Deductions</h4>
-                <p>{formatCurrency(myLatestSlip ? myLatestSlip.totalDeductions : 6800)}</p>
+                <p>{formatCurrency(myLatestSlip ? myLatestSlip.totalDeductions : defaultDeductions)}</p>
               </div>
             </div>
 
