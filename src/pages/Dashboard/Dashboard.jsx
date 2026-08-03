@@ -284,7 +284,7 @@ export default function Dashboard() {
   const wfhPercent = stats.totalUsers > 0 ? Math.round((stats.employeeStatuses.wfh / stats.totalUsers) * 100) : 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', padding: '0 35px 35px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
       
       {/* 1. Welcome Banner */}
       <div style={{
@@ -415,7 +415,7 @@ export default function Dashboard() {
       {/* 3. Row 3: Attendance Gauge & Employee Status */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '24px',
         width: '100%'
       }}>
@@ -607,7 +607,7 @@ export default function Dashboard() {
       {/* 4. Departments & Recent Activities */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         gap: '24px',
         width: '100%'
       }}>

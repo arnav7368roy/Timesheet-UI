@@ -327,7 +327,7 @@ export default function Calendar() {
 
       {/* TAB 1: INTERACTIVE CALENDAR GRID */}
       {activeTab === 'calendar' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '24px', width: '100%' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', width: '100%' }}>
           <div className="table-card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

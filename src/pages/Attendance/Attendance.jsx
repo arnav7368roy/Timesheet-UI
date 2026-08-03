@@ -1306,18 +1306,22 @@ export default function Attendance() {
           justify-content: space-between;
           align-items: center;
           background: var(--card-bg);
-          padding: 10px 30px;
+          padding: 12px 20px;
           border-bottom: 1px solid var(--border);
           box-shadow: var(--shadow-sm);
+          flex-wrap: wrap;
+          gap: 12px;
         }
         .zoho-tabs {
           display: flex;
           gap: 5px;
+          flex-wrap: wrap;
+          overflow-x: auto;
         }
         .zoho-tab {
-          padding: 12px 20px;
+          padding: 10px 16px;
           font-weight: 600;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           color: var(--text-muted);
           border-bottom: 3px solid transparent;
           cursor: pointer;
@@ -1326,6 +1330,7 @@ export default function Attendance() {
           align-items: center;
           gap: 8px;
           border-radius: 8px 8px 0 0;
+          white-space: nowrap;
         }
         .zoho-tab:hover {
           color: var(--primary);
@@ -1350,6 +1355,7 @@ export default function Attendance() {
           font-size: 0.85rem;
           font-weight: 500;
           color: var(--text);
+          flex-wrap: wrap;
         }
         .role-simulator-select {
           border: 1px solid var(--border);
@@ -1367,7 +1373,7 @@ export default function Attendance() {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
           gap: 15px;
-          padding: 20px 30px;
+          padding: 16px 0;
         }
         .metric-mini-card {
           background: var(--card-bg);

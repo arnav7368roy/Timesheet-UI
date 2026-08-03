@@ -556,7 +556,7 @@ export default function Leave() {
           flexWrap: 'wrap',
           gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text)' }}>
               Select User to View Available Balances:
             </span>

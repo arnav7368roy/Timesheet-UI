@@ -161,7 +161,7 @@ export default function Settings() {
       {/* 2-Column Main Settings Grid */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
         gap: '24px',
         width: '100%' 
       }}>

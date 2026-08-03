@@ -225,7 +225,7 @@ export default function Reports() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%', padding: '0 35px 35px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', width: '100%' }}>
       
       {/* Top Navigation Bar */}
       <div style={{
