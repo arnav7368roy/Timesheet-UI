@@ -50,11 +50,15 @@ const minutesToTimeString = (mins) => {
   return `${hStr}:${mStr} ${ampm}`;
 };
 
-// Helper: Calculate difference in hours between two time strings
+// Helper: Calculate difference in hours between two time strings (uses current time if endStr is missing/pending)
 const calculateHoursDiff = (startStr, endStr) => {
   const startMins = parseTimeToMinutes(startStr);
-  const endMins = parseTimeToMinutes(endStr);
-  if (startMins === null || endMins === null) return 0;
+  if (startMins === null) return 0;
+  let endMins = parseTimeToMinutes(endStr);
+  if (endMins === null) {
+    const now = new Date();
+    endMins = now.getHours() * 60 + now.getMinutes();
+  }
   let diff = endMins - startMins;
   if (diff < 0) diff += 24 * 60; // Handle overnight shifts
   return parseFloat((diff / 60).toFixed(2));

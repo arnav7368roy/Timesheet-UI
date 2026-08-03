@@ -437,30 +437,53 @@ export default function Payroll() {
         const attRes = await apiRequest(`/attendance?limit=500&month=${monthFilter}&year=${yearFilter}`);
         const attendanceCounts = {};
         
+        // Merge local storage simulated logs
+        let localLogs = [];
+        try {
+          const s1 = localStorage.getItem('sim_attendance_logs_v2');
+          const s2 = localStorage.getItem('sim_attendance_logs');
+          if (s1) localLogs = localLogs.concat(JSON.parse(s1));
+          if (s2) localLogs = localLogs.concat(JSON.parse(s2));
+        } catch (e) {}
+
+        const allLogs = [];
         if (attRes.ok && attRes.data && attRes.data.status && Array.isArray(attRes.data.data)) {
-          attRes.data.data.forEach(log => {
-            if (!log) return;
-            const empId = (log.employeeId || log.userId || '').toLowerCase().trim();
-            const empCode = (log.employeeCode || '').toLowerCase().trim();
-            const empName = (log.employeeName || log.name || '').toLowerCase().trim();
-            const status = (log.status || '').toUpperCase();
-            
-            // Strictly count only explicit PRESENT, WFH (1.0 day) or HALF_DAY (0.5 day) status entries
-            const isFullPresent = status === 'PRESENT' || status === 'WFH';
-            const isHalfDay = status === 'HALF_DAY';
-            
-            if (isFullPresent || isHalfDay) {
-              const increment = isHalfDay ? 0.5 : 1;
-              if (empId) attendanceCounts[empId] = (attendanceCounts[empId] || 0) + increment;
-              if (empCode) attendanceCounts[empCode] = (attendanceCounts[empCode] || 0) + increment;
-              if (empName) attendanceCounts[empName] = (attendanceCounts[empName] || 0) + increment;
-              if (empId.length >= 8) {
-                const shortId = empId.substring(0, 8);
-                attendanceCounts[shortId] = (attendanceCounts[shortId] || 0) + increment;
-              }
-            }
-          });
+          allLogs.push(...attRes.data.data);
         }
+        localLogs.forEach(l => {
+          if (l && l.date) {
+            const mMatch = l.date.includes(`-0${monthFilter}-`) || l.date.includes(`-${monthFilter}-`);
+            if (mMatch) allLogs.push(l);
+          }
+        });
+
+        allLogs.forEach(log => {
+          if (!log) return;
+          const empId = (log.employeeId || log.userId || '').toLowerCase().trim();
+          const empCode = (log.employeeCode || '').toLowerCase().trim();
+          const empName = (log.employeeName || log.name || '').toLowerCase().trim();
+          const status = (log.status || '').toUpperCase();
+          const hasCheckIn = !!(log.checkIn && log.checkIn !== '-' && log.checkIn !== '--:--');
+
+          // Count any record that indicates presence (PRESENT, LATE, WFH, ON_TIME, HALF_DAY, APPROVED, CHECKED_IN, COMPLETED, or has checkIn)
+          const isNotAbsent = status !== 'ABSENT' && status !== 'LEAVE' && status !== 'WEEKLY_OFF' && status !== 'HOLIDAY';
+          const isPresent = isNotAbsent || hasCheckIn || status === 'PRESENT' || status === 'LATE' || status === 'HALF_DAY' || status === 'WFH' || status === 'APPROVED' || status === 'CHECKED_IN';
+          
+          if (isPresent) {
+            const increment = (status === 'HALF_DAY' || status === 'HALF DAY') ? 0.5 : 1;
+            if (empId) attendanceCounts[empId] = (attendanceCounts[empId] || 0) + increment;
+            if (empCode) attendanceCounts[empCode] = (attendanceCounts[empCode] || 0) + increment;
+            if (empName) attendanceCounts[empName] = (attendanceCounts[empName] || 0) + increment;
+            const fName = empName.split(' ')[0];
+            if (fName && fName.length > 2) {
+              attendanceCounts[fName] = (attendanceCounts[fName] || 0) + increment;
+            }
+            if (empId.length >= 8) {
+              const shortId = empId.substring(0, 8);
+              attendanceCounts[shortId] = (attendanceCounts[shortId] || 0) + increment;
+            }
+          }
+        });
 
         // 3. Query live backend Salary Structures API endpoint
         const structRes = await apiRequest('/payroll/salary-structures');
