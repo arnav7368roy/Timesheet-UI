@@ -499,6 +499,38 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {isCheckedIn && (
+                <div style={{
+                  fontSize: '0.85rem',
+                  color: '#10b981',
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  fontWeight: '700',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span>⏱️ Active Duration:</span>
+                  <span>
+                    {(() => {
+                      if (!checkInTime || checkInTime === '--:--') return '0h 0m';
+                      const match = checkInTime.match(/^(\d+):(\d+)\s*(AM|PM)$/i);
+                      if (!match) return '0h 0m';
+                      let hr = parseInt(match[1], 10);
+                      const min = parseInt(match[2], 10);
+                      if (match[3].toUpperCase() === 'PM' && hr !== 12) hr += 12;
+                      if (match[3].toUpperCase() === 'AM' && hr === 12) hr = 0;
+                      const checkInMins = hr * 60 + min;
+                      const currentMins = time.getHours() * 60 + time.getMinutes();
+                      let diff = currentMins - checkInMins;
+                      if (diff < 0) diff += 24 * 60;
+                      return `${Math.floor(diff / 60)}h ${diff % 60}m elapsed`;
+                    })()}
+                  </span>
+                </div>
+              )}
+
               {isCheckedOut ? (
                 <div style={{
                   background: 'rgba(16, 185, 129, 0.12)',
