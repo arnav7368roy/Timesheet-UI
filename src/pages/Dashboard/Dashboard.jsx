@@ -295,21 +295,21 @@ export default function Dashboard() {
               Welcome Back, {user?.firstName || 'Adrian'} 👋
             </h2>
             <p style={{ margin: '0', fontSize: '0.95rem', color: '#94a3b8', fontWeight: '500' }}>
-              You have <span style={{ color: '#fbbf24', fontWeight: '700' }}>{stats.totalTasks - stats.completedTasks} pending tasks</span> & <span style={{ color: '#10b981', fontWeight: '700' }}>{stats.totalProjects} active projects</span>.
+              HRMS Dashboard & System Overview — <span style={{ color: '#10b981', fontWeight: '700' }}>{stats.activeUsers} Active Employees</span> & <span style={{ color: '#fbbf24', fontWeight: '700' }}>{stats.presentToday} Present Today</span>.
             </p>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', width: '100%', maxWidth: '100%', zIndex: 1 }}>
           <button 
-            onClick={() => navigate('/tasks')}
+            onClick={() => navigate('/employees')}
             className="primary-btn"
             style={{ padding: '12px 20px', whiteSpace: 'nowrap', flex: '1 1 140px', justifyContent: 'center' }}
           >
-            View Tasks
+            View Employees
           </button>
           <button 
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate('/attendance')}
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               color: '#ffffff',
@@ -328,7 +328,7 @@ export default function Dashboard() {
               justifyContent: 'center'
             }}
           >
-            View Projects
+            Attendance Logs
           </button>
         </div>
       </div>
@@ -370,22 +370,22 @@ export default function Dashboard() {
           onClick={() => navigate('/attendance')}
         />
         <MetricCard 
-          title="Total Projects" 
-          value={stats.totalProjects}
-          subtext="View Projects"
-          icon={Folder}
+          title="Total Employees" 
+          value={stats.totalUsers}
+          subtext="View Directory"
+          icon={Users}
           gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
           color={{ bg: 'rgba(16, 185, 129, 0.12)', text: '#10b981' }}
-          onClick={() => navigate('/projects')}
+          onClick={() => navigate('/employees')}
         />
         <MetricCard 
-          title="Total Tasks" 
-          value={`${stats.completedTasks}/${stats.totalTasks}`}
-          subtext="View Board"
-          icon={ListTodo}
+          title="Active Employees" 
+          value={`${stats.activeUsers}/${stats.totalUsers}`}
+          subtext="Roster Details"
+          icon={UserCheck}
           gradient="linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)"
           color={{ bg: 'rgba(139, 92, 246, 0.12)', text: '#8b5cf6' }}
-          onClick={() => navigate('/tasks')}
+          onClick={() => navigate('/employees')}
         />
         <MetricCard 
           title="Departments" 
