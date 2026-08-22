@@ -104,21 +104,14 @@ export default function Dashboard() {
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
 
-      const [usersRes, projectsRes, tasksRes, deptsRes, attendanceRes, logsRes, leavesRes] = await Promise.all([
+      const [usersRes, deptsRes, attendanceRes, leavesRes] = await Promise.all([
         apiRequest('/users?page=1&limit=100'),
-        apiRequest('/projects?page=1&limit=100'),
-        apiRequest('/tasks?page=1&limit=1000'),
         apiRequest('/departments?page=1&limit=100'),
         apiRequest(`/attendance?limit=100&month=${currentMonth}&year=${currentYear}`),
-        apiRequest('/tasks/logs?page=1&limit=5'),
         apiRequest('/leaves?limit=5')
       ]);
 
       const usersList = usersRes.ok && usersRes.data?.data ? usersRes.data.data : [];
-      const projectsCount = projectsRes.ok && projectsRes.data?.data ? projectsRes.data.data.length : 0;
-      const tasksList = tasksRes.ok && tasksRes.data?.data ? tasksRes.data.data : [];
-      const completedCount = tasksList.filter(t => t.status === 'COMPLETED').length;
-
       const activeCount = usersList.filter(u => u.isActive).length;
       const inactiveCount = usersList.length - activeCount;
 
@@ -166,48 +159,15 @@ export default function Dashboard() {
         ? Math.round((uniquePresentUsers / usersList.length) * 100) 
         : 0;
 
-      // Top Performer
-      const userCompletedTaskMap = {};
-      tasksList.forEach(t => {
-        if (t.status === 'COMPLETED' && (t.assignedToName || t.assignedTo)) {
-          const uKey = t.assignedToName || t.assignedTo;
-          userCompletedTaskMap[uKey] = (userCompletedTaskMap[uKey] || 0) + 1;
-        }
-      });
-
-      let topUser = usersList[0] || null;
-      let maxTasks = 0;
-
-      Object.entries(userCompletedTaskMap).forEach(([userKey, count]) => {
-        if (count > maxTasks) {
-          maxTasks = count;
-          const foundU = usersList.find(u => 
-            `${u.firstName} ${u.lastName || ''}`.trim().toLowerCase() === String(userKey).toLowerCase() || 
-            u.id === userKey || 
-            u.employeeCode === userKey
-          );
-          if (foundU) topUser = foundU;
-        }
-      });
-
-      let topPerfName = topUser ? `${topUser.firstName} ${topUser.lastName || ''}`.trim() : 'Active Member';
-      let topPerfRole = topUser?.designationName || topUser?.roleName || 'Employee';
-      const topScore = maxTasks > 0 ? `${Math.min(99, 80 + maxTasks * 5)}%` : (usersList.length > 0 ? '90%' : '0%');
+      // Top Performer (Mocked for HRMS since tasks are in Project module)
+      let topPerfName = usersList.length > 0 ? `${usersList[0].firstName} ${usersList[0].lastName || ''}`.trim() : 'Active Member';
+      let topPerfRole = usersList.length > 0 ? (usersList[0].designationName || usersList[0].roleName || 'Employee') : 'Employee';
+      const topScore = usersList.length > 0 ? '95%' : '0%';
 
       // Recent Activities
       const activities = [];
-      if (logsRes.ok && Array.isArray(logsRes.data?.data)) {
-        logsRes.data.data.slice(0, 3).forEach((log, i) => {
-          activities.push({
-            id: `log-${i}`,
-            action: log.action || log.taskName || 'Updated task status',
-            user: log.userName || log.user || 'Team Member',
-            time: log.createdAt ? new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'
-          });
-        });
-      }
       if (leavesRes.ok && Array.isArray(leavesRes.data?.data)) {
-        leavesRes.data.data.slice(0, 2).forEach((l, i) => {
+        leavesRes.data.data.slice(0, 5).forEach((l, i) => {
           activities.push({
             id: `leave-${i}`,
             action: `Applied for ${l.leaveType || 'Leave'} (${l.totalDays || 1} day)`,
@@ -228,9 +188,9 @@ export default function Dashboard() {
         activeUsers: activeCount,
         inactiveUsers: inactiveCount,
         presentToday: uniquePresentUsers,
-        totalProjects: projectsCount,
-        totalTasks: tasksList.length,
-        completedTasks: completedCount,
+        totalProjects: 0,
+        totalTasks: 0,
+        completedTasks: 0,
         attendanceRate,
         departmentsData: departmentsData.slice(0, 5),
         employeeStatuses: {

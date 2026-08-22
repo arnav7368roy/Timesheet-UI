@@ -8,11 +8,9 @@ import PublicRoute from '../components/Layout/PublicRoute';
 import Login from '../pages/Login/Login';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Employees from '../pages/Employees/Employees';
-import Projects from '../pages/Projects/Projects';
 import Timesheets from '../pages/Timesheets/Timesheets';
 import Attendance from '../pages/Attendance/Attendance';
 import Leave from '../pages/Leave/Leave';
-import Tasks from '../pages/Tasks/Tasks';
 import Calendar from '../pages/Calendar/Calendar';
 import Reports from '../pages/Reports/Reports';
 import Settings from '../pages/Settings/Settings';
@@ -51,14 +49,6 @@ export default function AppRoutes() {
         } 
       />
       <Route 
-        path="/projects" 
-        element={
-          <PrivateRoute>
-            <Layout><Projects /></Layout>
-          </PrivateRoute>
-        } 
-      />
-      <Route 
         path="/timesheets" 
         element={
           <PrivateRoute>
@@ -79,14 +69,6 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <Layout><Leave /></Layout>
-          </PrivateRoute>
-        } 
-      />
-      <Route 
-        path="/tasks" 
-        element={
-          <PrivateRoute>
-            <Layout><Tasks /></Layout>
           </PrivateRoute>
         } 
       />

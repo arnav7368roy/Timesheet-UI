@@ -26,7 +26,7 @@ export default function ApplyOnDutyModal({ isOpen, onClose, onSuccess }) {
 
     try {
       const token = localStorage.getItem('token');
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8003';
       const response = await fetch(`${apiBaseUrl}/api/v1/attendance/on-duty`, {
         method: 'POST',
         headers: {

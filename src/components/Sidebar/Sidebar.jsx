@@ -26,12 +26,9 @@ export default function Sidebar({ mobileOpen, closeMobile }) {
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/employees', label: 'Employees', icon: Users },
-    { path: '/projects', label: 'Projects', icon: FolderOpen },
-    { path: '/timesheets', label: 'Timesheets', icon: Clock },
     { path: '/attendance', label: 'Attendance', icon: CalendarCheck },
     { path: '/leave', label: 'Leave', icon: FileText },
     { path: '/payroll', label: 'Payroll', icon: CreditCard },
-    { path: '/tasks', label: 'Tasks', icon: CheckSquare },
     { path: '/calendar', label: 'Calendar', icon: Calendar },
     { path: '/reports', label: 'Reports', icon: BarChart3 },
     { path: '/settings', label: 'Settings', icon: Settings },
