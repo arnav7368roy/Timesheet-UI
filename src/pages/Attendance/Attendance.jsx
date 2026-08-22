@@ -499,15 +499,6 @@ export default function Attendance() {
       let targetDateStr = todayDateStr;
       let targetLogs = (liveLogs || []).filter(log => log && log.date === todayDateStr);
 
-      // Fallback: If no logs for today yet, pick the most recent date in liveLogs that has attendance check-ins
-      if (targetLogs.length === 0 && liveLogs && liveLogs.length > 0) {
-        const sortedDates = [...new Set(liveLogs.map(l => l.date).filter(Boolean))].sort().reverse();
-        if (sortedDates.length > 0) {
-          targetDateStr = sortedDates[0];
-          targetLogs = liveLogs.filter(log => log && log.date === targetDateStr);
-        }
-      }
-
       const present = targetLogs.filter(log => log && (
         log.status === 'Present' || 
         log.status === 'Checked In' || 

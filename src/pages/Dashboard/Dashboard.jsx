@@ -136,24 +136,15 @@ export default function Dashboard() {
         else ft++;
       });
 
-      // Attendance Rate & Present Count (Matching Attendance Dashboard logic)
+      // Attendance Rate & Present Count (Strictly today's live DB records)
       const attendanceList = attendanceRes.ok && attendanceRes.data?.data ? attendanceRes.data.data : [];
       const todayDateStr = now.toLocaleDateString('en-CA');
       
-      let targetLogs = attendanceList.filter(a => {
+      const targetLogs = attendanceList.filter(a => {
         const rawDate = a.attendanceDate || a.date;
         if (!rawDate) return false;
         return String(rawDate).split('T')[0] === todayDateStr;
       });
-
-      // Fallback to most recent date with attendance logs if no check-ins today yet (e.g. weekend or early morning)
-      if (targetLogs.length === 0 && attendanceList.length > 0) {
-        const sortedDates = [...new Set(attendanceList.map(a => String(a.attendanceDate || a.date || '').split('T')[0]).filter(Boolean))].sort().reverse();
-        if (sortedDates.length > 0) {
-          const latestDate = sortedDates[0];
-          targetLogs = attendanceList.filter(a => String(a.attendanceDate || a.date || '').split('T')[0] === latestDate);
-        }
-      }
 
       const todayPresents = targetLogs.filter(a => {
         const statusUpper = String(a.status || '').toUpperCase();
