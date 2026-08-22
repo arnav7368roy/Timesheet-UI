@@ -61,8 +61,8 @@ export default function Login() {
     setIsForgotSubmitting(true);
     setForgotError('');
     setForgotSuccess('');
-    try {
-      const url = `https://timesheet-2-e5cr.onrender.com/api/v1/auth/forgot-password`;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://timesheet-2-e5cr.onrender.com/api/v1';
+      const url = `${baseUrl}/auth/forgot-password`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

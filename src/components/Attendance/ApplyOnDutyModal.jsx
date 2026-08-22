@@ -25,8 +25,7 @@ export default function ApplyOnDutyModal({ isOpen, onClose, onSuccess }) {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8003';
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://timesheet-2-e5cr.onrender.com';
       const response = await fetch(`${apiBaseUrl}/api/v1/attendance/on-duty`, {
         method: 'POST',
         headers: {
