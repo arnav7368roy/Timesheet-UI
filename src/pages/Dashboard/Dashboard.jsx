@@ -136,24 +136,33 @@ export default function Dashboard() {
         else ft++;
       });
 
-      // Attendance Rate
+      // Attendance Rate & Present Count (Matching Attendance Dashboard logic)
       const attendanceList = attendanceRes.ok && attendanceRes.data?.data ? attendanceRes.data.data : [];
-      const todayYear = now.getFullYear();
-      const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
-      const todayDay = String(now.getDate()).padStart(2, '0');
-      const todayDateStr = `${todayYear}-${todayMonth}-${todayDay}`;
-
-      const todayPresents = attendanceList.filter(a => {
+      const todayDateStr = now.toLocaleDateString('en-CA');
+      
+      let targetLogs = attendanceList.filter(a => {
         const rawDate = a.attendanceDate || a.date;
         if (!rawDate) return false;
-        const dStr = String(rawDate).split('T')[0];
-        const statusUpper = String(a.status || '').toUpperCase();
-        const hasCheckedIn = !!a.checkIn;
-        const isPresentStatus = statusUpper === 'PRESENT' || statusUpper === 'LATE' || statusUpper === 'HALF_DAY';
-        return dStr === todayDateStr && (isPresentStatus || hasCheckedIn);
+        return String(rawDate).split('T')[0] === todayDateStr;
       });
 
-      const uniquePresentUsers = new Set(todayPresents.map(a => a.employeeId || a.employeeCode || a.userId)).size;
+      // Fallback to most recent date with attendance logs if no check-ins today yet (e.g. weekend or early morning)
+      if (targetLogs.length === 0 && attendanceList.length > 0) {
+        const sortedDates = [...new Set(attendanceList.map(a => String(a.attendanceDate || a.date || '').split('T')[0]).filter(Boolean))].sort().reverse();
+        if (sortedDates.length > 0) {
+          const latestDate = sortedDates[0];
+          targetLogs = attendanceList.filter(a => String(a.attendanceDate || a.date || '').split('T')[0] === latestDate);
+        }
+      }
+
+      const todayPresents = targetLogs.filter(a => {
+        const statusUpper = String(a.status || '').toUpperCase();
+        const hasCheckedIn = !!a.checkIn && a.checkIn !== '-' && a.checkIn !== '--:--';
+        const isPresentStatus = statusUpper === 'PRESENT' || statusUpper === 'LATE' || statusUpper === 'HALF_DAY' || statusUpper === 'CHECKED_IN' || statusUpper === 'WFH';
+        return isPresentStatus || hasCheckedIn;
+      });
+
+      const uniquePresentUsers = new Set(todayPresents.map(a => a.employeeId || a.employeeCode || a.userId || a.employeeName)).size;
 
       const attendanceRate = usersList.length > 0 
         ? Math.round((uniquePresentUsers / usersList.length) * 100) 
