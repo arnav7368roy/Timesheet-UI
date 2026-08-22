@@ -60,7 +60,7 @@ export default function Login() {
     }
     setIsForgotSubmitting(true);
     setForgotError('');
-    setForgotSuccess('');
+    try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://timesheet-2-e5cr.onrender.com/api/v1';
       const url = `${baseUrl}/auth/forgot-password`;
       const response = await fetch(url, {
